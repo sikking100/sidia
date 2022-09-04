@@ -1,13 +1,31 @@
 import React from 'react';
-import { Link } from '@inertiajs/inertia-react'
+import { Link, InertiaLink } from '@inertiajs/inertia-react'
 import { Inertia } from '@inertiajs/inertia'
 import route from 'ziggy-js'
+import axios from 'axios'
+
 
 interface Props {
   header: React.ReactNode
 }
 
 export default function Authenticated({ children, header }: React.PropsWithChildren<Props>) {
+  const [countData, setCountData] = React.useState<number>()
+  React.useEffect(() => {
+    updateState()
+    return () => {
+      setCountData(0)
+    }
+  }, [])
+
+  const updateState = () => {
+    setInterval(() => {
+      axios.get(route('count')).then(res => {
+        const maps = res.data.count
+        setCountData(maps)
+      })
+    }, 30000)
+  }
 
   function logout() {
     Inertia.post(route('logout'))
@@ -28,7 +46,12 @@ export default function Authenticated({ children, header }: React.PropsWithChild
               <Link
                 className={'px-6'}
                 href={route('application.index')}>
-                Pemohon
+                <div className={'inline-flex items-center'}>
+                  Pemohon
+                  {countData && countData > 0 ? <span className="inline-flex justify-center items-center ml-2 w-4 h-4 text-xs font-semibold text-white bg-red-500 rounded-full">
+                    {countData}
+                  </span> : <div></div>}
+                </div>
               </Link>
               <Link
                 className={'px-6'}
@@ -38,12 +61,13 @@ export default function Authenticated({ children, header }: React.PropsWithChild
             </div>
             <div className="flex">
               <div className="shrink-0 flex items-center">
-                <Link
+                <InertiaLink
+                  method='post'
                   as={'button'}
-                  onClick={logout}
-                  href="#">
+                  href={route('logout')}
+                >
                   Logout
-                </Link>
+                </InertiaLink>
               </div>
             </div>
           </div>

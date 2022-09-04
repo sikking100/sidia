@@ -13,7 +13,7 @@ export default function Welcome(props: any) {
       <div className={'flex flex-row flex-wrap gap-11'}>
         <div className={'shadow w-[18rem] bg-gray-200'}>
           <img
-            src={'https://layanan-online.dukcapil.metrokota.go.id/asset/src/assets/images/big/aset_pelayanan/KTP.jpg'}
+            src={'../../assets/ktp.png'}
             className={'rounded-t-sm'}
           />
           <div
@@ -28,27 +28,27 @@ export default function Welcome(props: any) {
                 align={'left'}
               >
                 <Dropdown.Link
-                  href={route('pemula')}
+                  href={route('form', 'KTP-Pemula')}
                 >
                   KTP Pemula
                 </Dropdown.Link>
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'KTP-Rusak')}
                 >
                   KTP Rusak
                 </Dropdown.Link>
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'KTP-Hilang')}
                 >
                   KTP Hilang
                 </Dropdown.Link>
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'KTP-Perubahan')}
                 >
                   KTP Perubahan Data
                 </Dropdown.Link>
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'KTP-Disabilitas')}
                 >
                   Perekaman Disabilitas
                 </Dropdown.Link>
@@ -59,7 +59,7 @@ export default function Welcome(props: any) {
 
         <div className={'shadow w-[18rem] bg-gray-200'}>
           <img
-            src={'https://layanan-online.dukcapil.metrokota.go.id/asset/src/assets/images/big/aset_pelayanan/KK.jpg'}
+            src={'../../assets/kk.png'}
             className={'rounded-t-sm'}
           />
           <div
@@ -74,22 +74,22 @@ export default function Welcome(props: any) {
                 align={'left'}
               >
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'KK-Baru')}
                 >
                   KK Baru
                 </Dropdown.Link>
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'KK-Rusak')}
                 >
                   KK Rusak
                 </Dropdown.Link>
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'KK-Hilang')}
                 >
                   KK Hilang
                 </Dropdown.Link>
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'KK-Perubahan-Data')}
                 >
                   KK Perubahan Data
                 </Dropdown.Link>
@@ -99,7 +99,7 @@ export default function Welcome(props: any) {
         </div>
         <div className={'shadow w-[18rem] bg-gray-200'}>
           <img
-            src={'https://layanan-online.dukcapil.metrokota.go.id/asset/src/assets/images/big/aset_pelayanan/KIA.jpg'}
+            src={'../../assets/kia.png'}
             className={'rounded-t-sm'}
           />
           <div
@@ -114,22 +114,22 @@ export default function Welcome(props: any) {
                 align={'left'}
               >
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'KIA-Baru')}
                 >
                   KIA Baru
                 </Dropdown.Link>
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'KIA-Rusak')}
                 >
                   KIA Rusak
                 </Dropdown.Link>
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'KIA-Hilang')}
                 >
                   KIA Hilang
                 </Dropdown.Link>
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'KIA-Perubahan-Data')}
                 >
                   KIA Perubahan Data
                 </Dropdown.Link>
@@ -139,7 +139,7 @@ export default function Welcome(props: any) {
         </div>
         <div className={'shadow w-[18rem] bg-gray-200'}>
           <img
-            src={'https://layanan-online.dukcapil.metrokota.go.id/asset/src/assets/images/big/aset_pelayanan/SKPWNI.jpg'}
+            src={'../../assets/skpwni.png'}
             className={'rounded-t-sm'}
           />
           <div
@@ -154,7 +154,7 @@ export default function Welcome(props: any) {
                 align={'left'}
               >
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'SKPWNI-Pindah-Keluar')}
                 >
                   Pindah Keluar
                 </Dropdown.Link>
@@ -164,7 +164,7 @@ export default function Welcome(props: any) {
         </div>
         <div className={'shadow w-[18rem] bg-gray-200'}>
           <img
-            src={'https://layanan-online.dukcapil.metrokota.go.id/asset/src/assets/images/big/aset_pelayanan/AKTA_KELAHIRAN.jpg'}
+            src={'../../assets/akta.png'}
             className={'rounded-t-sm'}
           />
           <div
@@ -179,22 +179,22 @@ export default function Welcome(props: any) {
                 align={'left'}
               >
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'Akta-Kelahiran-Baru')}
                 >
                   Akta Lahir Baru
                 </Dropdown.Link>
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'Akta-Kelahiran-Rusak')}
                 >
                   Akta Lahir Rusak
                 </Dropdown.Link>
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'Akta-Kelahiran-Hilang')}
                 >
                   Akta Lahir Hilang
                 </Dropdown.Link>
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'Akta-Kelahiran-Perubahan')}
                 >
                   Akta Lahir Perubahan Data
                 </Dropdown.Link>
@@ -204,7 +204,7 @@ export default function Welcome(props: any) {
         </div>
         <div className={'shadow w-[18rem] bg-gray-200'}>
           <img
-            src={'https://layanan-online.dukcapil.metrokota.go.id/asset/src/assets/images/big/aset_pelayanan/AKTA_PERKAWINAN.jpg'}
+            src={'../../assets/perkawinan.png'}
             className={'rounded-t-sm'}
           />
           <div
@@ -213,7 +213,7 @@ export default function Welcome(props: any) {
             <span className={'block pb-4'}>Perkawinan</span>
             <Link
               className={'rounded bg-kemenag text-white py-2 px-4'}
-              href={'/'}
+              href={route('form', 'Perkawinan')}
             >
               Layanan
             </Link>
@@ -221,7 +221,7 @@ export default function Welcome(props: any) {
         </div>
         <div className={'shadow w-[18rem] bg-gray-200'}>
           <img
-            src={'https://layanan-online.dukcapil.metrokota.go.id/asset/src/assets/images/big/aset_pelayanan/AKTA_PERCERAIAN.jpg'}
+            src={'../../assets/cerai.png'}
             className={'rounded-t-sm'}
           />
           <div
@@ -230,7 +230,7 @@ export default function Welcome(props: any) {
             <span className={'block pb-4'}>Perceraian</span>
             <Link
               className={'rounded bg-kemenag text-white py-2 px-4'}
-              href={'/'}
+              href={route('form', 'Perceraian')}
             >
               Layanan
             </Link>
@@ -238,7 +238,7 @@ export default function Welcome(props: any) {
         </div>
         <div className={'shadow w-[18rem] bg-gray-200'}>
           <img
-            src={'https://layanan-online.dukcapil.metrokota.go.id/asset/src/assets/images/big/aset_pelayanan/AKTA_KEMATIAN.jpg'}
+            src={'../../assets/kematian.png'}
             className={'rounded-t-sm'}
           />
           <div
@@ -247,7 +247,7 @@ export default function Welcome(props: any) {
             <span className={'block pb-4'}>Kematian</span>
             <Link
               className={'rounded bg-kemenag text-white py-2 px-4'}
-              href={'/'}
+              href={route('form', 'Kematian')}
             >
               Layanan
             </Link>
@@ -255,13 +255,13 @@ export default function Welcome(props: any) {
         </div>
         <div className={'shadow w-[18rem] bg-gray-200'}>
           <img
-            src={'https://layanan-online.dukcapil.metrokota.go.id/asset/src/assets/images/big/pelayanan/piak_p.jpg'}
+            src={'../../assets/nikmasalah.png'}
             className={'rounded-t-sm'}
           />
           <div
             className={'p-6 w-full mx-auto w-full'}
           >
-            <span className={'block pb-2'}>Data NIK bermasalah (BPJS,BANK dll)</span>
+            <span className={'block pb-2'}>Data NIK bermasalah (BPJS, BANK, NPWP DLL)</span>
             <Dropdown>
               <Dropdown.Trigger>
                 <button className={'rounded bg-kemenag text-white py-2 px-4'}>Layanan</button>
@@ -270,7 +270,7 @@ export default function Welcome(props: any) {
                 align={'left'}
               >
                 <Dropdown.Link
-                  href={'/'}
+                  href={route('form', 'Pengaduan-Data-Kependudukan')}
                 >
                   Pengaduan Data Kependudukan (NIK)
                 </Dropdown.Link>

@@ -39,6 +39,9 @@ export default function Guest({ children, title = 'Selamat Datang' }: React.Prop
 
       </div>
       <div className={'w-full flex justify-between pb-6'}>
+        <img src={'../../assets/banner.png'} />
+      </div>
+      <div className={'w-full flex justify-between pb-6'}>
         <h5>{title}</h5>
         <p>{moment(Date.now()).format('dddd, DD MMMM yyyy')}</p>
       </div>

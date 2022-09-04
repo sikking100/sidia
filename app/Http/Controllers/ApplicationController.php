@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Requests\StoreApplicationRequest;
 use App\Http\Requests\UpdateApplicationRequest;
+use App\Http\Requests\UpdateStatusRequest;
+
 use App\Models\Application;
+use App\Models\Menu;
 use Inertia\Inertia;
 use App\Support\MyUploadFile;
 
@@ -59,7 +62,8 @@ class ApplicationController extends Controller
      */
     public function show(Application $application)
     {
-        return Inertia::render('Admin/Pemohon/Show', compact('application'));
+        $files = $application->files;
+        return Inertia::render('Admin/Pemohon/Show', compact('application', 'files'));
     }
 
     /**
@@ -70,12 +74,11 @@ class ApplicationController extends Controller
      */
     public function edit(Application $application)
     {
-$pdf = app('dompdf.wrapper');
-$pdf->getDomPDF()->set_option("enable_php",true);
-$pdf->loadView('report',compact('application'));
-return $pdf->stream('applicant.pdf');
-
-     return view('report', compact('application'));
+      $pdf = app('dompdf.wrapper');
+      $pdf->getDomPDF()->set_option("enable_php",true);
+      $pdf->loadView('report',compact('application'));
+      return $pdf->stream('applicant.pdf');
+     // return view('report', compact('application'));
     }
 
     /**
@@ -87,8 +90,10 @@ return $pdf->stream('applicant.pdf');
      */
     public function update(UpdateApplicationRequest $request, Application $application)
     {
-        //
+        dd($application);
     }
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -98,9 +103,30 @@ return $pdf->stream('applicant.pdf');
      */
     public function destroy(Application $application)
     {
-        $this->up->deleteFile('applicant',$application);
-        $this->up->deleteImage('applicant',$application);
+        $this->up->deleteKK($application->category,$application);
+        $this->up->deleteKTP($application->category,$application);
+        $this->up->deleteSurat($application->category,$application);
+        $this->up->deleteImages('applicant',$application);
         $application->delete();
         return redirect()->route('application.index');
     }
+
+    public function update_status(UpdateStatusRequest $request, $id)
+    {
+      $application = Application::where('id', $id)->first();
+      $application->status = $request->status;
+      $application->status_description = $request->status_description;
+      $application->save();
+      session()->flash('message', 'Sukses mengubah status');
+      return redirect()->route('application.index');
+    }
+
+    public function count()
+    {
+      $c = Application::all()->whereIn('status',['PENDING', 'DEFFICIENT', 'VERIFIED']);
+      return response()->json([
+        'count' => count($c)
+      ]);
+    }
+
 }

@@ -24,6 +24,8 @@ class StoreApplicationRequest extends FormRequest
     public function rules()
     {
         return [
+            'family_card_number' => ['min:16', 'required', 'regex:/^\S*$/u', 'numeric'],
+            'family_head_name' => 'required|string',
             'id_card_number' => ['min:16', 'required', 'regex:/^\S*$/u', 'numeric'],
             'name' => 'required|string',
             'phone' => ['min:12', 'required', 'regex:/^\S*$/u', 'numeric'],
@@ -33,6 +35,7 @@ class StoreApplicationRequest extends FormRequest
             'description' => 'nullable|string',
             'images' => 'required|image',
             'sex' => 'required',
+            'religion' => 'required',
         ];
     }
 }

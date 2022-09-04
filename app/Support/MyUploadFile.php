@@ -10,13 +10,21 @@ use File;
 class MyUploadFile
 {
 
-    public function uploadImages($request, $folder, $model)
-      {
-        $name = time().'.'.$request->images->extension();
-        $request->images->storeAs($folder, $name, 'public');
-        $model->images = $name;
-        return;
-      }
+  public function uploadImages($request, $folder, $model)
+  {
+    $name = time().'.'.$request->images->extension();
+    $request->images->storeAs($folder, $name, 'public');
+    $model->images = $name;
+    return;
+  }
+
+  public function deleteImages($folder,$model)
+  {
+    if (File::exists(public_path('storage/'.$folder.'/'.$model->images))) {
+      File::delete(public_path('storage/'.$folder.'/'.$model->images));
+    }
+    return;
+  }
 
   public function uploadKK($request, $folder, $model)
   {

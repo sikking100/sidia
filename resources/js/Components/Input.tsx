@@ -5,11 +5,14 @@ interface Props {
   type?: React.HTMLInputTypeAttribute | undefined
   name: string
   value?: string | number | readonly string[] | undefined
+  defaultValue?: string | number | readonly string[] | undefined
   className?: string
   autoComplete?: string | undefined
   required?: boolean
   isFocused?: boolean
   handleChange: React.ChangeEventHandler<HTMLInputElement>
+  handleSubmit?: React.FormEventHandler<HTMLInputElement>
+  handleLoad?: React.ReactEventHandler<HTMLInputElement>
 }
 
 export default function Input({
@@ -21,6 +24,10 @@ export default function Input({
   required,
   isFocused,
   handleChange,
+  handleSubmit,
+  handleLoad,
+  defaultValue,
+
 }: Props) {
   const input = useRef() as React.MutableRefObject<HTMLInputElement>;
 
@@ -43,7 +50,10 @@ export default function Input({
         ref={input}
         autoComplete={autoComplete}
         required={required}
-        onChange={(e) => handleChange(e)}
+        onChange={handleChange}
+        onSubmit={handleSubmit}
+        onLoad={handleLoad}
+        defaultValue={defaultValue}
       />
     </div>
   );

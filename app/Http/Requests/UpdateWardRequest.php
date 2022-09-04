@@ -13,7 +13,7 @@ class UpdateWardRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -24,7 +24,8 @@ class UpdateWardRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+          'name' => 'min:3',
+            'district_id' => 'required',
         ];
     }
 }

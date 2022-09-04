@@ -21,6 +21,8 @@ export default function PemohonIndex(props: Props) {
     list.push(
       <tr key={i}>
         <td className={'p-4 border border-slate-700'}><p className={'flex justify-center'}>{i + 1}</p></td>
+        <td className={'p-4 border border-slate-700'}><p className={'flex justify-center'}>{e.id}</p></td>
+
         <td className={'p-4 border border-slate-700'}>{e.name}</td>
         <td className={'p-4 border border-slate-700'}>{e.category}</td>
 
@@ -67,6 +69,7 @@ export default function PemohonIndex(props: Props) {
               <thead>
                 <tr>
                   <th className='p-4 border border-slate-600'>No</th>
+                  <th className='p-4 border border-slate-600'>No. Antrian</th>
                   <th className='p-4 border border-slate-600'>Nama</th>
                   <th className='p-4 border border-slate-600'>Kategori</th>
                   <th className='p-4 border border-slate-600'>Aksi</th>

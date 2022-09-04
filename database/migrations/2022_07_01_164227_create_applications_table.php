@@ -16,6 +16,8 @@ return new class extends Migration
         Schema::create('applications', function (Blueprint $table) {
             $table->id();
             $table->string('id_card_number', 20);
+            $table->string('family_card_number', 20);
+            $table->string('family_head_name', 255);
             $table->string('category');
             $table->string('name', 255);
             $table->string('phone', 20);
@@ -26,9 +28,9 @@ return new class extends Migration
             $table->string('ward', 255);
             $table->text('images');
             $table->text('description')->nullable();
-            $table->string('file_id_card', 20)->nullable();
-            $table->string('file_family_card', 20)->nullable();
-            $table->string('file_lost_letter', 20)->nullable();
+            $table->text('problems')->nullable();
+            $table->enum('status', ['PENDING', 'DEFFICIENT', 'VERIFIED', 'COMPLETED'])->default('PENDING');
+            $table->text('status_description')->nullable();
             $table->timestamps();
         });
     }
