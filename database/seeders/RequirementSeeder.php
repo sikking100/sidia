@@ -66,37 +66,17 @@ class RequirementSeeder extends Seeder
           //KIA
           [
             'menu_id' => '10',
-            'name' => 'Foto KTP suami/istri asli',
+            'name' => 'Kutipan akta kelahiran',
             'link' => null
           ],
           [
             'menu_id' => '10',
-            'name' => 'Foto KTP suami/istri foto copy',
+            'name' => 'Kartu Keluarga (KK)',
             'link' => null
           ],
           [
             'menu_id' => '10',
-            'name' => 'Foto KK asli',
-            'link' => null
-          ],
-          [
-            'menu_id' => '10',
-            'name' => 'Foto KK foto copy',
-            'link' => null
-          ],
-          [
-            'menu_id' => '10',
-            'name' => 'Foto Akta Kelahiran asli',
-            'link' => null
-          ],
-          [
-            'menu_id' => '10',
-            'name' => 'Foto Akta Kelahiran foto copy',
-            'link' => null
-          ],
-          [
-            'menu_id' => '10',
-            'name' => 'Pas foto berwarna ukuran 4 x 6',
+            'name' => 'Pas foto berwarna ukuran 2 x 3',
             'link' => null
           ],
           [
@@ -110,13 +90,8 @@ class RequirementSeeder extends Seeder
             'link' => null
           ],
           [
-            'menu_id' => '11',
-            'name' => 'Foto anak umur 5 tahun',
-            'link' => null
-          ],
-          [
             'menu_id' => '12',
-            'name' => 'Surat Kehilangan KIA dari Kepolisian',
+            'name' => 'Surat Kehilangan KIA dari desa atau kelurahan',
             'link' => null
           ],
           [
@@ -125,18 +100,13 @@ class RequirementSeeder extends Seeder
             'link' => null
           ],
           [
-            'menu_id' => '12',
-            'name' => 'Foto / FC KIA hilang (jika masih ada)',
+            'menu_id' => '13',
+            'name' => 'Foto Ijazah atau berkas data dukung perubahan data lainnya',
             'link' => null
           ],
           [
             'menu_id' => '13',
-            'name' => 'Foto KIA asli',
-            'link' => null
-          ],
-          [
-            'menu_id' => '13',
-            'name' => 'Pas Foto terbaru berwarna ukuran 4 x 6',
+            'name' => 'Foto KIA Asli',
             'link' => null
           ],
           [
@@ -147,8 +117,8 @@ class RequirementSeeder extends Seeder
           //SKPWNI
           [
             'menu_id' => '14',
-            'name' => 'Formulir F 1.03',
-            'link' => 'https://google.com',
+            'name' => 'Foto Surat Keterangan Pindah dari desa atau kelurahan',
+            'link' => null,
           ],
           [
             'menu_id' => '14',
@@ -157,103 +127,38 @@ class RequirementSeeder extends Seeder
           ],
           [
             'menu_id' => '14',
-            'name' => 'Foto KTP asli yang pindah/surat kehilangan jika KTP pindah',
-            'link' => null
-          ],
-          [
-            'menu_id' => '14',
-            'name' => 'Foto Buku nikah/Akta perkawinan',
-            'link' => null
-          ],
-          [
-            'menu_id' => '14',
-            'name' => 'Surat cerai/Akta perceraian',
-            'link' => null
-          ],
-          [
-            'menu_id' => '14',
-            'name' => 'Fotocopy akta kelahiran',
-            'link' => null
-          ],
-          [
-            'menu_id' => '14',
-            'name' => 'Fotocopy ijazah',
-            'link' => null
-          ],
-          [
-            'menu_id' => '14',
-            'name' => 'Surat Keterangan gol darah (seluruh anggota keluarga yang ada di KK)',
+            'name' => 'Foto KTP asli',
             'link' => null
           ],
           //Akta kelahiran
           [
             'menu_id' => '15',
-            'name' => 'Foto formulir F-2.01 yang sudah diisi',
-            'link' => 'https://google.com',
-          ],
-          [
-            'menu_id' => '15',
-            'name' => 'Surat kelahiran asli dari (Bidan/RSU/Puskesmas dll) / jika tidak ada gunakan formulir SPTJM',
-            'link' => 'https://google.com'
-          ],
-          [
-            'menu_id' => '15',
-            'name' => 'Foto KK orang tua',
+            'name' => 'Surat kelahiran asli dari (Bidan/RSU/Puskesmas dll)',
             'link' => null
           ],
           [
             'menu_id' => '15',
-            'name' => 'Foto KTP orang tua (berdampingan)',
+            'name' => 'Foto isian akta kelahiran dari desa / kelurahan',
             'link' => null
           ],
           [
             'menu_id' => '15',
-            'name' => 'Foto Buku nikah/akta perkawinan orangtua pada bagian yang berisi biodata (jika tidak ada gunakan formulir SPTJM)',
+            'name' => 'Foto Buku nikah / akta perkawinan orang tua',
             'link' => null
           ],
           [
             'menu_id' => '15',
-            'name' => 'Foto KK saksi kelahiran 1',
-            'link' => null
-          ],
-          [
-            'menu_id' => '15',
-            'name' => 'Foto KK saksi kelahiran 2',
-            'link' => null
-          ],
-          [
-            'menu_id' => '15',
-            'name' => 'Foto Surat Pernyataan bagi pemohon yang berumur lebih dari 1 Tahun',
-            'link' => null
-          ],
-          [
-            'menu_id' => '15',
-            'name' => 'Foto surat pernyatan perubahan data kependudukan (jika ada perubahan di buku nikah atau di kk tidak sama)',
+            'name' => 'Foto KK asli ( jika yang bersangkutan belum ditambahkan dalam KK )',
             'link' => null
           ],
           [
             'menu_id' => '16',
-            'name' => 'Foto KTP',
+            'name' => 'Foto Akta Kelahiran yang rusak',
             'link' => null
           ],
           [
             'menu_id' => '16',
             'name' => 'Foto KK',
-            'link' => null
-          ],
-          [
-            'menu_id' => '16',
-            'name' => 'FOTO Akta Kelahiran, apabila tidak ada diganti Surat Keputusan Penetapan Pengadilan',
-            'link' => null
-          ],
-          [
-            'menu_id' => '16',
-            'name' => 'surat permohonan',
-            'link' => null
-          ],
-          [
-            'menu_id' => '17',
-            'name' => 'Foto KTP',
             'link' => null
           ],
           [
@@ -263,160 +168,120 @@ class RequirementSeeder extends Seeder
           ],
           [
             'menu_id' => '17',
-            'name' => 'Surat Kehilangan Akta Kelahiran Dari Kepolisian',
-            'link' => null
-          ],
-          [
-            'menu_id' => '17',
-            'name' => 'Foto Copy Akta Kelahiran',
-            'link' => null
-          ],
-          [
-            'menu_id' => '17',
-            'name' => 'surat permohonan',
+            'name' => 'Foto Surat Keterangan Hilang dari Desa atau Kelurahan',
             'link' => null
           ],
           [
             'menu_id' => '18',
-            'name' => 'Foto formulir F-2.49 yang telah diisi',
-            'link' => 'https://google.com'
-          ],
-          [
-            'menu_id' => '18',
-            'name' => 'Foto KTP',
+            'name' => 'Foto fotocopy ijazah ( atau berkas data dukung perubahan data lainnya )',
             'link' => null
           ],
           [
             'menu_id' => '18',
-            'name' => 'Foto Akta Kelahiran',
-            'link' => null
-          ],
-          [
-            'menu_id' => '18',
-            'name' => 'Foto Buku Nikah Orang Tua',
-            'link' => null
-          ],
-          [
-            'menu_id' => '18',
-            'name' => 'Foto Surat Permohonan perubahan akta kelahiran',
-            'link' => null
-          ],
-          [
-            'menu_id' => '18',
-            'name' => 'Foto KK',
+            'name' => 'Foto Akta Lahir asli',
             'link' => null
           ],
           //PERKAWINAN
           [
             'menu_id' => '19',
-            'name' => 'Foto formulir F-2.12 yang sudah diisi',
-            'link' => 'https://google.com'
-          ],
-          [
-            'menu_id' => '19',
-            'name' => 'Foto Surat untuk kawin dari kelurahan',
+            'name' => 'Foto Formulir N1 yang sudah diisi',
             'link' => null
           ],
           [
             'menu_id' => '19',
-            'name' => 'Foto Akta Kelahiran Calon Pengantin',
+            'name' => 'Foto Formulir N2 yang sudah diisi',
             'link' => null
           ],
           [
             'menu_id' => '19',
-            'name' => 'Foto KK Calon Pengantin',
+            'name' => 'Foto Formulir N3 yang sudah diisi',
             'link' => null
           ],
           [
             'menu_id' => '19',
-            'name' => 'Pas foto berdampingan calon pengantin 4 x 6 cm sebanyak 4 lembar',
+            'name' => 'Foto Formulir N4 yang sudah diisi',
             'link' => null
           ],
           [
             'menu_id' => '19',
-            'name' => 'Akta kematian/perceraian bagi yang berstatus janda/duda',
+            'name' => 'Foto Surat Nikah Agama',
+            'link' => null
+          ],
+          [
+            'menu_id' => '19',
+            'name' => 'Foto KK orang tua Suami',
+            'link' => null
+          ],
+          [
+            'menu_id' => '19',
+            'name' => 'Foto KK orang tua Istri',
+            'link' => null
+          ],
+          [
+            'menu_id' => '19',
+            'name' => 'Foto KTP-El Suami',
+            'link' => null
+          ],
+          [
+            'menu_id' => '19',
+            'name' => 'Foto KTP-El Istri',
+            'link' => null
+          ],
+          [
+            'menu_id' => '19',
+            'name' => 'Foto KTP-El Saksi 1',
+            'link' => null
+          ],
+          [
+            'menu_id' => '19',
+            'name' => 'Foto KTP-El Saksi 2',
+            'link' => null
+          ],
+          [
+            'menu_id' => '19',
+            'name' => 'Pas Foto 4 x 6',
             'link' => null
           ],
           //PERCERAIAN
           [
             'menu_id' => '20',
-            'name' => 'Foto formulir F-2.19 yang sudah diisi',
-            'link' => 'https://google.com'
-          ],
-          [
-            'menu_id' => '20',
-            'name' => 'Foto Surat keputusan pengadilan yang mempunyai kekuatan hukum tetap',
+            'name' => 'Foto salinan putusan pengadilan',
             'link' => null
           ],
           [
             'menu_id' => '20',
-            'name' => 'Foto Akta perkawinan suami istri asli',
+            'name' => 'Foto Akta Perkawinan Asli',
             'link' => null
           ],
           [
             'menu_id' => '20',
-            'name' => 'Foto KTP suami',
+            'name' => 'Foto KTP-El suami',
             'link' => null
           ],
           [
             'menu_id' => '20',
-            'name' => 'Foto KTP istri',
+            'name' => 'Foto KTP-El istri',
             'link' => null
           ],
           [
             'menu_id' => '20',
-            'name' => 'Foto KK suami',
-            'link' => null
-          ],
-          [
-            'menu_id' => '20',
-            'name' => 'Foto KK istri',
+            'name' => 'Foto KK Asli',
             'link' => null
           ],
           //KEMATIAN
           [
             'menu_id' => '21',
-            'name' => 'Foto Formulir F-2.28 yang sudah diisi',
-            'link' => 'https://google.com'
-          ],
-          [
-            'menu_id' => '21',
-            'name' => 'Foto Formulir F-2.29 yang sudah diisi',
-            'link' => 'https://google.com'
-          ],
-          [
-            'menu_id' => '21',
-            'name' => 'Foto Surat Keterangan Kematian Dari Kelurahan',
+            'name' => 'Foto Surat keterangan kematian dari Desa / Kelurahan',
             'link' => null
           ],
           [
             'menu_id' => '21',
-            'name' => 'Foto Akta kelahiran',
+            'name' => 'Foto KTP-El asli yang bersangkutan',
             'link' => null
           ],
           [
             'menu_id' => '21',
-            'name' => 'Foto surat keterangan kematian dari rumah sakit',
-            'link' => null
-          ],
-          [
-            'menu_id' => '21',
-            'name' => 'Foto KTP',
-            'link' => null
-          ],
-          [
-            'menu_id' => '21',
-            'name' => 'Foto KK',
-            'link' => null
-          ],
-          [
-            'menu_id' => '21',
-            'name' => 'Foto surat nikah/akta perkawinan',
-            'link' => null
-          ],
-          [
-            'menu_id' => '21',
-            'name' => 'Foto Surat Keputusan pengadlian yang mempunyai kekuatan hukum tetap jika kematian diatas 5 tahun',
+            'name' => 'Foto KK Asli yang bersangkutan',
             'link' => null
           ],
           //PENGADUAN

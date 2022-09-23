@@ -179,7 +179,7 @@ export default function Form({ category }: Props) {
             className={'w-full'}
           />
           <ErrorText message={errors.phone} />
-          <Label forInput={'email'} value={'Email pemohon'} className={'pt-6 pb-2'} />
+          <Label forInput={'email'} value={'Email pemohon'} className={'pt-6 pb-2'} required={false} />
           <Input
             name='email'
             type={'email'}
@@ -246,7 +246,8 @@ export default function Form({ category }: Props) {
           <Label forInput={'images'} value={'Ket : Foto Wajah Jelas'} className={'pt-2 font-bold'} />
 
           <ErrorText message={errors.images} />
-          <Button className={'mt-6'} processing={process}>Selanjutnya</Button>
+          <p className={'text-red-900 mt-6'}>* Harus diisi</p>
+          <Button className={'mt-2'} processing={process}>Selanjutnya</Button>
         </form>
       </div>}
     </Guest>

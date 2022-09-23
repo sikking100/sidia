@@ -63,7 +63,7 @@
         <td colspan="5" style="width: 100%">
           <span class="h1">PEMERINTAH KABUPATEN MOROWALI UTARA</span>
           <span class="h2">DINAS KEPENDUDUKAN DAN PENCATATAN SIPIL</span>
-          <span class="alamat">Alamat :Komspanleks Perkantoran Jl. Bumi Nangka Kolonodale KodePos : 94971</span>
+          <span class="alamat">Alamat :Kompleks Perkantoran Jl. Bumi Nangka Kolonodale KodePos : 94971</span>
         </td>
       </tr>
       <tr>
@@ -285,13 +285,13 @@
       </tr>
       <tr>
         <td colspan="4">
-          <p style="text-align: center; font-style: italic;">sidia.dukcapil.morowalikab.go.id</p>
+          <p style="text-align: center; font-style: italic;">sidia.dukcapil.morowaliutarakab.go.id</p>
         </td>
 
         <td>
         </td>
         <td >
-          <p style="text-align: center;">{{ date('d M Y') }}</p>
+          <p style="text-align: center;">{{ date('d F Y') }}</p>
         </td>
       </tr>
       <tr>
