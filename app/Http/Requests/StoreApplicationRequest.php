@@ -29,7 +29,7 @@ class StoreApplicationRequest extends FormRequest
             'id_card_number' => ['min:16', 'required', 'regex:/^\S*$/u', 'numeric'],
             'name' => 'required|string',
             'phone' => ['min:12', 'required', 'regex:/^\S*$/u', 'numeric'],
-            'email' => 'string',
+            'email' => 'nullable|email',
             'district' => 'required|string',
             'ward' => 'required|string',
             'description' => 'nullable|string',

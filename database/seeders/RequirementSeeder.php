@@ -63,6 +63,62 @@ class RequirementSeeder extends Seeder
             'name' => 'Foto Kartu Keluarga',
             'link' => null
           ],
+          //KK
+          [
+            'menu_id' => '6',
+            'name' => 'Foto formulir isian kartu keluarga (KK) dari desa/kelurahan yang sudah diisi',
+            'link' => null
+          ],
+          [
+            'menu_id' => '6',
+            'name' => 'Foto Skpwni (bagi penduduk pindah datang)',
+            'link' => null
+          ],
+          [
+            'menu_id' => '6',
+            'name' => 'Foto buku nikah/akta perkawinan (bagi pasangan baru menikah dan/atau bagi pasangan jika status dalam KK “kawin belum tercatat”)',
+            'link' => null
+          ],
+          [
+            'menu_id' => '6',
+            'name' => 'Foto Surat Keterangan kelahiran putra/putri pemohon yang akan menjadi anggota keluarga baru dalam Kartu Keluarga (KK) (jika ada penambahan anggota keluarga)',
+            'link' => null
+          ],
+          [
+            'menu_id' => '6',
+            'name' => 'Foto Surat Keterangan Kematian (jika ada pengurangan anggota keluarga',
+            'link' => null
+          ],
+          [
+            'menu_id' => '7',
+            'name' => 'Foto nikah/akta nikah (bagi pasangan jika status dalam KK “kawin belum tercatat”)',
+            'link' => null
+          ],
+          [
+            'menu_id' => '8',
+            'name' => 'Foto Surat keterangan hilang dari desa atau kelurahan',
+            'link' => null
+          ],
+          [
+            'menu_id' => '8',
+            'name' => 'Foto nikah/akta nikah (bagi pasangan jika status dalam KK “kawin belum tercatat”)',
+            'link' => null
+          ],
+          [
+            'menu_id' => '9',
+            'name' => 'Foto Ijazah atau berkas data dukung perubahan data lainnya',
+            'link' => null
+          ],
+          [
+            'menu_id' => '9',
+            'name' => 'Foto KK Asli',
+            'link' => null
+          ],
+          [
+            'menu_id' => '9',
+            'name' => 'Foto nikah/akta nikah (bagi pasangan jika status dalam KK “kawin belum tercatat”)',
+            'link' => null
+          ],
           //KIA
           [
             'menu_id' => '10',
@@ -72,11 +128,6 @@ class RequirementSeeder extends Seeder
           [
             'menu_id' => '10',
             'name' => 'Kartu Keluarga (KK)',
-            'link' => null
-          ],
-          [
-            'menu_id' => '10',
-            'name' => 'Pas foto berwarna ukuran 2 x 3',
             'link' => null
           ],
           [
@@ -153,11 +204,6 @@ class RequirementSeeder extends Seeder
           ],
           [
             'menu_id' => '16',
-            'name' => 'Foto Akta Kelahiran yang rusak',
-            'link' => null
-          ],
-          [
-            'menu_id' => '16',
             'name' => 'Foto KK',
             'link' => null
           ],
@@ -182,26 +228,26 @@ class RequirementSeeder extends Seeder
             'link' => null
           ],
           //PERKAWINAN
-          [
-            'menu_id' => '19',
-            'name' => 'Foto Formulir N1 yang sudah diisi',
-            'link' => null
-          ],
-          [
-            'menu_id' => '19',
-            'name' => 'Foto Formulir N2 yang sudah diisi',
-            'link' => null
-          ],
-          [
-            'menu_id' => '19',
-            'name' => 'Foto Formulir N3 yang sudah diisi',
-            'link' => null
-          ],
-          [
-            'menu_id' => '19',
-            'name' => 'Foto Formulir N4 yang sudah diisi',
-            'link' => null
-          ],
+          // [
+          //   'menu_id' => '19',
+          //   'name' => 'Foto Formulir N1 yang sudah diisi',
+          //   'link' => null
+          // ],
+          // [
+          //   'menu_id' => '19',
+          //   'name' => 'Foto Formulir N2 yang sudah diisi',
+          //   'link' => null
+          // ],
+          // [
+          //   'menu_id' => '19',
+          //   'name' => 'Foto Formulir N3 yang sudah diisi',
+          //   'link' => null
+          // ],
+          // [
+          //   'menu_id' => '19',
+          //   'name' => 'Foto Formulir N4 yang sudah diisi',
+          //   'link' => null
+          // ],
           [
             'menu_id' => '19',
             'name' => 'Foto Surat Nikah Agama',
@@ -237,22 +283,22 @@ class RequirementSeeder extends Seeder
             'name' => 'Foto KTP-El Saksi 2',
             'link' => null
           ],
-          [
-            'menu_id' => '19',
-            'name' => 'Pas Foto 4 x 6',
-            'link' => null
-          ],
+          // [
+          //   'menu_id' => '19',
+          //   'name' => 'Pas Foto 4 x 6',
+          //   'link' => null
+          // ],
           //PERCERAIAN
           [
             'menu_id' => '20',
             'name' => 'Foto salinan putusan pengadilan',
             'link' => null
           ],
-          [
-            'menu_id' => '20',
-            'name' => 'Foto Akta Perkawinan Asli',
-            'link' => null
-          ],
+          // [
+          //   'menu_id' => '20',
+          //   'name' => 'Foto Akta Perkawinan Asli',
+          //   'link' => null
+          // ],
           [
             'menu_id' => '20',
             'name' => 'Foto KTP-El suami',
@@ -263,11 +309,11 @@ class RequirementSeeder extends Seeder
             'name' => 'Foto KTP-El istri',
             'link' => null
           ],
-          [
-            'menu_id' => '20',
-            'name' => 'Foto KK Asli',
-            'link' => null
-          ],
+          // [
+          //   'menu_id' => '20',
+          //   'name' => 'Foto KK Asli',
+          //   'link' => null
+          // ],
           //KEMATIAN
           [
             'menu_id' => '21',

@@ -102,7 +102,7 @@ export default function Form({ category }: Props) {
           {persyaratan.get(category)!.map((e, i) => <p key={i}>{e}</p>)}
         </div>
       </div>
-      {category.split('-')[0] != 'KK' && <div
+      {category.split('-')[0] != '' && <div
         className={'bg-white rounded p-6'}
       >
         <h5 className={'text-lg font-bold'}>
