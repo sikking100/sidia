@@ -64,7 +64,7 @@ class DistrictController extends Controller
      */
     public function edit(District $district)
     {
-        //
+        return Inertia::render('Admin/District/Edit', compact('district'));
     }
 
     /**
@@ -76,7 +76,9 @@ class DistrictController extends Controller
      */
     public function update(UpdateDistrictRequest $request, District $district)
     {
-        //
+        $district->name = $request->name;
+        $district->save();
+        return redirect()->route('district.index');
     }
 
     /**

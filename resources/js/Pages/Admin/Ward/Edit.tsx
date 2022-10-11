@@ -6,7 +6,7 @@ import WardForm from '@/Pages/Admin/Ward/Form'
 
 interface Props {
   district: District
-  ward: Ward
+  wards: Ward
 }
 
 export default function WardEdit(props: Props) {
@@ -15,7 +15,7 @@ export default function WardEdit(props: Props) {
       <WardForm
         district_id={props.district.id}
 
-        ward={props.ward}
+        ward={props.wards}
       />
     </Authenticated>
   )

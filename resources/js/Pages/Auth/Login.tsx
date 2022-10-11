@@ -66,6 +66,12 @@ export default function Login() {
 
 
     <div className={'min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-kemenag'}>
+      <div className={'text-white w-full flex flex-col place-items-center'}>
+        <img src={'/assets/logo.png'} className={'h-40 mb-2'} />
+        <h6 className={'mx-auto'}>Login Dashboard</h6>
+        <h6 className={'text-sm mx-auto'}>Sidia Disdukcapil Kab. Morowali Utara</h6>
+        <span className={'text-xs mx-auto'}>Versi 1.0</span>
+      </div>
       <div className={'w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg'}>
 
         <Head title="Log in" />

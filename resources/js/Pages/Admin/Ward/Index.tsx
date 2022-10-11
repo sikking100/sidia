@@ -32,13 +32,9 @@ export default function Ward(props: Props) {
         <td className={'p-4 border border-slate-700'}>{e.name}</td>
         <td className='p-4 border border-slate-700'>
           <div className="flex flex-row gap-2">
+
             <Link
-              href={route('district.edit', e.id)}
-              className={'bg-kemenag hover:bg-kemenag-dark text-white font-bold py-2 px-4 rounded'}>
-              Kelurahan
-            </Link>
-            <Link
-              href={route('district.edit', e.id)}
+              href={route('ward.edit', e.id)}
               className={'bg-yellow-500 hover:bg-kemenag-dark text-white font-bold py-2 px-4 rounded'}>
               Ubah
             </Link>
@@ -47,7 +43,7 @@ export default function Ward(props: Props) {
                 ef.preventDefault()
                 if (confirm("Are you sure you want to delete this user?")) {
                   setShowAlert(true)
-                  Inertia.delete(route('district.destroy', e.id));
+                  Inertia.delete(route('ward.destroy', e.id));
                 }
               }}
               className={'bg-red-500 hover:bg-kemenag-dark text-white font-bold py-2 px-4 rounded'}

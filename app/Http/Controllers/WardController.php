@@ -41,7 +41,7 @@ class WardController extends Controller
     {
         $ward = Ward::make($request->all());
         $ward->save();
-        session()->flash('message', 'Berhasil menambah kelurahan');
+        session()->flash('message', 'Berhasil menambah desa / kelurahan');
         return redirect()->route('district.show', $request->district_id);
     }
 
@@ -51,7 +51,7 @@ class WardController extends Controller
      * @param  \App\Models\Index  $ward
      * @return \Illuminate\Http\Response
      */
-    public function show(Index $ward)
+    public function show(Ward $ward)
     {
         //
     }
@@ -62,9 +62,10 @@ class WardController extends Controller
      * @param  \App\Models\Index  $ward
      * @return \Illuminate\Http\Response
      */
-    public function edit(Index $ward)
+    public function edit(Ward $ward)
     {
-        //
+        $district = $ward->district()->first();
+        return Inertia::render('Admin/Ward/Edit', ['district' => $district, 'wards' => $ward]);
     }
 
     /**
@@ -74,9 +75,12 @@ class WardController extends Controller
      * @param  \App\Models\Index  $ward
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateWardRequest $request, Index $ward)
+    public function update(UpdateWardRequest $request, Ward $ward)
     {
-        //
+        $ward->name = $request->name;
+        $ward->save();
+        session()->flash('message', 'Berhasil mengubah desa / kelurahan');
+        return redirect()->route('district.show', $ward->district_id);
     }
 
     /**
@@ -85,8 +89,10 @@ class WardController extends Controller
      * @param  \App\Models\Index  $ward
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Index $ward)
+    public function destroy(Ward $ward)
     {
-        //
+        $ward->delete();
+        session()->flash('message', 'Berhasil menghapus desa / kelurahan');
+        return redirect()->route('district.show', $ward->district_id);
     }
 }

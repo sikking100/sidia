@@ -35,7 +35,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('district',  DistrictController::class);
     Route::get('/ward/create/{ward}', [WardController::class, 'create'])->name('ward.create');
     Route::post('/ward', [WardController::class, 'store'])->name('ward.store');
-    Route::get('/ward/{ward}/edit/{district}', [WardController::class, 'edit'])->name('ward.edit');
+    Route::get('/ward/{ward}/edit', [WardController::class, 'edit'])->name('ward.edit');
     Route::put('/ward/{ward}', [WardController::class, 'update'])->name('ward.update');
     Route::delete('/ward/{ward}', [WardController::class, 'destroy'])->name('ward.destroy');
 });
