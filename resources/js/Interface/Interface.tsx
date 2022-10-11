@@ -95,7 +95,7 @@ export const persyaratan: Map<string, string[]> = new Map<string, string[]>([
   ['KK-Baru', [
     '1.Membawa formulir isisan kartu keluarga (KK) dari desa/kelurahan',
     '2.Membawa SKPWNI (bagi penduduk pindah datang)',
-    '3.Membawa buku nikah/akta perkawinan (bagi pasangan baru menikah dan/atau bagi pasangan jika status dalam KK "kasin belum tercatat")',
+    '3.Membawa buku nikah/akta perkawinan (bagi pasangan baru menikah dan/atau bagi pasangan jika status dalam KK "kawin belum tercatat")',
     '4.Membawa Surat Keterangan kelahiran putra/putri pemohon yang akan menjadi anggota keluarga baru dalam Kartu Keluarga (KK) (jika ada penambahan anggota keluarga)',
     '5.Membawa Surat Keterangan Kematian (jika ada pengurangan anggota keluarga)',
   ]],
