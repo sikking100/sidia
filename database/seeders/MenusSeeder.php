@@ -15,31 +15,31 @@ class MenusSeeder extends Seeder
      */
     public function run()
     {
-      // Menu::truncate();
-      $menu = [
-        ['name' => 'KTP-Pemula'],
-        ['name' => 'KTP-Rusak'],
-        ['name' => 'KTP-Hilang'],
-        ['name' => 'KTP-Perubahan'],
-        ['name' => 'KTP-Disabilitas'],
-        ['name' => 'KK-Baru'],
-        ['name' => 'KK-Rusak'],
-        ['name' => 'KK-Hilang'],
-        ['name' => 'KK-Perubahan'],
-        ['name' => 'KIA-Baru'],
-        ['name' => 'KIA-Rusak'],
-        ['name' => 'KIA-Hilang'],
-        ['name' => 'KIA-Perubahan'],
-        ['name' => 'SKPWNI-Pindah'],
-        ['name' => 'AKTA-Baru'],
-        ['name' => 'AKTA-Rusak'],
-        ['name' => 'AKTA-Hilang'],
-        ['name' => 'AKTA-Perubahan'],
-        ['name' => 'PERKAWINAN'],
-        ['name' => 'PERCERAIAN'],
-        ['name' => 'KEMATIAN'],
-        ['name' => 'PENGADUAN'],
-      ];
-      Menu::insert($menu);
+        // Menu::truncate();
+        $menu = [
+            ['name' => 'KTP-Pemula'],
+            ['name' => 'KTP-Rusak'],
+            ['name' => 'KTP-Hilang'],
+            ['name' => 'KTP-Perubahan'],
+            ['name' => 'KTP-Disabilitas'],
+            ['name' => 'KK-Baru'],
+            ['name' => 'KK-Rusak'],
+            ['name' => 'KK-Hilang'],
+            ['name' => 'KK-Perubahan-Data'],
+            ['name' => 'KIA-Baru'],
+            ['name' => 'KIA-Rusak'],
+            ['name' => 'KIA-Hilang'],
+            ['name' => 'KIA-Perubahan-Data'],
+            ['name' => 'SKPWNI-Pindah'],
+            ['name' => 'Akta-Kelahiran-Baru'],
+            ['name' => 'Akta-Kelahiran-Rusak'],
+            ['name' => 'Akta-Kelahiran-Hilang'],
+            ['name' => 'Akta-Kelahiran-Perubahan'],
+            ['name' => 'PERKAWINAN'],
+            ['name' => 'PERCERAIAN'],
+            ['name' => 'KEMATIAN'],
+            ['name' => 'PENGADUAN'],
+        ];
+        Menu::insert($menu);
     }
 }
