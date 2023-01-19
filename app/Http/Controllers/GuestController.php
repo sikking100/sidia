@@ -24,14 +24,16 @@ class GuestController extends Controller
         $this->upload = new MyUploadFile();
     }
 
-    public function check() {
+    public function check()
+    {
         return Inertia::render('Guest/CheckApplicant');
     }
 
-    public function applicant($id) {
-        $applicant = Application::where('id_card_number', $id)->whereIn('status',['PENDING', 'DEFFICIENT', 'VERIFIED'])->get();
+    public function applicant($id)
+    {
+        $applicant = Application::where('id_card_number', $id)->whereIn('status', ['PENDING', 'DEFFICIENT', 'VERIFIED'])->get();
         return response()->json(
-          $applicant
+            $applicant
         );
     }
 
@@ -43,7 +45,7 @@ class GuestController extends Controller
     public function formAction(StoreApplicationRequest $request)
     {
         $applicant = Application::make($request->all());
-        $this->upload->uploadImages($request,'images',$applicant);
+        $this->upload->uploadImages($request, 'images', $applicant);
         $applicant->status_description = "Mohon cek secara berkala, sementara permohonan Anda sedang diverifikasi";
         $applicant->save();
         // $exp = explode("-",$request->category);
@@ -58,34 +60,30 @@ class GuestController extends Controller
         return redirect()->route('upload', [$applicant->id, $category]);
     }
 
-    public function uploadFile($id, $category) {
-      $menu = Menu::firstWhere('name', $category);
-      $syarat = $menu->requirements;
-      return Inertia::render('Guest/UploadFile', ['id' => $id, 'requirements' => $syarat, 'category' => $category]);
+    public function uploadFile($id, $category)
+    {
+        $menu = Menu::firstWhere('name', $category);
+        $syarat = $menu->requirements;
+        return Inertia::render('Guest/UploadFile', ['id' => $id, 'requirements' => $syarat, 'category' => $category]);
     }
 
     public function uploadAction(Request $request)
     {
-      $menu = Menu::firstWhere('name', $request->category);
-      $syarat = $menu->requirements;
-      $names = '';
-      for ($i=0; $i < count($syarat); $i++) {
-        $applicant = Application::find($request->id);
-        $name = join('_', explode(' ', $syarat[$i]->name));
-        $nameExt = time().'.'.$request->$name->extension();
-        $request->$name->storeAs($request->category, $nameExt, 'public');
-        $files = new File;
-        $files->name = $syarat[$i]->name;
-        $files->place = $request->category.'/'.$nameExt;
-        $applicant->files()->save($files);
-      }
-
-      // foreach ($syarat as $key => $value) {
-      //
-      //   // $applicant->files()->save($files);
-      // }
-      session()->flash('message', 'Silakan mengecek permohonan');
-      return redirect('/');
+        $menu = Menu::firstWhere('name', $request->category);
+        $syarat = $menu->requirements;
+        for ($i = 0; $i < count($syarat); $i++) {
+            $applicant = Application::find($request->id);
+            $n = explode(' ', $syarat[$i]->name);
+            $name = $n[0] . '_' . $n[1];
+            $nameExt = $i . time() . '.' . $request->$name->extension();
+            $request->$name->storeAs($request->category, $nameExt, 'public');
+            $files = new File;
+            $files->name = $syarat[$i]->name;
+            $files->place = $request->category . '/' . $nameExt;
+            $applicant->files()->save($files);
+        }
+        session()->flash('message', 'Silakan mengecek permohonan');
+        return redirect('/');
     }
 
     //go to upload
@@ -218,7 +216,7 @@ class GuestController extends Controller
         $district = District::where('name', $id)->first();
         $wards = $district->wards()->get();
         return response()->json([
-          'wards' => $wards
+            'wards' => $wards
         ]);
     }
 }
