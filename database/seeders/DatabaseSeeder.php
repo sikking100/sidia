@@ -17,17 +17,17 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
 
-         \App\Models\User::factory()->create([
-             'name' => 'Test User',
-             'email' => 'test@example.com',
-             'password' => Hash::make('secret'),
-         ]);
+        \App\Models\User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => Hash::make('secret'),
+        ]);
 
-         $this->call([
-           DistrictSeeder::class,
-           WardSeeder::class,
-           MenusSeeder::class,
-           RequirementSeeder::class,
-         ]);
+        //  $this->call([
+        //    DistrictSeeder::class,
+        //    WardSeeder::class,
+        //    MenusSeeder::class,
+        //    RequirementSeeder::class,
+        //  ]);
     }
 }

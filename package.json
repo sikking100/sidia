@@ -27,7 +27,7 @@
         "postcss": "^8.4.6",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
-        "react-google-recaptcha-v3": "^1.9.8",
+        "react-google-recaptcha-v3": "^1.10.1",
         "react-timeago2": "^1.0.1",
         "tailwindcss": "^3.1.0",
         "ts-node": "^10.8.1",

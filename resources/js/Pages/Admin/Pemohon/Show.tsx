@@ -5,12 +5,20 @@ import Button from '@/Components/Button'
 import Label from '@/Components/Label'
 import Input from '@/Components/Input'
 import { ErrorText } from '@/Components/Error'
-import { useForm } from '@inertiajs/inertia-react'
+import { Link, useForm } from '@inertiajs/inertia-react'
 import { Inertia } from '@inertiajs/inertia'
 
 import { Modal } from 'flowbite-react'
 import route from 'ziggy-js'
+import axios from 'axios'
+import { url } from 'inspector'
 
+
+interface FileTicket {
+  TypeName: string
+  FilePath: string
+  FileName: string
+}
 interface Props {
   application: Applicant
   files: Array<Files>
@@ -51,7 +59,7 @@ export default function PemohonShow({ application, files }: Props) {
     return
   }
 
-  const { data, errors, setData, put } = useForm<FormUpdateStatus>({
+  const { data, errors, setData, put, get } = useForm<FormUpdateStatus>({
     status: '',
     status_description: ''
   })
@@ -62,6 +70,11 @@ export default function PemohonShow({ application, files }: Props) {
     put(route('status', application.id))
     // setShowModal(!showModal)
     return
+  }
+
+  function handleClick(e: React.MouseEvent<HTMLAnchorElement> | React.KeyboardEvent<HTMLAnchorElement>, name: string) {
+    e.preventDefault()
+    window.open(route('photo', name))
   }
 
   return (
@@ -181,6 +194,16 @@ export default function PemohonShow({ application, files }: Props) {
         <table>
           <tbody>
             <tr>
+              <td>Ticket</td>
+              <td>:</td>
+              <td>{application.ticket}</td>
+            </tr>
+            <tr>
+              <td>Status</td>
+              <td>:</td>
+              <td>{application.status}</td>
+            </tr>
+            <tr>
               <td>Nik</td>
               <td>:</td>
               <td>{application.id_card_number}</td>
@@ -213,18 +236,35 @@ export default function PemohonShow({ application, files }: Props) {
           </tbody>
 
         </table>
-        <div className={'mt-6'}>
-          Foto Wajah jelas
-          <img src={`../../storage/images/${application.images}`} className={'h-40'} />
+        {
+          application.ticket !== null && application.ticket !== '' ?
+            application.files !== null && application.files !== '' ? <div>
+              Daftar berkas
+              {(JSON.parse(application.files!) as Array<FileTicket>).map((v, k) => {
+                return <div key={k}>
+                  <Link href='#' className={'text-blue-500'} type='button' onClick={(e) => handleClick(e, v.FileName)}>
+                    {v.TypeName}
+                  </Link>
+                </div>
+              })}
+            </div> : 'Berkas tidak lengakp' : <div>
+              <div className={'mt-6'}>
+                Foto Wajah jelas
+                <img src={`../../storage/images/${application.images}`} className={'h-40'} />
 
 
-        </div>
-        {files.map((v, k) => {
-          return <div className={'mt-6'} key={k}>
-            <p>{v.name}</p>
-            <img src={`../../storage/${v.place}`} />
-          </div>
-        })}
+              </div>
+              {files.map((v, k) => {
+                return <div className={'mt-6'} key={k}>
+                  <p>{v.name}</p>
+                  <img src={`../../storage/${v.place}`} />
+                </div>
+              })}
+            </div>
+        }
+
+
+
       </div>
     </Authenticated >
   )

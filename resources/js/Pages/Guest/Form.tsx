@@ -111,7 +111,7 @@ export default function Form({ category }: Props) {
         <span className={'text-sm font-thin text-gray-500'}>
           {`Pelayanan ${subtitle.get(category)}`}
         </span>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} autoComplete="off">
           <Label forInput={''} value={'No. KK'} className={'pt-6 pb-2'} />
           <Input
             name='family_card_number'

@@ -8,28 +8,35 @@ use App\Models\File;
 
 class Application extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    protected $fillable = [
-      'family_card_number',
-      'family_head_name',
-      'id_card_number',
-      'category',
-      'name',
-      'phone',
-      'email',
-      'district',
-      'ward',
-      'description',
-      'images',
-      'sex',
-      'religion',
-      'status_description',
-      'problems',
-    ];
+  protected $fillable = [
+    'family_card_number',
+    'family_head_name',
+    'id_card_number',
+    'category',
+    'name',
+    'phone',
+    'email',
+    'district',
+    'ward',
+    'description',
+    'images',
+    'sex',
+    'religion',
+    'status_description',
+    'problems',
+    'ticket',
+    'files'
+  ];
 
-    public function files()
-    {
-        return $this->hasMany(File::class);
-    }
+  public function filess()
+  {
+    return $this->hasMany(File::class);
+  }
+
+  public function cat()
+  {
+    return $this->hasOne(Menu::class, 'name', 'category');
+  }
 }

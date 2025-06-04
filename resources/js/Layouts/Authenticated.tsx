@@ -48,7 +48,7 @@ export default function Authenticated({ children, header }: React.PropsWithChild
                 href={route('application.index')}>
                 <div className={'inline-flex items-center'}>
                   Pemohon
-                  {countData && countData > 0 ? <span className="inline-flex justify-center items-center ml-2 w-4 h-4 text-xs font-semibold text-white bg-red-500 rounded-full">
+                  {countData && countData > 0 ? <span className="inline-flex justify-center items-center ml-2 p-2 text-xs font-semibold text-white bg-red-500 rounded-full">
                     {countData}
                   </span> : <div></div>}
                 </div>

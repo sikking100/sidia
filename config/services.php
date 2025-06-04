@@ -30,5 +30,9 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
-
+    'external_api' => [
+        'url' => env('EXTERNAL_API_URL'),
+        'symmetric' => env('EXTERNAL_API_SYMMETRIC'),
+        'secret' => env('EXTERNAL_API_SECRET'),
+    ]
 ];

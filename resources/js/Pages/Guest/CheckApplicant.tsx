@@ -41,6 +41,8 @@ export default function CheckApplicant() {
   }
   const process = progress && progress.percentage > 0 || false
 
+
+
   return (
     <Guest
       title='Cek Permohonan'>
@@ -62,10 +64,19 @@ export default function CheckApplicant() {
                 No
               </th>
               <th className={'border border-slate-300 p-6 text-left'}>
+                Tanggal Pengajuan
+              </th>
+              <th className={'border border-slate-300 p-6 text-left'}>
+                No Tiket
+              </th>
+              <th className={'border border-slate-300 p-6 text-left'}>
                 Nik
               </th>
               <th className={'border border-slate-300 p-6 text-left'}>
                 Nama
+              </th>
+              <th className={'border border-slate-300 p-6 text-left'}>
+                Jenis Layanan
               </th>
               <th className={'border border-slate-300 p-6 text-left'}>
                 Status
@@ -79,32 +90,49 @@ export default function CheckApplicant() {
             </tr>
           </thead>
           <tbody>
-            {applicant.map((a, i) => <tr key={i}>
-              <td className={'border border-slate-300 p-6'}>
-                {i}
-              </td>
-              <td className={'border border-slate-300 p-6'}>
-                {a.id_card_number}
-              </td>
-              <td className={'border border-slate-300 p-6'}>
-                {a.name}
-              </td>
-              <td className={'border border-slate-300 p-6'}>
-                {a.status}
-              </td>
-              <td className={'border border-slate-300 p-6'}>
-                {a.status_description}
-              </td>
-              <td className={'border border-slate-300 p-6'}>
-                {a.status == 'DEFFICIENT' && <Link
-                  className={'button'}
-                  type={'a'}
-                  href={route('upload', { 'id': a.id!, 'category': a.category })}
-                >
-                  Upload Berkas
-                </Link>}
-              </td>
-            </tr>)}
+            {applicant.map((a, i) => {
+              const date = new Date(a.created_at ?? '')
+              const formattedDate = new Intl.DateTimeFormat('id-ID', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+              }).format(date)
+              return <tr key={i}>
+                <td className={'border border-slate-300 p-6'}>
+                  {i + 1}
+                </td>
+                <td className={'border border-slate-300 p-6'}>
+                  {formattedDate}
+                </td>
+                <td className={'border border-slate-300 p-6'}>
+                  {a.ticket}
+                </td>
+                <td className={'border border-slate-300 p-6'}>
+                  {a.id_card_number}
+                </td>
+                <td className={'border border-slate-300 p-6'}>
+                  {a.name}
+                </td>
+                <td className={'border border-slate-300 p-6'}>
+                  {a.category}
+                </td>
+                <td className={'border border-slate-300 p-6'}>
+                  {a.status}
+                </td>
+                <td className={'border border-slate-300 p-6'}>
+                  {a.status_description}
+                </td>
+                <td className={'border border-slate-300 p-6'}>
+                  {a.status == 'DEFFICIENT' && <Link
+                    className={'button'}
+                    type={'a'}
+                    href={route('upload', { 'id': a.id!, 'category': a.category })}
+                  >
+                    Upload Berkas
+                  </Link>}
+                </td>
+              </tr>
+            })}
           </tbody>
         </table>
       </div>}

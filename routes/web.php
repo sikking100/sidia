@@ -28,6 +28,7 @@ Route::get('/', function () {
     ]);
 });
 
+
 Route::group(['middleware' => 'auth'], function () {
     Route::resource('application', ApplicationController::class);
     Route::put('/applicants/{id}', [ApplicationController::class, 'update_status'])->name('status');
@@ -38,20 +39,21 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/ward/{ward}/edit', [WardController::class, 'edit'])->name('ward.edit');
     Route::put('/ward/{ward}', [WardController::class, 'update'])->name('ward.update');
     Route::delete('/ward/{ward}', [WardController::class, 'destroy'])->name('ward.destroy');
+    Route::get('/photo/{name}', [ApplicationController::class, 'photo'])->name('photo');
 });
 
-Route::controller(GuestController::class)->group(function() {
-  Route::get('/cek-permohonan', 'check')->name('check');
-  Route::get('/applicant/{id}', 'applicant');
-  Route::get('/form/{category}', 'form')->name('form');
-  Route::post('/form', 'formAction')->name('form.action');
-  Route::get('/uploadFile/{id}/{category}', 'uploadFile')->name('upload');
-  Route::post('/uploadFile/{id}', 'uploadAction')->name('upload.action');
-  Route::get('/wards/{id}', 'kelurahan');
+Route::controller(GuestController::class)->group(function () {
+    Route::get('/cek-permohonan', 'check')->name('check');
+    Route::get('/applicant/{id}', 'applicant');
+    Route::get('/form/{category}', 'form')->name('form');
+    Route::post('/form', 'formAction')->name('form.action');
+    Route::get('/uploadFile/{id}/{category}', 'uploadFile')->name('upload');
+    Route::post('/uploadFile/{id}', 'uploadAction')->name('upload.action');
+    Route::get('/wards/{id}', 'kelurahan');
 });
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

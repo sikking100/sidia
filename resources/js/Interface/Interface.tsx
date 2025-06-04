@@ -19,6 +19,9 @@ export interface Applicant {
   images: string | File | undefined
   status?: string
   status_description?: string | null
+  created_at?: string | null
+  files?: string | null
+  ticket?: string | null
 }
 
 export interface District {

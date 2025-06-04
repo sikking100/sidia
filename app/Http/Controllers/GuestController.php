@@ -15,6 +15,10 @@ use App\Http\Requests\KKKtpFileRequest;
 use App\Http\Requests\AllFileRequest;
 use Illuminate\Support\Facades\Route;
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use Illuminate\Support\Facades\Http;
+
 class GuestController extends Controller
 {
     private $upload;
@@ -31,7 +35,8 @@ class GuestController extends Controller
 
     public function applicant($id)
     {
-        $applicant = Application::where('id_card_number', $id)->whereIn('status', ['PENDING', 'DEFFICIENT', 'VERIFIED'])->get();
+        $applicant = Application::where('id_card_number', $id)->orderBy('created_at', 'desc')
+            ->whereIn('status', ['PENDING', 'DEFFICIENT', 'VERIFIED'])->get();
         return response()->json(
             $applicant
         );
@@ -45,12 +50,40 @@ class GuestController extends Controller
     public function formAction(StoreApplicationRequest $request)
     {
         $applicant = Application::make($request->all());
+
         $this->upload->uploadImages($request, 'images', $applicant);
         $applicant->status_description = "Mohon cek secara berkala, sementara permohonan Anda sedang diverifikasi";
         $applicant->save();
-        // $exp = explode("-",$request->category);
-        // $last = end($exp);
-        // $name = strtolower($last);
+
+        $currentTimestamp = strtotime("now");
+        $key = config('services.external_api.symmetric');
+        $payload = [
+            "iss" => "lumen-jwt",
+            "iat" => $currentTimestamp
+        ];
+
+        $token = JWT::encode($payload, $key, 'HS256');
+        $data = [
+            "nama_aplikasi" => "sidia",
+            "nama_layanan" => $applicant->cat->name_citigov,
+            "id_layanan" => $applicant->cat->id_citigov,
+            "nomor_tiket" => $applicant->id . "/" . $applicant->id_card_number . "/" . $applicant->created_at->format('d') . "/" . $applicant->created_at->format('m') . "/" . $applicant->created_at->format('Y'),
+            "status" => 1,
+            "nama_pemohon" => $applicant->name,
+            "nik_pemohon" => $applicant->id_card_number,
+            "email_pemohon" => $applicant->email,
+            "telepon_pemohon" => $applicant->phone,
+            "nip_petugas" => "198709032020122002",
+            "nama_petugas" => "FATMAWATI",
+            "bidang_petugas" => "PENDAFTARAN PENDUDUK",
+            "jabatan_petugas" => "PENGAWAS KEPENDUDUKAN",
+        ];
+        $ext_url = config('services.external_api.url');
+
+        $result = Http::withHeaders([
+            'token' => $token,
+            'symmetric' => $key,
+        ])->post($ext_url . "application/ticket/insert", $data);
         $category = $request->category;
 
         // dd(gettype($syarat));
