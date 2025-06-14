@@ -7,6 +7,8 @@ use App\Http\Controllers\DistrictController;
 use App\Http\Controllers\WardController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\MenuController;
+use App\Http\Controllers\RequirementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +33,8 @@ Route::get('/', function () {
 
 Route::group(['middleware' => 'auth'], function () {
     Route::resource('application', ApplicationController::class);
+    Route::resource('requirements', RequirementController::class);
+    Route::resource('menu', MenuController::class);
     Route::put('/applicants/{id}', [ApplicationController::class, 'update_status'])->name('status');
     Route::get('/applicants', [ApplicationController::class, 'count'])->name('count');
     Route::resource('district',  DistrictController::class);
@@ -40,6 +44,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::put('/ward/{ward}', [WardController::class, 'update'])->name('ward.update');
     Route::delete('/ward/{ward}', [WardController::class, 'destroy'])->name('ward.destroy');
     Route::get('/photo/{name}', [ApplicationController::class, 'photo'])->name('photo');
+    Route::post('/uploadFile/{id}/berkas', [ApplicationController::class, 'uploadBerkas'])->name('upload.berkas');
+    Route::get('/open-file', [ApplicationController::class, 'openFile'])->name('file.open');
 });
 
 Route::controller(GuestController::class)->group(function () {
@@ -50,6 +56,7 @@ Route::controller(GuestController::class)->group(function () {
     Route::get('/uploadFile/{id}/{category}', 'uploadFile')->name('upload');
     Route::post('/uploadFile/{id}', 'uploadAction')->name('upload.action');
     Route::get('/wards/{id}', 'kelurahan');
+    Route::get('/download-file', 'downloadFile')->name('file.download');
 });
 
 Route::get('/dashboard', function () {

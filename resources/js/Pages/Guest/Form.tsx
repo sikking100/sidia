@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios'
-import { Applicant, District, Ward, persyaratan, subtitle, permasalahan } from '@/Interface/Interface'
+import { Applicant, District, Ward, persyaratan, subtitle, permasalahan, Menu, Requirement } from '@/Interface/Interface'
 import { useForm, usePage } from '@inertiajs/inertia-react'
 import Label from '@/Components/Label'
 import Input from '@/Components/Input'
@@ -10,13 +10,16 @@ import Button from '@/Components/Button'
 import { defImage } from '@/Components/Constant'
 import Guest from '@/Layouts/Guest'
 import { Head } from '@inertiajs/inertia-react'
+import { Parser } from 'html-to-react'
 
 interface Props {
   subtitle: string
   category: string
+  menu: Menu
+  requirements: Array<Requirement>
 }
 
-export default function Form({ category }: Props) {
+export default function Form({ category, menu, requirements }: Props) {
   const { data, errors, setData, post, progress } = useForm<Applicant>(
     {
       family_card_number: '',
@@ -99,8 +102,20 @@ export default function Form({ category }: Props) {
       >
         <h5 className={'block text-lg font-bold'}>Persyaratan</h5>
         <div className={'bg-green-200 p-6 rounded mt-4 text-green-800 font-bold'}>
-          {persyaratan.get(category)!.map((e, i) => <p key={i}>{e}</p>)}
+          {/* {persyaratan.get(category)!.map((e, i) => <p key={i}>{e}</p>)} */}
+          <p>Berkas Upload :</p>
+          {requirements.map((v, i) => <p key={i}>{v.name}</p>)}
+          {/* {persyaratan.get(application.category)?.map((v, i) => <p key={i}>{v}</p>)} */}
+
+          {menu.description === null || menu.description === '' ? <div></div> : <div>
+            <p className='pt-6'>Persyaratan Tambahan :</p>
+            <div className='prose'>
+              {Parser().parse(menu.description)}
+            </div>
+          </div>}
         </div>
+
+
       </div>
       {category.split('-')[0] != '' && <div
         className={'bg-white rounded p-6'}

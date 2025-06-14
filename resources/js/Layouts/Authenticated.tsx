@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, InertiaLink } from '@inertiajs/inertia-react'
+import { Link, InertiaLink, usePage } from '@inertiajs/inertia-react'
 import { Inertia } from '@inertiajs/inertia'
 import route from 'ziggy-js'
 import axios from 'axios'
@@ -30,6 +30,7 @@ export default function Authenticated({ children, header }: React.PropsWithChild
   function logout() {
     Inertia.post(route('logout'))
   }
+  const { url } = usePage()
   return (
     <div className="min-h-screen min-w-screen bg-gray-100">
       <nav className={'bg-white border-b border-gray-100'}>
@@ -44,7 +45,7 @@ export default function Authenticated({ children, header }: React.PropsWithChild
             </div>
             <div className={'flex mx-auto items-center'}>
               <Link
-                className={'px-6'}
+                className={`px-6 ${url === '/application' ? 'active' : ''}`}
                 href={route('application.index')}>
                 <div className={'inline-flex items-center'}>
                   Pemohon
@@ -54,9 +55,14 @@ export default function Authenticated({ children, header }: React.PropsWithChild
                 </div>
               </Link>
               <Link
-                className={'px-6'}
+                className={`px-6 ${url === '/district' ? 'active' : ''}`}
                 href={route('district.index')}>
                 Kecamatan
+              </Link>
+              <Link
+                className={`px-6 ${url.startsWith('/menu') ? 'active' : ''}`}
+                href={route('menu.index')}>
+                Persyaratan
               </Link>
             </div>
             <div className="flex">
@@ -73,12 +79,7 @@ export default function Authenticated({ children, header }: React.PropsWithChild
           </div>
         </div>
       </nav>
-      {header && (
-        <header >
-          <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
-        </header>
-      )}
-      <main>{children}</main>
+      <main className='py-6'>{children}</main>
     </div>
   );
 }

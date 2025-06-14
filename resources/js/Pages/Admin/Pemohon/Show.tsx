@@ -1,6 +1,6 @@
 import React from 'react'
 import Authenticated from '@/Layouts/Authenticated'
-import { Applicant, persyaratan, Files } from '@/Interface/Interface'
+import { Applicant, persyaratan, Files, Menu, Requirement } from '@/Interface/Interface'
 import Button from '@/Components/Button'
 import Label from '@/Components/Label'
 import Input from '@/Components/Input'
@@ -12,6 +12,7 @@ import { Modal } from 'flowbite-react'
 import route from 'ziggy-js'
 import axios from 'axios'
 import { url } from 'inspector'
+import { getStatus } from '@/Functions/functions'
 
 
 interface FileTicket {
@@ -22,6 +23,8 @@ interface FileTicket {
 interface Props {
   application: Applicant
   files: Array<Files>
+  menu: Menu
+  requirements: Array<Requirement>
 }
 
 interface FormUpdateStatus {
@@ -29,7 +32,7 @@ interface FormUpdateStatus {
   status_description: string
 }
 
-export default function PemohonShow({ application, files }: Props) {
+export default function PemohonShow({ application, files, menu, requirements }: Props) {
   const [showModal, setShowModal] = React.useState<boolean>(false)
   function onClick(e: React.FormEvent<HTMLButtonElement>) {
     e.preventDefault()
@@ -46,9 +49,15 @@ export default function PemohonShow({ application, files }: Props) {
     })
   }
 
-  function onTolak(e: React.FormEvent<HTMLButtonElement>) {
+  function onRevisi(e: React.FormEvent<HTMLButtonElement>) {
     e.preventDefault()
     setData('status', 'DEFFICIENT')
+    setShowModal(!showModal)
+  }
+
+  function onTolak(e: React.FormEvent<HTMLButtonElement>) {
+    e.preventDefault()
+    setData('status', 'CANCEL')
     setShowModal(!showModal)
   }
 
@@ -98,49 +107,50 @@ export default function PemohonShow({ application, files }: Props) {
         >
           Selesai
         </Button>}
-        {application.status == 'PENDING' && <React.Fragment>
-          <Button
-            onClick={onTolak}
-            type={'button'}
-            className={'mb-6 mr-6'}
-            processing={false}
-          >
-            Tolak
-          </Button>
-          <Modal
-            show={showModal}
-            size="md"
-            popup={true}
-          // onClose={onClose}
-          >
-            <Modal.Header />
-            <Modal.Body>
-              <div className="text-center">
-                <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                  Berikan alasan penolakan
-                </h3>
-                <div className="flex justify-center gap-4">
-                  <form onSubmit={handleSubmit}>
+        {application.status == 'PENDING' &&
+          <React.Fragment>
+            <Button
+              onClick={onRevisi}
+              type={'button'}
+              className={'mb-6 mr-6'}
+              processing={false}
+            >
+              Revisi Berkas
+            </Button>
+            <Modal
+              show={showModal}
+              size="md"
+              popup={true}
+            // onClose={onClose}
+            >
+              <Modal.Header />
+              <Modal.Body>
+                <div className="text-center">
+                  <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                    Berikan alasan revisi
+                  </h3>
+                  <div className="flex justify-center gap-4">
+                    <form onSubmit={handleSubmit}>
 
-                    <Label forInput={'status_description'} value={'Alasan'} className={'pt-6 pb-2'} />
+                      <Label forInput={'status_description'} value={'Alasan'} className={'pt-6 pb-2'} />
 
-                    <Input
-                      name='status_description'
-                      value={data.status_description}
-                      handleChange={e => setData('status_description', e.target.value)}
-                      className={'w-full'}
-                    />
-                    <ErrorText message={errors.status_description} />
+                      <Input
+                        name='status_description'
+                        value={data.status_description}
+                        handleChange={e => setData('status_description', e.target.value)}
+                        className={'w-full'}
+                      />
+                      <ErrorText message={errors.status_description} />
 
-                    <Button className={'mt-6 mr-2'} processing={false}>Selanjutnya</Button>
-                    <Button type={'reset'} className={'mt-6 ml-2'} processing={false} onClick={(_) => setShowModal(!showModal)}>Batal</Button>
+                      <Button className={'mt-6 mr-2'} processing={false}>Selanjutnya</Button>
+                      <Button type={'reset'} className={'mt-6 ml-2'} processing={false} onClick={(_) => setShowModal(!showModal)}>Batal</Button>
 
-                  </form>
+                    </form>
+                  </div>
                 </div>
-              </div>
-            </Modal.Body>
-          </Modal>
-        </React.Fragment>}
+              </Modal.Body>
+            </Modal>
+          </React.Fragment>}
         {(application.status == 'PENDING' || application.status == 'DEFFICIENT') &&
           <React.Fragment>
             <Button
@@ -151,7 +161,6 @@ export default function PemohonShow({ application, files }: Props) {
             >
               Verifikasi
             </Button>
-
             <Modal
               show={showModal}
               size="md"
@@ -187,9 +196,62 @@ export default function PemohonShow({ application, files }: Props) {
               </Modal.Body>
             </Modal>
           </React.Fragment>}
+        {(application.status == 'PENDING') &&
+          <React.Fragment>
+            <Button
+              onClick={onTolak}
+              type={'button'}
+              className={'mb-6 bg-red-600 ml-6'}
+              processing={false}
+            >
+              Tolak
+            </Button>
+            <Modal
+              show={showModal}
+              size="md"
+              popup={true}
+            // onClose={onClose}
+            >
+              <Modal.Header />
+              <Modal.Body>
+                <div className="text-center">
+                  <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                    Berikan Alasan penolakan
+                  </h3>
+                  <div className="w-full">
+                    <form onSubmit={handleSubmit}>
+
+                      <Label forInput={'status_description'} value={'Alasan'} className={'pt-6 pb-2'} />
+                      <textarea
+                        name='status_description'
+                        onChange={e => setData('status_description', e.target.value)}
+                        className={'w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm'}
+                        rows={5}
+                        value={data.status_description}
+                      >
+                      </textarea>
+                      <ErrorText message={errors.status_description} />
+
+                      <Button className={'mt-6 mr-2'} processing={false}>Selanjutnya</Button>
+                      <Button type={'reset'} className={'mt-6 ml-2'} processing={false} onClick={(_) => setShowModal(!showModal)}>Batal</Button>
+
+                    </form>
+                  </div>
+                </div>
+              </Modal.Body>
+            </Modal>
+          </React.Fragment>}
         <h5 className={'block text-lg font-bold'}>Persyaratan</h5>
         <div className={'bg-green-200 p-6 rounded mt-4 mb-4 text-green-800 font-bold'}>
-          {persyaratan.get(application.category)?.map((v, i) => <p key={i}>{v}</p>)}
+          <p>Berkas Upload :</p>
+          {requirements.map((v, i) => <p key={i}>{v.name}</p>)}
+          {/* {persyaratan.get(application.category)?.map((v, i) => <p key={i}>{v}</p>)} */}
+
+          {menu.description === null || menu.description === '' ? <div></div> : <div>
+            <p>Persyaratan Tambahan :</p>
+            {menu.description}
+          </div>}
+
         </div>
         <table>
           <tbody>
@@ -201,7 +263,7 @@ export default function PemohonShow({ application, files }: Props) {
             <tr>
               <td>Status</td>
               <td>:</td>
-              <td>{application.status}</td>
+              <td>{getStatus(application.status ?? '')}</td>
             </tr>
             <tr>
               <td>Nik</td>
@@ -255,6 +317,9 @@ export default function PemohonShow({ application, files }: Props) {
 
               </div>
               {files.map((v, k) => {
+                if (v.name.includes('Hasil')) {
+                  return <div></div>
+                }
                 return <div className={'mt-6'} key={k}>
                   <p>{v.name}</p>
                   <img src={`../../storage/${v.place}`} />

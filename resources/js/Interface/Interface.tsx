@@ -22,6 +22,8 @@ export interface Applicant {
   created_at?: string | null
   files?: string | null
   ticket?: string | null
+  upload?: string | null
+  filess?: Array<Files>
 }
 
 export interface District {
@@ -40,6 +42,14 @@ export interface Requirement {
   link?: string
   menu_id: number
   name: string
+}
+
+export interface Menu {
+  id: number
+  id_citigov: number
+  name: string
+  name_citigov: string
+  description: string
 }
 
 export interface Files {

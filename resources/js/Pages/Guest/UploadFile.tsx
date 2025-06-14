@@ -29,6 +29,7 @@ export default function UploadFile({ id, requirements, category }: Props) {
         post(route('upload.action', { 'id': id, 'category': category }))
         return
     }
+
     return (
         <Guest
             title={category}>

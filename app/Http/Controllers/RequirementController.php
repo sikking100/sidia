@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRequirementRequest;
 use App\Http\Requests\UpdateRequirementRequest;
 use App\Models\Requirement;
+use Inertia\Inertia;
 
 class RequirementController extends Controller
 {
@@ -15,7 +16,17 @@ class RequirementController extends Controller
      */
     public function index()
     {
-        //
+        $requirements = Requirement::all();
+        // return Inertia::render('Admin/Pemohon/Index', [
+        //     'data' => $application->items(),
+        //     'meta' => [
+        //         'current_page' => $application->currentPage(),
+        //         'last_page' => $application->lastPage(),
+        //         'per_page' => $application->perPage(),
+        //         'total' => $application->total(),
+        //     ]
+        // ]);
+        return Inertia::render('Admin/Persyaratan/Index', compact('requirements'));
     }
 
     /**

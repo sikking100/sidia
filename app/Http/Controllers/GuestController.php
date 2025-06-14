@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class GuestController extends Controller
 {
@@ -28,6 +29,18 @@ class GuestController extends Controller
         $this->upload = new MyUploadFile();
     }
 
+    public function downloadFile(Request $request)
+    {
+        $filename = $request->place;
+
+        // dd($filename);
+        if (!Storage::exists('public/' . $filename)) {
+            abort(404);
+        }
+        // return response()->download(storage_path('app/public/' . $filename));
+        return Storage::download('public/' . $filename);
+    }
+
     public function check()
     {
         return Inertia::render('Guest/CheckApplicant');
@@ -35,8 +48,7 @@ class GuestController extends Controller
 
     public function applicant($id)
     {
-        $applicant = Application::where('id_card_number', $id)->orderBy('created_at', 'desc')
-            ->whereIn('status', ['PENDING', 'DEFFICIENT', 'VERIFIED'])->get();
+        $applicant = Application::with('filess')->where('id_card_number', $id)->orderBy('created_at', 'desc')->get();
         return response()->json(
             $applicant
         );
@@ -44,7 +56,9 @@ class GuestController extends Controller
 
     public function form($category)
     {
-        return Inertia::render('Guest/Form', ['category' => $category]);
+        $menu = Menu::firstWhere('name', $category);
+        $requirements = $menu->requirements;
+        return Inertia::render('Guest/Form', ['category' => $category, 'menu' => $menu, 'requirements' => $requirements]);
     }
 
     public function formAction(StoreApplicationRequest $request)
@@ -113,7 +127,7 @@ class GuestController extends Controller
             $files = new File;
             $files->name = $syarat[$i]->name;
             $files->place = $request->category . '/' . $nameExt;
-            $applicant->files()->save($files);
+            $applicant->filess()->save($files);
         }
         session()->flash('message', 'Silakan mengecek permohonan');
         return redirect('/');

@@ -8,6 +8,7 @@ import { Applicant } from '@/Interface/Interface'
 import Button from '@/Components/Button'
 import { useForm, Link } from '@inertiajs/inertia-react'
 import route from 'ziggy-js'
+import { getStatus } from '@/Functions/functions'
 
 interface FormProps {
   nik: string
@@ -117,14 +118,29 @@ export default function CheckApplicant() {
                   {a.category}
                 </td>
                 <td className={'border border-slate-300 p-6'}>
-                  {a.status}
+                  {getStatus(a.status ?? '')}
                 </td>
                 <td className={'border border-slate-300 p-6'}>
                   {a.status_description}
                 </td>
                 <td className={'border border-slate-300 p-6'}>
+                  {
+                    a.status == 'COMPLETED' && (a.filess !== null && a.filess!.length !== 0 && a.filess!.filter((e) => e.name.includes('Hasil')).length !== 0) ?
+                      // <Link
+                      //   className={'inline-block bg-green-600 px-4 py-2 text-white rounded-md font-semibold'}
+                      //   type={'a'}
+                      //   target="_blank"
+                      //   rel="noopener noreferrer"
+                      //   href={route('file.download', { 'place': a.filess!.filter((e) => e.name.includes('Hasil'))[0].place })}
+                      // >
+                      //   Download Hasil
+
+                      // </Link>
+                      <a className={'inline-block bg-green-600 px-4 py-2 text-white rounded-md font-semibold'} href={`/download-file?place=${a.filess!.filter((e) => e.name.includes('Hasil'))[0].place}`} target="_blank" rel="noopener noreferrer">Download Hasil</a>
+                      : <div></div>
+                  }
                   {a.status == 'DEFFICIENT' && <Link
-                    className={'button'}
+                    className={'button inline-block'}
                     type={'a'}
                     href={route('upload', { 'id': a.id!, 'category': a.category })}
                   >

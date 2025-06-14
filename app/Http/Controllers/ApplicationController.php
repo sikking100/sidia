@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateApplicationRequest;
 use App\Http\Requests\UpdateStatusRequest;
 
 use App\Models\Application;
+use App\Models\File;
 use App\Models\Menu;
 use Inertia\Inertia;
 use App\Support\MyUploadFile;
@@ -16,6 +17,7 @@ use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use mervick\aesEverywhere\AES256;
 
 class ApplicationController extends Controller
@@ -26,6 +28,34 @@ class ApplicationController extends Controller
     public function __construct()
     {
         $this->up = new MyUploadFile();
+    }
+
+    public function openFile(Request $request)
+    {
+        $filename = $request->place;
+
+        // dd($filename);
+        if (!Storage::exists('public/' . $filename)) {
+            abort(404);
+        }
+        // return response()->download(storage_path('app/public/' . $filename));
+        // return Storage::download('public/' . $filename);
+        return response()->file('public/' . $filename, [
+            'Content-Disposition' => 'inline; filename=' . '"' . $filename . '"',
+        ]);
+    }
+
+    public function uploadBerkas(Request $request)
+    {
+        $applicant = Application::find($request->id);
+        $nameExt = time() . '.' . $request->b->extension();
+        $request->b->storeAs($request->category, $nameExt, 'public');
+        $files = new File;
+        $files->name = 'Hasil-' . $request->id;
+        $files->place = $nameExt;
+        $applicant->filess()->save($files);
+        session()->flash('message', 'Berkas berhasil diupload');
+        return redirect()->route('application.index');
     }
 
     public function photo(Request $request)
@@ -57,7 +87,7 @@ class ApplicationController extends Controller
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
 
-        $application = Application::query()->orderBy('created_at', 'desc')->paginate($perPage, ['*'], 'page', $page);
+        $application = Application::with('filess')->orderBy('created_at', 'desc')->paginate($perPage, ['*'], 'page', $page);
 
         return Inertia::render('Admin/Pemohon/Index', [
             'data' => $application->items(),
@@ -228,7 +258,7 @@ class ApplicationController extends Controller
                     $status = "COMPLETED";
                     break;
                 case 3:
-                    $status = "DEFFICIENT";
+                    $status = "CANCEL";
                     break;
                 default:
                     $status = "PENDING";
@@ -259,7 +289,9 @@ class ApplicationController extends Controller
     {
 
         $files = $application->filess;
-        return Inertia::render('Admin/Pemohon/Show', compact('application', 'files'));
+        $menu = Menu::firstWhere('name', $application->category);
+        $requirements = $menu->requirements;
+        return Inertia::render('Admin/Pemohon/Show', compact('application', 'files', 'menu', 'requirements'));
     }
 
     /**
@@ -322,7 +354,7 @@ class ApplicationController extends Controller
                     case "COMPLETED":
                         $status = 2;
                         break;
-                    case "DEFFICIENT":
+                    case "CANCEL":
                         $status = 3;
                         break;
                     default:

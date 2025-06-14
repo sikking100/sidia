@@ -61,9 +61,11 @@ export default function DistrictIndex(props: Props) {
           setShowAlert={setShowAlert}
           message={f.message}
         />
-        <Link className={'link'} href={route('district.create')}>
-          Tambah Data
-        </Link>
+        <div className='mb-6'>
+          <Link className={'btn bg-green-600 text-white'} href={route('district.create')}>
+            Tambah Data
+          </Link>
+        </div>
         {
           props.districts?.length == 0 ? <p>Tidak ada data</p>
             :

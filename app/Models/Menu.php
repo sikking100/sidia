@@ -10,6 +10,12 @@ class Menu extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'description'
+    ];
+
+    public $timestamps = false;
+
     public function requirements()
     {
         return $this->hasMany(Requirement::class);
