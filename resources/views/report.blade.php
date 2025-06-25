@@ -217,7 +217,7 @@
       </tr>
       <tr>
         <td colspan="6">
-          @foreach ($application->files as $file)
+          @foreach ($application->filess as $file)
           {{ $file->name }}<br>
           <img src="{{ public_path('storage/' . $file->place) }}" style="width: 50%" /><br><br>
           <div class="page-break"></div>

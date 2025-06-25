@@ -13,6 +13,7 @@ import route from 'ziggy-js'
 import axios from 'axios'
 import { url } from 'inspector'
 import { getStatus } from '@/Functions/functions'
+import { Parser } from 'html-to-react'
 
 
 interface FileTicket {
@@ -249,7 +250,9 @@ export default function PemohonShow({ application, files, menu, requirements }: 
 
           {menu.description === null || menu.description === '' ? <div></div> : <div>
             <p>Persyaratan Tambahan :</p>
-            {menu.description}
+            <div className="prose">
+              {Parser().parse(menu.description)}
+            </div>
           </div>}
 
         </div>

@@ -109,7 +109,7 @@ export default function Form({ category, menu, requirements }: Props) {
 
           {menu.description === null || menu.description === '' ? <div></div> : <div>
             <p className='pt-6'>Persyaratan Tambahan :</p>
-            <div className='prose'>
+            <div className="prose">
               {Parser().parse(menu.description)}
             </div>
           </div>}
