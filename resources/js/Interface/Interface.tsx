@@ -31,6 +31,12 @@ export interface District {
   name: string
 }
 
+export interface Hamlet {
+  id: number
+  name: string
+  ward: Ward
+}
+
 export interface Ward {
   id: number
   district_id: number
@@ -55,6 +61,15 @@ export interface Menu {
 export interface Files {
   name: string
   place: string
+}
+
+export interface User {
+  id: number
+  ddesa: Ward
+  name: string
+  email: string
+  password: string
+  role: string
 }
 
 export const subtitle: Map<string, string> = new Map<string, string>([

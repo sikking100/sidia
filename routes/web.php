@@ -9,6 +9,7 @@ use App\Http\Controllers\GuestController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\RequirementController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('application', ApplicationController::class);
     Route::resource('requirements', RequirementController::class);
     Route::resource('menu', MenuController::class);
+    Route::resource('user', UserController::class);
+    Route::put('/regen/{id}', [UserController::class, 'user_regen'])->name('regen');
     Route::put('/applicants/{id}', [ApplicationController::class, 'update_status'])->name('status');
     Route::get('/applicants', [ApplicationController::class, 'count'])->name('count');
     Route::resource('district',  DistrictController::class);

@@ -3,6 +3,7 @@ import { Link, InertiaLink, usePage } from '@inertiajs/inertia-react'
 import { Inertia } from '@inertiajs/inertia'
 import route from 'ziggy-js'
 import axios from 'axios'
+import { User } from '@/Interface/Interface';
 
 
 interface Props {
@@ -11,6 +12,8 @@ interface Props {
 
 export default function Authenticated({ children, header }: React.PropsWithChildren<Props>) {
   const [countData, setCountData] = React.useState<number>()
+  const  { user }  = usePage().props.auth as { user: User }
+  
   React.useEffect(() => {
     updateState()
     return () => {
@@ -31,11 +34,14 @@ export default function Authenticated({ children, header }: React.PropsWithChild
     Inertia.post(route('logout'))
   }
   const { url } = usePage()
+
   return (
     <div className="min-h-screen min-w-screen bg-gray-100">
       <nav className={'bg-white border-b border-gray-100'}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+          {user.role === 'desa' ? <div>
+            
+          </div> : <div className="flex justify-between h-16">
             <div className="flex">
               <div className="shrink-0 flex items-center">
                 <Link href="/">
@@ -44,6 +50,13 @@ export default function Authenticated({ children, header }: React.PropsWithChild
               </div>
             </div>
             <div className={'flex mx-auto items-center'}>
+              <Link
+                className={`px-6 ${url === '/user' ? 'active' : ''}`}
+                href={route('user.index')}>
+                <div className={'inline-flex items-center'}>
+                  User
+                </div>
+              </Link>
               <Link
                 className={`px-6 ${url === '/application' ? 'active' : ''}`}
                 href={route('application.index')}>
@@ -72,11 +85,11 @@ export default function Authenticated({ children, header }: React.PropsWithChild
                   as={'button'}
                   href={route('logout')}
                 >
-                  Logout
+                  Logout 
                 </InertiaLink>
               </div>
             </div>
-          </div>
+          </div>}
         </div>
       </nav>
       <main className='py-6'>{children}</main>

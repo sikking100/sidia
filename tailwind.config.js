@@ -7,6 +7,8 @@ module.exports = {
     './storage/framework/views/*.php',
     './resources/views/**/*.blade.php',
     './resources/js/**/*.tsx',
+    "./node_modules/flowbite/**/*.js", // Tambahkan ini
+    "./node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}"
   ],
 
   theme: {
@@ -22,5 +24,9 @@ module.exports = {
     },
   },
 
-  plugins: [require('@tailwindcss/forms'), require('flowbite/plugin'), require('@tailwindcss/typography')],
+  plugins: [
+    require('@tailwindcss/forms'), 
+    require('flowbite/plugin'), 
+    require('@tailwindcss/typography')
+  ],
 };
