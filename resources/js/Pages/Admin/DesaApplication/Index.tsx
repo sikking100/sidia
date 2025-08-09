@@ -11,7 +11,7 @@ interface Props {
   hamlets?: Array<Hamlet>
 }
 
-export default function HamletIndex(props: Props) {
+export default function DesaApplicationIndex(props: Props) {
   const { flash } = usePage().props
   const f = flash as { message: string }
   const [showAlert, setShowAlert] = React.useState(true);

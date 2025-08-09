@@ -1,12 +1,11 @@
 import React from 'react'
 import Authenticated from '@/Layouts/Authenticated'
-import DistrictForm from '@/Pages/Admin/District/Form'
-import HamletForm from './Form'
+import DesaApplicationForm from './Form'
 
-export default function HamletCreate() {
+export default function DesaApplicationCreate() {
     return (
         <Authenticated header={<h2>Dusun</h2>}>
-            <HamletForm />
+            <DesaApplicationForm />
         </Authenticated>
     )
 }

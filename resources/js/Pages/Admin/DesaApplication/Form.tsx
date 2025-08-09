@@ -8,7 +8,7 @@ interface Props {
   hamlet?: Hamlet
 }
 
-export default function HamletForm({ hamlet }: Props) {
+export default function DesaApplicationForm({ hamlet }: Props) {
   const { data, setData, post, put, errors } = useForm({
     'name': hamlet?.name ?? ''
   })
