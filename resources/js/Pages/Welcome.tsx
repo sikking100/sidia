@@ -17,7 +17,7 @@ export default function Welcome(props: any) {
             className={'rounded-t-sm'}
           />
           <div
-            className={'p-6 w-full mx-auto w-full'}
+            className={'p-6 w-full mx-auto'}
           >
             <span className={'block pb-2'}>KTP-el</span>
             <Dropdown>
@@ -63,7 +63,7 @@ export default function Welcome(props: any) {
             className={'rounded-t-sm'}
           />
           <div
-            className={'p-6 w-full mx-auto w-full'}
+            className={'p-6 w-full mx-auto'}
           >
             <span className={'block pb-2'}>Kartu Keluarga</span>
             <Dropdown>
@@ -103,7 +103,7 @@ export default function Welcome(props: any) {
             className={'rounded-t-sm'}
           />
           <div
-            className={'p-6 w-full mx-auto w-full'}
+            className={'p-6 w-full mx-auto'}
           >
             <span className={'block pb-2'}>KIA</span>
             <Dropdown>
@@ -143,7 +143,7 @@ export default function Welcome(props: any) {
             className={'rounded-t-sm'}
           />
           <div
-            className={'p-6 w-full mx-auto w-full'}
+            className={'p-6 w-full mx-auto'}
           >
             <span className={'block pb-2'}>SKPWNI</span>
             <Dropdown>
@@ -168,7 +168,7 @@ export default function Welcome(props: any) {
             className={'rounded-t-sm'}
           />
           <div
-            className={'p-6 w-full mx-auto w-full'}
+            className={'p-6 w-full mx-auto'}
           >
             <span className={'block pb-2'}>Kelahiran</span>
             <Dropdown>
@@ -208,7 +208,7 @@ export default function Welcome(props: any) {
             className={'rounded-t-sm'}
           />
           <div
-            className={'p-6 w-full mx-auto w-full'}
+            className={'p-6 w-full mx-auto'}
           >
             <span className={'block pb-4'}>Perkawinan</span>
             <Link
@@ -225,7 +225,7 @@ export default function Welcome(props: any) {
             className={'rounded-t-sm'}
           />
           <div
-            className={'p-6 w-full mx-auto w-full'}
+            className={'p-6 w-full mx-auto'}
           >
             <span className={'block pb-4'}>Perceraian</span>
             <Link
@@ -242,7 +242,7 @@ export default function Welcome(props: any) {
             className={'rounded-t-sm'}
           />
           <div
-            className={'p-6 w-full mx-auto w-full'}
+            className={'p-6 w-full mx-auto'}
           >
             <span className={'block pb-4'}>Kematian</span>
             <Link
@@ -259,7 +259,7 @@ export default function Welcome(props: any) {
             className={'rounded-t-sm'}
           />
           <div
-            className={'p-6 w-full mx-auto w-full'}
+            className={'p-6 w-full mx-auto'}
           >
             <span className={'block pb-2'}>Data NIK bermasalah (BPJS, BANK, NPWP DLL)</span>
             <Dropdown>

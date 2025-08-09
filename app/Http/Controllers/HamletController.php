@@ -38,6 +38,8 @@ class HamletController extends Controller
     public function store(Request $request)
     {
         $hamlet = Hamlet::make($request->all());
+        $user = auth()->user();
+        $hamlet->ward_id = $user->ddesa->id;
         $hamlet->save();
         session()->flash('message', 'Data berhasil disimpan');
         return redirect()->route('hamlet.index');
@@ -62,7 +64,7 @@ class HamletController extends Controller
      */
     public function edit(Hamlet $hamlet)
     {
-        return Inertia::render('Admin/Hamlet/Create', compact('hamlet'));
+        return Inertia::render('Admin/Hamlet/Edit', compact('hamlet'));
     }
 
     /**
@@ -74,6 +76,7 @@ class HamletController extends Controller
      */
     public function update(Request $request, Hamlet $hamlet)
     {
+        $hamlet->name = $request->name;
         $hamlet->save();
         session()->flash('message', 'Data berhasil diubah');
         return redirect()->route('hamlet.index');

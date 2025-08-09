@@ -7,6 +7,8 @@ use App\Http\Controllers\DistrictController;
 use App\Http\Controllers\WardController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\DesaApplicationController;
+use App\Http\Controllers\HamletController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\UserController;
@@ -37,6 +39,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('requirements', RequirementController::class);
     Route::resource('menu', MenuController::class);
     Route::resource('user', UserController::class);
+    Route::resource('hamlet', HamletController::class);
+    Route::resource('desa-applications', DesaApplicationController::class);
+    Route::get('/desa/buat', [DesaApplicationController::class, 'buat'])->name('buat');
     Route::put('/regen/{id}', [UserController::class, 'user_regen'])->name('regen');
     Route::put('/applicants/{id}', [ApplicationController::class, 'update_status'])->name('status');
     Route::get('/applicants', [ApplicationController::class, 'count'])->name('count');
