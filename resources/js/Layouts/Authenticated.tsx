@@ -43,18 +43,18 @@ export default function Authenticated({ children, header }: React.PropsWithChild
           {user.role === 'desa' ? <div className='flex justify-between h-16'>
             <div className={'flex mx-auto items-center'}>
               <Link
-                className={`px-6 ${url === '/desa-applications' ? 'active' : ''}`}
+                className={`px-6 ${url === '/desa/buat' ? 'active' : ''}`}
                 href={route('buat')}>
                 Buat Permohonan
               </Link>
               <Link
-                className={`px-6 ${url === '/application' ? 'active' : ''}`}
-                href={route('application.index')}>
+                className={`px-6 ${url === '/desa' ? 'active' : ''}`}
+                href={route('desa.index')}>
                 <div className={'inline-flex items-center'}>
                   Pemohon
-                  {countData && countData > 0 ? <span className="inline-flex justify-center items-center ml-2 p-2 text-xs font-semibold text-white bg-red-500 rounded-full">
+                  {/* {countData && countData > 0 ? <span className="inline-flex justify-center items-center ml-2 p-2 text-xs font-semibold text-white bg-red-500 rounded-full">
                     {countData}
-                  </span> : <div></div>}
+                  </span> : <div></div>} */}
                 </div>
               </Link>
               <Link

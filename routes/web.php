@@ -40,8 +40,17 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('menu', MenuController::class);
     Route::resource('user', UserController::class);
     Route::resource('hamlet', HamletController::class);
-    Route::resource('desa-applications', DesaApplicationController::class);
+
+    // desa
+    Route::get('/desa', [DesaApplicationController::class, 'index'])->name('desa.index');
+    Route::post('/desa', [DesaApplicationController::class, 'store'])->name('desa.store');
     Route::get('/desa/buat', [DesaApplicationController::class, 'buat'])->name('buat');
+    Route::get('/desa/create/{category}', [DesaApplicationController::class, 'create'])->name('desa.create');
+    Route::get('/desa/{id}', [DesaApplicationController::class, 'show'])->name('desa.show');
+    Route::get('/desa/{id}/edit', [DesaApplicationController::class, 'edit'])->name('desa.edit');
+    Route::put('/desa/{id}', [DesaApplicationController::class, 'update'])->name('desa.update');
+    // end desa
+
     Route::put('/regen/{id}', [UserController::class, 'user_regen'])->name('regen');
     Route::put('/applicants/{id}', [ApplicationController::class, 'update_status'])->name('status');
     Route::get('/applicants', [ApplicationController::class, 'count'])->name('count');

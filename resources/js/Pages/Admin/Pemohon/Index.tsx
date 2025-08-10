@@ -1,25 +1,16 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import Authenticated from '@/Layouts/Authenticated'
 import { Link, useForm, usePage } from '@inertiajs/inertia-react'
 import route from 'ziggy-js'
 import { Inertia } from '@inertiajs/inertia'
 import Alert from '@/Components/Alert'
-import { Applicant, Files } from '@/Interface/Interface'
+import { Applicant, Files, Meta } from '@/Interface/Interface'
 import { getStatus } from '@/Functions/functions'
 import Button from '@/Components/Button'
 import { Modal } from 'flowbite-react'
 import { ErrorText } from '@/Components/Error'
 import Input from '@/Components/Input'
 import Label from '@/Components/Label'
-
-
-interface Meta {
-  current_page: number
-  last_page: number
-  per_page: number
-  total: number
-}
-
 interface Props {
   data?: Array<Applicant>
   meta: Meta
@@ -40,6 +31,7 @@ export default function PemohonIndex(props: Props) {
       b: undefined
     }
   )
+  const id = useRef<number>()
 
 
   const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,10 +42,9 @@ export default function PemohonIndex(props: Props) {
     setData('b', file)
   }
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>, id: number) {
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    console.log(data)
-    post(route('upload.berkas', id))
+    post(route('upload.berkas', id.current))
     setShowModal(!showModal)
     return
   }
@@ -64,7 +55,9 @@ export default function PemohonIndex(props: Props) {
       <tr key={i}>
         <td className={'p-4 border border-slate-700'}><p className={'flex justify-center'}>{((current_page - 1) * (per_page)) + i + 1}</p></td>
         <td className={'p-4 border border-slate-700'}><p className={'flex justify-center'}>{e.id}</p></td>
-        <td className={'p-4 border border-slate-700 justify-items-center'}><p className={'flex justify-center'}>{getStatus(e.status ?? '')} </p><p className={'text-green-500'}>{e.filess !== null && e.filess!.length !== 0 && e.filess![0].name.includes('Hasil') ? '(Berkas terupload)' : ''}</p></td>
+        <td className={'p-4 border border-slate-700 justify-items-center'}>
+          <p className={'flex justify-center'}>{getStatus(e.status ?? '')} </p>
+          <p className={'text-green-500'}>{(e.filess !== null && e.filess!.length !== 0 && e.filess!.filter((e) => e.name.includes('Hasil')).length !== 0) ? '(Berkas terupload)' : ''}</p></td>
 
         <td className={'p-4 border border-slate-700'}>{e.name}</td>
         <td className={'p-4 border border-slate-700'}>{e.category}</td>
@@ -78,7 +71,10 @@ export default function PemohonIndex(props: Props) {
 
                 <React.Fragment>
                   <button
-                    onClick={(e) => setShowModal(!showModal)}
+                    onClick={(ev) => {
+                      setShowModal(!showModal)
+                      id.current = e.id
+                    }}
                     className={'bg-green-500 hover:bg-green-800 text-white font-bold py-2 px-4 rounded'}
                   >
                     Upload
@@ -96,7 +92,7 @@ export default function PemohonIndex(props: Props) {
                           Upload data yang akan diunduh oleh pemohon
                         </h3>
                         <div className="flex justify-center gap-4">
-                          <form onSubmit={(ev) => onSubmit(ev, e.id ?? 0)}>
+                          <form onSubmit={(ev) => onSubmit(ev)}>
 
                             <Label forInput={'status_description'} value={'PDF / Word'} className={'pt-6 pb-2'} />
 

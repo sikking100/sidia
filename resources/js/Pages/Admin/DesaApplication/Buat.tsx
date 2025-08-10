@@ -27,27 +27,27 @@ export default function Buat() {
                                     align={'left'}
                                 >
                                     <Dropdown.Link
-                                        href={route('form', 'KTP-Pemula')}
+                                        href={route('desa.create', 'KTP-Pemula')}
                                     >
                                         KTP Pemula
                                     </Dropdown.Link>
                                     <Dropdown.Link
-                                        href={route('form', 'KTP-Rusak')}
+                                        href={route('desa.create', 'KTP-Rusak')}
                                     >
                                         KTP Rusak
                                     </Dropdown.Link>
                                     <Dropdown.Link
-                                        href={route('form', 'KTP-Hilang')}
+                                        href={route('desa.create', 'KTP-Hilang')}
                                     >
                                         KTP Hilang
                                     </Dropdown.Link>
                                     <Dropdown.Link
-                                        href={route('form', 'KTP-Perubahan')}
+                                        href={route('desa.create', 'KTP-Perubahan')}
                                     >
                                         KTP Perubahan Data
                                     </Dropdown.Link>
                                     <Dropdown.Link
-                                        href={route('form', 'KTP-Disabilitas')}
+                                        href={route('desa.create', 'KTP-Disabilitas')}
                                     >
                                         Perekaman Disabilitas
                                     </Dropdown.Link>
@@ -73,22 +73,22 @@ export default function Buat() {
                                     align={'left'}
                                 >
                                     <Dropdown.Link
-                                        href={route('form', 'KK-Baru')}
+                                        href={route('desa.create', 'KK-Baru')}
                                     >
                                         KK Baru
                                     </Dropdown.Link>
                                     <Dropdown.Link
-                                        href={route('form', 'KK-Rusak')}
+                                        href={route('desa.create', 'KK-Rusak')}
                                     >
                                         KK Rusak
                                     </Dropdown.Link>
                                     <Dropdown.Link
-                                        href={route('form', 'KK-Hilang')}
+                                        href={route('desa.create', 'KK-Hilang')}
                                     >
                                         KK Hilang
                                     </Dropdown.Link>
                                     <Dropdown.Link
-                                        href={route('form', 'KK-Perubahan-Data')}
+                                        href={route('desa.create', 'KK-Perubahan-Data')}
                                     >
                                         KK Perubahan Data
                                     </Dropdown.Link>
@@ -113,22 +113,22 @@ export default function Buat() {
                                     align={'left'}
                                 >
                                     <Dropdown.Link
-                                        href={route('form', 'KIA-Baru')}
+                                        href={route('desa.create', 'KIA-Baru')}
                                     >
                                         KIA Baru
                                     </Dropdown.Link>
                                     <Dropdown.Link
-                                        href={route('form', 'KIA-Rusak')}
+                                        href={route('desa.create', 'KIA-Rusak')}
                                     >
                                         KIA Rusak
                                     </Dropdown.Link>
                                     <Dropdown.Link
-                                        href={route('form', 'KIA-Hilang')}
+                                        href={route('desa.create', 'KIA-Hilang')}
                                     >
                                         KIA Hilang
                                     </Dropdown.Link>
                                     <Dropdown.Link
-                                        href={route('form', 'KIA-Perubahan-Data')}
+                                        href={route('desa.create', 'KIA-Perubahan-Data')}
                                     >
                                         KIA Perubahan Data
                                     </Dropdown.Link>
@@ -153,7 +153,7 @@ export default function Buat() {
                                     align={'left'}
                                 >
                                     <Dropdown.Link
-                                        href={route('form', 'SKPWNI-Pindah-Keluar')}
+                                        href={route('desa.create', 'SKPWNI-Pindah-Keluar')}
                                     >
                                         Pindah Keluar
                                     </Dropdown.Link>
@@ -178,22 +178,22 @@ export default function Buat() {
                                     align={'left'}
                                 >
                                     <Dropdown.Link
-                                        href={route('form', 'Akta-Kelahiran-Baru')}
+                                        href={route('desa.create', 'Akta-Kelahiran-Baru')}
                                     >
                                         Akta Lahir Baru
                                     </Dropdown.Link>
                                     <Dropdown.Link
-                                        href={route('form', 'Akta-Kelahiran-Rusak')}
+                                        href={route('desa.create', 'Akta-Kelahiran-Rusak')}
                                     >
                                         Akta Lahir Rusak
                                     </Dropdown.Link>
                                     <Dropdown.Link
-                                        href={route('form', 'Akta-Kelahiran-Hilang')}
+                                        href={route('desa.create', 'Akta-Kelahiran-Hilang')}
                                     >
                                         Akta Lahir Hilang
                                     </Dropdown.Link>
                                     <Dropdown.Link
-                                        href={route('form', 'Akta-Kelahiran-Perubahan')}
+                                        href={route('desa.create', 'Akta-Kelahiran-Perubahan')}
                                     >
                                         Akta Lahir Perubahan Data
                                     </Dropdown.Link>
@@ -212,7 +212,7 @@ export default function Buat() {
                             <span className={'block pb-4'}>Perkawinan</span>
                             <Link
                                 className={'rounded bg-kemenag text-white py-2 px-4'}
-                                href={route('form', 'Perkawinan')}
+                                href={route('desa.create', 'Perkawinan')}
                             >
                                 Layanan
                             </Link>
@@ -229,7 +229,7 @@ export default function Buat() {
                             <span className={'block pb-4'}>Perceraian</span>
                             <Link
                                 className={'rounded bg-kemenag text-white py-2 px-4'}
-                                href={route('form', 'Perceraian')}
+                                href={route('desa.create', 'Perceraian')}
                             >
                                 Layanan
                             </Link>
@@ -246,7 +246,7 @@ export default function Buat() {
                             <span className={'block pb-4'}>Kematian</span>
                             <Link
                                 className={'rounded bg-kemenag text-white py-2 px-4'}
-                                href={route('form', 'Kematian')}
+                                href={route('desa.create', 'Kematian')}
                             >
                                 Layanan
                             </Link>
@@ -269,7 +269,7 @@ export default function Buat() {
                                     align={'left'}
                                 >
                                     <Dropdown.Link
-                                        href={route('form', 'Pengaduan-Data-Kependudukan')}
+                                        href={route('desa.create', 'Pengaduan-Data-Kependudukan')}
                                     >
                                         Pengaduan Data Kependudukan (NIK)
                                     </Dropdown.Link>

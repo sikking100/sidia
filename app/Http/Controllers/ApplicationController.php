@@ -318,7 +318,7 @@ class ApplicationController extends Controller
      */
     public function update(UpdateApplicationRequest $request, Application $application)
     {
-        // dd($application);
+        dd($request->all());
     }
 
 

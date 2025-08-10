@@ -6,6 +6,7 @@ export const getStatus = (status: string): string => {
         case 'COMPLETED': return 'Selesai'
         case 'DEFFICIENT': return 'Berkas tidak sesuai'
         case 'VERIFIED': return 'Terverfikasi'
+        case 'REVISED' : return 'Sudah direvisi'
         default: return 'Tertolak'
     }
 }

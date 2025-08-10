@@ -28,7 +28,7 @@ return new class extends Migration
             $table->text('images');
             $table->text('description')->nullable();
             $table->text('problems')->nullable();
-            $table->enum('status', ['PENDING', 'DEFFICIENT', 'VERIFIED', 'COMPLETED'])->default('PENDING');
+            $table->enum('status', ['READY', 'SENDED', 'PROSES', 'REVISION', 'REJECT', 'COMPLETED'])->default('READY');
             $table->timestamps();
         });
     }

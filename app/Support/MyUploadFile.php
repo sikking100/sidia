@@ -26,6 +26,14 @@ class MyUploadFile
     return;
   }
 
+  public function deleteBerkas($folder)
+  {
+    if (File::exists(public_path('storage/' . $folder))) {
+      File::delete(public_path('storage/' . $folder));
+    }
+    return;
+  }
+
   public function uploadKK($request, $folder, $model)
   {
     $name = time() . '.' . $request->file_family_card->extension();

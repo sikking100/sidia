@@ -108,7 +108,7 @@ export default function PemohonShow({ application, files, menu, requirements }: 
         >
           Selesai
         </Button>}
-        {application.status == 'PENDING' &&
+        {(application.status == 'PENDING' || application.status == 'REVISED') &&
           <React.Fragment>
             <Button
               onClick={onRevisi}
@@ -116,7 +116,7 @@ export default function PemohonShow({ application, files, menu, requirements }: 
               className={'mb-6 mr-6'}
               processing={false}
             >
-              Revisi Berkas
+              {application.status === 'REVISED' ? 'Revisi Ulang' : 'Revisi Berkas'}
             </Button>
             <Modal
               show={showModal}
@@ -152,7 +152,7 @@ export default function PemohonShow({ application, files, menu, requirements }: 
               </Modal.Body>
             </Modal>
           </React.Fragment>}
-        {(application.status == 'PENDING' || application.status == 'DEFFICIENT') &&
+        {(application.status == 'PENDING' || application.status == 'DEFFICIENT' || application.status == 'REVISED') &&
           <React.Fragment>
             <Button
               onClick={onVerified}

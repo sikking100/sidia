@@ -24,6 +24,52 @@ export interface Applicant {
   ticket?: string | null
   upload?: string | null
   filess?: Array<Files>
+  hamlet_id?: number | null
+}
+
+export interface DesaApplication {
+  id?: number
+  hamlet: Hamlet
+  id_card_number: string
+  family_card_number: string
+  family_head_name: string
+  category: string
+  name: string
+  phone: string
+  email: string
+  sex: string
+  religion: string
+  images: string | File | undefined
+  description: string
+  problem?: string
+  status?: string
+  status_description?: string | null
+  created_at?: string | null
+  files?: string | null
+}
+
+export interface Meta {
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
+}
+
+export interface DesaApplicationPost {
+  hamlet_id: number
+  id_card_number: string
+  family_card_number: string
+  family_head_name: string
+  category: string
+  name: string
+  phone: string
+  email: string
+  sex: string
+  religion: string
+  images: string | File | undefined
+  description: string
+  problem?: string
+  filessss: FilesForm[] | undefined
 }
 
 export interface District {
@@ -56,6 +102,12 @@ export interface Menu {
   name: string
   name_citigov: string
   description: string
+}
+
+export interface FilesForm {
+  name: string
+  filenya: File
+  place: string
 }
 
 export interface Files {
