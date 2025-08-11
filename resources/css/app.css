@@ -3,6 +3,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+    @apply bg-gray-100; /* Warna background default */
+  }
+
 .link {
   @apply text-blue-500;
 }
@@ -21,5 +25,9 @@
 
 .active {
   @apply bg-gray-400 text-white h-full content-center;
+}
+
+.blue-gradient {
+  @apply bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white hover:bg-gradient-to-br focus:ring-blue-300 dark:focus:ring-blue-800
 }
 

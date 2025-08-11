@@ -48,7 +48,7 @@ export default function Guest({ children, title = 'Selamat Datang' }: React.Prop
           </div>
         </Link>
 
-        <Link href={route('dashboard')}>
+        <Link href={route('application.index')}>
 
           <div className={'inline-flex mr-2 rounded-full bg-kemenag py-2 px-4'}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className="w-6 h-6">
