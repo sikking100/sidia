@@ -23,7 +23,6 @@ createInertiaApp({
   // },
   resolve: (name) => resolvePageComponent(
     `./Pages/${name}.tsx`,
-    // @ts-ignore
     import.meta.glob('./Pages/**/*.tsx')
   ),
   setup({ el, App, props }) {
@@ -33,16 +32,16 @@ createInertiaApp({
     // // return {
     // //   destroy: () => root.unmount()
     // // }
-    if (!el) {
-      return {};
-    }
+    // if (!el) {
+    //   return {};
+    // }
 
     const root = createRoot(el);
     root.render(<App {...props} />);
 
-    return {
-      destroy: () => root.unmount(),
-    };
+    // return {
+    //   destroy: () => root.unmount(),
+    // };
   },
 });
 

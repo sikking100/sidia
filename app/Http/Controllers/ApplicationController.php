@@ -8,8 +8,11 @@ use App\Http\Requests\UpdateApplicationRequest;
 use App\Http\Requests\UpdateStatusRequest;
 
 use App\Models\Application;
+use App\Models\District;
 use App\Models\File;
+use App\Models\Hamlet;
 use App\Models\Menu;
+use App\Models\Ward;
 use Inertia\Inertia;
 use App\Support\MyUploadFile;
 use Firebase\JWT\JWT;
@@ -84,19 +87,116 @@ class ApplicationController extends Controller
      */
     public function index(Request $request)
     {
+
+        $districts = District::all();
+        $wards = Ward::all();
+        $hamlets = Hamlet::all();
+
+        $query = Application::query();
+
+        if ($request->has('district') && !empty($request->district)) {
+            $query->where('district', 'like', '%' . $request->district . '%');
+        }
+
+        if ($request->has('ward') && !empty($request->ward)) {
+            $query->where('ward', 'like', '%' . $request->ward . '%');
+        }
+
+        if ($request->has('hamlet_id') && !empty($request->hamlet_id)) {
+            $query->where('hamlet_id', $request->hamlet_id);
+        }
+
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('nikname') && !empty($request->nikname)) {
+            if (is_numeric($request->nikname)) {
+                $query->where('id_card_number', $request->nikname);
+            } else {
+                $query->where('name', 'like', '%' . $request->nikname . '%');
+            }
+        }
+
+        if ($request->has('tahun') && !empty($request->tahun)) {
+            $query->whereYear('created_at', $request->tahun);
+        }
+
+        $application = Application::with('filess')->orderBy('created_at', 'desc')->paginate(10, ['*'], 'page', 1);
+
+        return Inertia::render('Admin/Pemohon/Index', [
+            'data' => $application->items(),
+            'districts' => $districts,
+            'wards' => $wards,
+            'hamlets' => $hamlets,
+            'meta' => [
+                'current_page' => $application->currentPage(),
+                'last_page' => $application->lastPage(),
+                'per_page' => $application->perPage(),
+                'total' => $application->total(),
+            ],
+        ]);
+    }
+
+    public function get_years()
+    {
+        $years = Application::selectRaw('DISTINCT YEAR(created_at) as year')->groupBy('year')->orderBy('year')->pluck('year');
+        return response()->json($years);
+    }
+
+    public function paging(Request $request)
+    {
+
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
 
-        $application = Application::with('filess')->orderBy('created_at', 'desc')->paginate($perPage, ['*'], 'page', $page);
+        // dd($request->nikname);
 
-        return Inertia::render('Admin/Pemohon/Index', [
+        $query = Application::query();
+
+        if ($request->has('district') && !empty($request->district)) {
+
+            $query->where('district', 'like', '%' . $request->district . '%');
+        }
+
+        if ($request->has('ward') && !empty($request->ward)) {
+            $query->where('ward', 'like', '%' . $request->ward . '%');
+        }
+
+        if ($request->has('hamlet_id') && !empty($request->hamlet_id) && $request->hamlet_id != -1) {
+            $query->where('hamlet_id', $request->hamlet_id);
+        }
+
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('nikname') && !empty($request->nikname)) {
+
+
+            if (is_numeric($request->nikname)) {
+                $query->where('id_card_number', $request->nikname);
+            } else {
+                $query->where('name', 'like', '%' . $request->nikname . '%');
+            }
+        }
+
+        if ($request->has('tahun') && !empty($request->tahun)) {
+
+            $query->whereYear('created_at', $request->tahun);
+        }
+        // $query->whereYear('created_at', $request->tahun);
+        // $query->where('name', 'like', '%' . $request->nikname . '%');
+        $application = $query->with('filess')->orderBy('created_at', 'desc')->paginate($perPage, ['*'], 'page', $page);
+
+        return response()->json([
             'data' => $application->items(),
             'meta' => [
                 'current_page' => $application->currentPage(),
                 'last_page' => $application->lastPage(),
                 'per_page' => $application->perPage(),
                 'total' => $application->total(),
-            ]
+            ],
         ]);
     }
 

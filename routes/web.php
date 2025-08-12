@@ -36,6 +36,8 @@ Route::get('/', function () {
 
 Route::group(['middleware' => 'auth'], function () {
     Route::resource('application', ApplicationController::class);
+    Route::get('/paging', [ApplicationController::class, 'paging'])->name('paging');
+    Route::get('/years', [ApplicationController::class, 'get_years']);
     Route::resource('requirements', RequirementController::class);
     Route::resource('menu', MenuController::class);
     Route::resource('user', UserController::class);
@@ -75,6 +77,7 @@ Route::controller(GuestController::class)->group(function () {
     Route::get('/wards/{id}', 'kelurahan');
     Route::get('/download-file', 'downloadFile')->name('file.download');
 });
+
 
 // Route::get('/dashboard', function () {
 //     return Inertia::render('Dashboard');
