@@ -1,3 +1,4 @@
+import { Files } from "@/Interface/Interface"
 import axios from "axios"
 import { useEffect, useState } from "react"
 
@@ -26,3 +27,8 @@ export function useIsMobile(breakpoint: number = 768): boolean {
 
   return isMobile;
 }
+
+export const getFileType = (file: Files) => {
+  const ext = file.place.split('.').pop()?.toLowerCase();
+  return ext === 'pdf' ? 'pdf' : 'image';
+};

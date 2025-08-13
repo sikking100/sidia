@@ -6,6 +6,8 @@ import axios from 'axios'
 import { User } from '@/Interface/Interface';
 import { Button, Navbar, NavbarCollapse, NavbarLink, NavbarToggle } from 'flowbite-react';
 import { useIsMobile } from '@/Functions/functions';
+import { HiDocument, HiLogout, HiOfficeBuilding, HiTicket, HiUser } from 'react-icons/hi';
+import { HiBuildingOffice } from 'react-icons/hi2';
 
 
 interface Props {
@@ -41,20 +43,36 @@ export default function Authenticated({ children, header }: React.PropsWithChild
 
   return (
     <div className="min-h-screen min-w-screen">
-      {isMobile ? <Navbar fluid rounded>
-        <NavbarToggle />
-        <NavbarCollapse>
-          <NavbarLink href="#">
-            Pemohon
-          </NavbarLink>
-          <NavbarLink href="#">
-            Pengguna
-          </NavbarLink>
-          <NavbarLink href="#">Kecamatan</NavbarLink>
-          <NavbarLink href="#">Persyaratan</NavbarLink>
-          <NavbarLink onClick={(e) => Inertia.post(route('logout'))} as={Link}>Logout</NavbarLink>
-        </NavbarCollapse>
-      </Navbar> :
+      {isMobile ?
+        <Navbar fluid rounded theme={{
+          toggle: {
+            base: "ml-4"
+          },
+          link: {
+            base: 'flex items-center'
+          }
+        }}>
+          <NavbarToggle />
+          <NavbarCollapse>
+            <NavbarLink href="#">
+              <HiTicket className={'mr-2'} />
+              Pemohon
+            </NavbarLink>
+            <NavbarLink href="#">
+              <HiUser className={'mr-2'} />
+              Pengguna
+            </NavbarLink>
+            <NavbarLink href="#">
+              <HiOfficeBuilding className={'mr-2'} />
+              Kecamatan</NavbarLink>
+            <NavbarLink href="#">
+              <HiDocument className={'mr-2'} />
+              Persyaratan</NavbarLink>
+            <NavbarLink onClick={(e) => Inertia.post(route('logout'))} as={Link}>
+              <HiLogout className={'mr-2'} />
+              Logout</NavbarLink>
+          </NavbarCollapse>
+        </Navbar> :
         <nav>
           <div className="w-full mx-auto pt-6 px-6">
             <div className='w-full flex gap-x-2'>
@@ -67,6 +85,7 @@ export default function Authenticated({ children, header }: React.PropsWithChild
                 type='button'
                 size={"sm"}
               >
+                <HiTicket className={'mr-2'} />
                 Pemohon
               </Button>
               <Button
@@ -77,6 +96,8 @@ export default function Authenticated({ children, header }: React.PropsWithChild
                 // gradientMonochrome={`${url === '/user' ? 'info' : ''}`}
                 size={"sm"}
               >
+                <HiUser className={'mr-2'} />
+
                 Pengguna
               </Button>
               <Button
@@ -87,6 +108,8 @@ export default function Authenticated({ children, header }: React.PropsWithChild
                 // gradientMonochrome={`${url === '/district' ? 'info' : ''}`}
                 size={"sm"}
               >
+                <HiOfficeBuilding className={'mr-2'} />
+
                 Kecamatan
               </Button>
               <Button
@@ -97,6 +120,8 @@ export default function Authenticated({ children, header }: React.PropsWithChild
                 // gradientMonochrome={`${url === '/menu' ? 'info' : ''}`}
                 size={"sm"}
               >
+                <HiDocument className={'mr-2'} />
+
                 Persyaratan
               </Button>
               <div
@@ -109,13 +134,15 @@ export default function Authenticated({ children, header }: React.PropsWithChild
                   onClick={(e) => Inertia.post(route('logout'))}
 
                 >
+                  <HiLogout className={'mr-2'} />
                   Logout
                 </Button>
               </div>
             </div>
 
           </div>
-        </nav >}
+        </nav >
+      }
       <main className='p-6 m-6 bg-white shadow-md rounded-md'>{children}</main>
     </div >
   );

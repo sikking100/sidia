@@ -19,4 +19,9 @@ class Hamlet extends Model
     {
         return $this->belongsTo(Ward::class);
     }
+
+    public function applications()
+    {
+        return $this->hasMany(Application::class);
+    }
 }

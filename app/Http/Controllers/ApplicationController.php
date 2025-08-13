@@ -33,6 +33,12 @@ class ApplicationController extends Controller
         $this->up = new MyUploadFile();
     }
 
+    public function downloadFile(Request $request)
+    {
+        $filename = $request->place;
+        return Storage::download('public/' . $filename);
+    }
+
     public function openFile(Request $request)
     {
         $filename = $request->place;
@@ -389,9 +395,10 @@ class ApplicationController extends Controller
     {
 
         $files = $application->filess;
+        $hamlet = $application->hamlet;
         $menu = Menu::firstWhere('name', $application->category);
         $requirements = $menu->requirements;
-        return Inertia::render('Admin/Pemohon/Show', compact('application', 'files', 'menu', 'requirements'));
+        return Inertia::render('Admin/Pemohon/Show', compact('application', 'files', 'menu', 'requirements', 'hamlet'));
     }
 
     /**

@@ -62,74 +62,131 @@ export default function Login() {
   };
 
   return (
+    <div className='min-h-screen bg-blue-400 content-center'>
+      <div className={'border-blue-600 bg-white border-solid border-4 w-fit  md:flex md:flex-row rounded-md mx-auto min-h-fit items-center'}>
+        <img src="/assets/loginbupati.webp" alt="" className={'h-96 rounded-sm'} />
+        <div className={'w-full h-full sm:max-w-md px-6 py-4 overflow-hidden'}>
+          <form onSubmit={submit}>
 
+            <div>
+              <Label forInput="email" value="Email" />
+              <Input
+                type="text"
+                name="email"
+                value={data.email}
+                className="mt-1 block w-full"
+                autoComplete="username"
+                isFocused={true}
+                handleChange={(e) => setData('email', e.target.value)}
+              />
+            </div>
+            <div className="mt-4">
+              <Label forInput="password" value="Password" />
 
+              <Input
+                type="password"
+                name="password"
+                value={data.password}
+                className="mt-1 block w-full"
+                autoComplete="current-password"
+                handleChange={(e) => setData('password', e.target.value)}
+              />
+            </div>
 
-    <div className={'min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-kemenag'}>
-      <div className={'text-white w-full flex flex-col place-items-center'}>
-        <img src={'/assets/logo.png'} className={'h-40 mb-2'} />
-        <h6 className={'mx-auto'}>Login Dashboard</h6>
-        <h6 className={'text-sm mx-auto'}>Sidia Disdukcapil Kab. Morowali Utara</h6>
-        <span className={'text-xs mx-auto'}>Versi 1.0</span>
-      </div>
-      <div className={'w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg'}>
-
-        <Head title="Log in" />
-
-        <form onSubmit={submit}>
-          <div>
-            <Label forInput="email" value="Email" />
-
-            <Input
-              type="text"
-              name="email"
-              value={data.email}
-              className="mt-1 block w-full"
-              autoComplete="username"
-              isFocused={true}
-              handleChange={(e) => setData('email', e.target.value)}
-            />
-          </div>
-
-          <div className="mt-4">
-            <Label forInput="password" value="Password" />
-
-            <Input
-              type="password"
-              name="password"
-              value={data.password}
-              className="mt-1 block w-full"
-              autoComplete="current-password"
-              handleChange={(e) => setData('password', e.target.value)}
-            />
-          </div>
-
-          <div className="block mt-4">
-            <GoogleReCaptchaProvider
-              reCaptchaKey={siteKey.props.siteKey}
-            >
-              <GoogleReCaptcha onVerify={e => {
-                if (e !== '') {
-                  if (data.token === '') {
-                    setData('token', e)
+            <div className="block mt-4">
+              <GoogleReCaptchaProvider
+                reCaptchaKey={siteKey.props.siteKey}
+              >
+                <GoogleReCaptcha onVerify={e => {
+                  if (e !== '') {
+                    if (data.token === '') {
+                      setData('token', e)
+                    }
                   }
-                }
-              }} />
-            </GoogleReCaptchaProvider>
-          </div>
+                }} />
+              </GoogleReCaptchaProvider>
+            </div>
 
 
-          <div className="flex items-center justify-end mt-4">
-            <Button className="ml-4" processing={processing}>
-              Log in
-            </Button>
-          </div>
-          {
-            Object.keys(siteKey.props.errors).length > 0 && Object.values(siteKey.props.errors).map((e, i) => <ErrorText key={i} message={e} />)
-          }
-        </form>
+            <div className="flex items-center justify-end mt-4">
+              <Button className="ml-4" processing={processing}>
+                Log in
+              </Button>
+            </div>
+            {
+              Object.keys(siteKey.props.errors).length > 0 && Object.values(siteKey.props.errors).map((e, i) => <ErrorText key={i} message={e} />)
+            }
+          </form>
+        </div>
       </div>
     </div>
+
+
+    // <div className={'min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-kemenag'}>
+    //   <div className={'text-white w-full flex flex-col place-items-center'}>
+    //     <img src={'/assets/logo.png'} className={'h-40 mb-2'} />
+    //     <h6 className={'mx-auto'}>Login Dashboard</h6>
+    //     <h6 className={'text-sm mx-auto'}>Sidia Disdukcapil Kab. Morowali Utara</h6>
+    //     <span className={'text-xs mx-auto'}>Versi 1.0</span>
+    //   </div>
+    //   <div className={'w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg'}>
+
+    //     <Head title="Log in" />
+
+    //     <form onSubmit={submit}>
+    //       <div>
+    //         <Label forInput="email" value="Email" />
+
+    //         <Input
+    //           type="text"
+    //           name="email"
+    //           value={data.email}
+    //           className="mt-1 block w-full"
+    //           autoComplete="username"
+    //           isFocused={true}
+    //           handleChange={(e) => setData('email', e.target.value)}
+    //         />
+    //       </div>
+
+    //       <div className="mt-4">
+    //         <Label forInput="password" value="Password" />
+
+    //         <Input
+    //           type="password"
+    //           name="password"
+    //           value={data.password}
+    //           className="mt-1 block w-full"
+    //           autoComplete="current-password"
+    //           handleChange={(e) => setData('password', e.target.value)}
+    //         />
+    //       </div>
+
+    //       <div className="block mt-4">
+    //         <GoogleReCaptchaProvider
+    //           reCaptchaKey={siteKey.props.siteKey}
+    //         >
+    //           <GoogleReCaptcha onVerify={e => {
+    //             if (e !== '') {
+    //               if (data.token === '') {
+    //                 setData('token', e)
+    //               }
+    //             }
+    //           }} />
+    //         </GoogleReCaptchaProvider>
+    //       </div>
+
+
+    //       <div className="flex items-center justify-end mt-4">
+    //         <Button className="ml-4" processing={processing}>
+    //           Log in
+    //         </Button>
+    //       </div>
+    //       {
+    //         Object.keys(siteKey.props.errors).length > 0 && Object.values(siteKey.props.errors).map((e, i) => <ErrorText key={i} message={e} />)
+    //       }
+    //     </form>
+    //   </div>
+    // </div>
 
   );
 }

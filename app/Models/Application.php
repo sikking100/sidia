@@ -39,4 +39,9 @@ class Application extends Model
   {
     return $this->hasOne(Menu::class, 'name', 'category');
   }
+
+  function hamlet()
+  {
+    return $this->belongsTo(Hamlet::class);
+  }
 }

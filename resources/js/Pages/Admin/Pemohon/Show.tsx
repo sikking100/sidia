@@ -1,19 +1,28 @@
 import React from 'react'
 import Authenticated from '@/Layouts/Authenticated'
-import { Applicant, persyaratan, Files, Menu, Requirement } from '@/Interface/Interface'
-import Button from '@/Components/Button'
+import { Applicant, persyaratan, Files, Menu, Requirement, Hamlet } from '@/Interface/Interface'
+
+import { Inertia } from '@inertiajs/inertia'
+
+import route from 'ziggy-js'
+
+import { HiBackward } from 'react-icons/hi2'
+import { ArrowLeftIcon, Avatar, Button, ButtonGroup, buttonTheme, CloseIcon, Modal, ModalBody, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Textarea, ThemeProvider } from 'flowbite-react'
+import { Link, useForm } from '@inertiajs/inertia-react'
+import { getFileType, getStatus } from '@/Functions/functions'
+import { MdArchive, MdCancel, MdDownloading, MdPrint, MdVerified } from 'react-icons/md'
+import { BsBack, BsDownload } from 'react-icons/bs'
+import { PiBackspace } from 'react-icons/pi'
+import { FcPrevious } from 'react-icons/fc'
+import { GiPreviousButton } from 'react-icons/gi'
+import { HiAdjustments, HiClock, HiCloudDownload, HiEye, HiPhone, HiTicket, HiUserCircle } from 'react-icons/hi'
+import { SiTicktick } from 'react-icons/si'
+import { BiCheck, BiCode, BiFace, BiFile, BiHome, BiMap, BiMapAlt, BiMapPin, BiPhone, BiPrinter, BiRevision, BiText, BiTime, BiUser, BiUserCircle } from 'react-icons/bi'
+import TimeAgo from 'react-timeago'
+import { makeIntlFormatter } from 'react-timeago/defaultFormatter'
 import Label from '@/Components/Label'
 import Input from '@/Components/Input'
 import { ErrorText } from '@/Components/Error'
-import { Link, useForm } from '@inertiajs/inertia-react'
-import { Inertia } from '@inertiajs/inertia'
-
-import { Modal } from 'flowbite-react'
-import route from 'ziggy-js'
-import axios from 'axios'
-import { url } from 'inspector'
-import { getStatus } from '@/Functions/functions'
-import { Parser } from 'html-to-react'
 
 
 interface FileTicket {
@@ -26,6 +35,7 @@ interface Props {
   files: Array<Files>
   menu: Menu
   requirements: Array<Requirement>
+  hamlet?: Hamlet
 }
 
 interface FormUpdateStatus {
@@ -33,8 +43,12 @@ interface FormUpdateStatus {
   status_description: string
 }
 
-export default function PemohonShow({ application, files, menu, requirements }: Props) {
+export default function PemohonShow({ application, files, menu, requirements, hamlet }: Props) {
   const [showModal, setShowModal] = React.useState<boolean>(false)
+  const [showModalPenolakan, setShowModalPenolakan] = React.useState<boolean>(false)
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [selectedFile, setSelectedFile] = React.useState<Files | null>(null);
+
   function onClick(e: React.FormEvent<HTMLButtonElement>) {
     e.preventDefault()
     window.open(route('application.edit', application.id))
@@ -59,7 +73,7 @@ export default function PemohonShow({ application, files, menu, requirements }: 
   function onTolak(e: React.FormEvent<HTMLButtonElement>) {
     e.preventDefault()
     setData('status', 'CANCEL')
-    setShowModal(!showModal)
+    setShowModalPenolakan(!showModalPenolakan)
   }
 
   function onVerified(e: React.FormEvent<HTMLButtonElement>) {
@@ -82,257 +96,336 @@ export default function PemohonShow({ application, files, menu, requirements }: 
     return
   }
 
-  function handleClick(e: React.MouseEvent<HTMLAnchorElement> | React.KeyboardEvent<HTMLAnchorElement>, name: string) {
-    e.preventDefault()
+  function handleClick(name: string) {
     window.open(route('photo', name))
   }
 
+  const handleView = (file: Files) => {
+    setSelectedFile(file);
+    setIsModalOpen(true);
+  };
+
+  const dateCreated = Date.parse(application.created_at ?? '')
+  const dateCreate = Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(dateCreated)
+  const intlFormatter = makeIntlFormatter({
+    locale: "id-ID", // string
+  });
   return (
     <Authenticated
       header={<h2>Pemohon</h2>}
     >
-      <div className={'container mx-auto bg-white rounded w-full p-6'}>
-        {(application.status == 'VERIFIED' || application.status == 'COMPLETED') && <Button
-          onClick={onClick}
-          type={'button'}
-          className={'mb-6 mr-6'}
-          processing={false}
+      {isModalOpen && selectedFile && (
+        <Modal show={isModalOpen} onClose={() => setIsModalOpen(false)} size="4xl">
+          <ModalHeader>Pratinjau File</ModalHeader>
+          <ModalBody>
+            {getFileType(selectedFile) === 'pdf' ? (
+              <iframe
+                src={`../../storage/${selectedFile.place}`}
+                width="100%"
+                height="600px"
+                title="PDF Viewer"
+              />
+            ) : (
+              <img
+                src={`../../storage/${selectedFile.place}`}
+                alt={selectedFile.name}
+                className="max-w-full max-h-[600px] mx-auto"
+              />
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button className={"bg-red-500"} size='xs' onClick={() => setIsModalOpen(false)}>
+              <CloseIcon className="me-2 h-4 w-4" />
+              Tutup
+            </Button>
+            <Button className={"bg-cyan-600"} size='xs' href={route('file.download', { place: selectedFile.place })}>
+              <BsDownload className='me-2 h-4 w-4' />
+              Download
+            </Button>
+          </ModalFooter>
+        </Modal>
+      )}
+
+      <Modal
+        show={showModal}
+        // size="xl"
+        popup={true}
+        onClose={showModal ? () => setShowModal(!showModal) : undefined}
+      >
+        <ModalHeader>
+          <p className='ml-4'>Berikan alasan revisi</p>
+        </ModalHeader>
+        <ModalBody
         >
-          Print Pdf
-        </Button>}
-        {(application.status == 'VERIFIED') && <Button
-          onClick={onSelesai}
-          type={'button'}
-          className={'mb-6 mr-6'}
-          processing={false}
-        >
-          Selesai
-        </Button>}
-        {(application.status == 'PENDING' || application.status == 'REVISED') &&
-          <React.Fragment>
-            <Button
-              onClick={onRevisi}
-              type={'button'}
-              className={'mb-6 mr-6'}
-              processing={false}
+          <form onSubmit={handleSubmit}>
+            <Textarea
+              rows={10}
+              className='min-w-screen'
+              name='status_description'
+              value={data.status_description}
+              onChange={e => setData('status_description', e.target.value)}
             >
+            </Textarea>
+            <ErrorText message={errors.status_description} />
+          </form>
+        </ModalBody>
+        <ModalFooter>
+          <Button type={'reset'} color={'red'} className={'mt-6 ml-2'} onClick={(_) => setShowModal(!showModal)}>Batal</Button>
+          <Button type={'submit'} className={'blue-gradient mt-6 mr-2'}>Revisi</Button>
+        </ModalFooter>
+      </Modal>
+
+      <Modal
+        show={showModalPenolakan}
+        // size="md"
+        popup={true}
+        onClose={() => setShowModalPenolakan(false)}
+      >
+        <ModalHeader>
+          <p className='ml-4'>Berikan Alasan penolakan</p>
+
+
+        </ModalHeader>
+        <ModalBody>
+          <form onSubmit={handleSubmit}>
+            <Textarea
+              name='status_description'
+              onChange={e => setData('status_description', e.target.value)}
+              // className={'w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm'}
+              rows={5}
+              value={data.status_description}
+            >
+            </Textarea>
+            <ErrorText message={errors.status_description} />
+          </form>
+        </ModalBody>
+        <ModalFooter>
+          <Button type={'reset'} color={'red'} onClick={_ => setShowModalPenolakan(!showModalPenolakan)}>Batal</Button>
+          <Button type={'submit'} className={'blue-gradient'}>Tolak</Button>
+        </ModalFooter>
+      </Modal>
+
+      <div className='flex flex-col'>
+        <div>
+          <Button
+            // as={Link}
+            href={route('application.index')}
+            size='sm'
+            className='w-fit'
+            color={'dark'}
+          >
+            <ArrowLeftIcon />
+          </Button>
+        </div>
+
+        <p className='mx-auto font-bold text-xl text-black'>{application.category}</p>
+        <Avatar className='mt-2' img={`../../storage/images/${application.images}`} rounded size='xl' />
+        <p className={`justify-center inline-flex mt-2 text-center text-2xl font-extrabold ${application.status === 'COMPLETED' ? 'text-green-400' : application.status === 'CANCEL' ? 'text-red-600' : 'text-yellow-400'}`}>
+          <MdVerified className='mr-1' size={'30'} />
+          {getStatus(application.status ?? '')}</p>
+        <span className='text-center'>{application.status_description}</span>
+
+
+        <div className='flex flex-auto flex-wrap self-center gap-4 mt-6'>
+          {(application.status == 'VERIFIED' || application.status == 'COMPLETED') &&
+            <Button
+              color={'blue'}
+              onClick={onClick}
+            >
+              <BiPrinter className="me-2 h-4 w-4" />
+              Print PDF
+            </Button>}
+          {
+            (application.status == 'VERIFIED') &&
+            <Button
+              color={'green'}
+              onClick={onSelesai}
+            >
+              <SiTicktick className="me-2 h-4 w-4" />
+              Selesai
+            </Button>
+          }
+          {(application.status == 'PENDING' || application.status == 'REVISED') &&
+            <Button
+              color={'yellow'}
+              onClick={onRevisi}
+
+            >
+              <BiRevision className="me-2 h-4 w-4" />
               {application.status === 'REVISED' ? 'Revisi Ulang' : 'Revisi Berkas'}
             </Button>
-            <Modal
-              show={showModal}
-              size="md"
-              popup={true}
-            // onClose={onClose}
-            >
-              <Modal.Header />
-              <Modal.Body>
-                <div className="text-center">
-                  <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                    Berikan alasan revisi
-                  </h3>
-                  <div className="flex justify-center gap-4">
-                    <form onSubmit={handleSubmit}>
-
-                      <Label forInput={'status_description'} value={'Alasan'} className={'pt-6 pb-2'} />
-
-                      <Input
-                        name='status_description'
-                        value={data.status_description}
-                        handleChange={e => setData('status_description', e.target.value)}
-                        className={'w-full'}
-                      />
-                      <ErrorText message={errors.status_description} />
-
-                      <Button className={'mt-6 mr-2'} processing={false}>Selanjutnya</Button>
-                      <Button type={'reset'} className={'mt-6 ml-2'} processing={false} onClick={(_) => setShowModal(!showModal)}>Batal</Button>
-
-                    </form>
-                  </div>
-                </div>
-              </Modal.Body>
-            </Modal>
-          </React.Fragment>}
-        {(application.status == 'PENDING' || application.status == 'DEFFICIENT' || application.status == 'REVISED') &&
-          <React.Fragment>
+          }
+          {(application.status == 'PENDING') &&
             <Button
-              onClick={onVerified}
-              type={'button'}
-              className={'mb-6'}
-              processing={false}
-            >
-              Verifikasi
-            </Button>
-            <Modal
-              show={showModal}
-              size="md"
-              popup={true}
-            // onClose={onClose}
-            >
-              <Modal.Header />
-              <Modal.Body>
-                <div className="text-center">
-                  <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                    Berikan Keterangan
-                  </h3>
-                  <div className="w-full">
-                    <form onSubmit={handleSubmit}>
-
-                      <Label forInput={'status_description'} value={'Alasan'} className={'pt-6 pb-2'} />
-                      <textarea
-                        name='status_description'
-                        onChange={e => setData('status_description', e.target.value)}
-                        className={'w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm'}
-                        rows={5}
-                        value={data.status_description}
-                      >
-                      </textarea>
-                      <ErrorText message={errors.status_description} />
-
-                      <Button className={'mt-6 mr-2'} processing={false}>Selanjutnya</Button>
-                      <Button type={'reset'} className={'mt-6 ml-2'} processing={false} onClick={(_) => setShowModal(!showModal)}>Batal</Button>
-
-                    </form>
-                  </div>
-                </div>
-              </Modal.Body>
-            </Modal>
-          </React.Fragment>}
-        {(application.status == 'PENDING') &&
-          <React.Fragment>
-            <Button
+              color={'red'}
               onClick={onTolak}
-              type={'button'}
-              className={'mb-6 bg-red-600 ml-6'}
-              processing={false}
+
             >
+              <BiRevision className="me-2 h-4 w-4" />
               Tolak
             </Button>
-            <Modal
-              show={showModal}
-              size="md"
-              popup={true}
-            // onClose={onClose}
-            >
-              <Modal.Header />
-              <Modal.Body>
-                <div className="text-center">
-                  <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                    Berikan Alasan penolakan
-                  </h3>
-                  <div className="w-full">
-                    <form onSubmit={handleSubmit}>
-
-                      <Label forInput={'status_description'} value={'Alasan'} className={'pt-6 pb-2'} />
-                      <textarea
-                        name='status_description'
-                        onChange={e => setData('status_description', e.target.value)}
-                        className={'w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm'}
-                        rows={5}
-                        value={data.status_description}
-                      >
-                      </textarea>
-                      <ErrorText message={errors.status_description} />
-
-                      <Button className={'mt-6 mr-2'} processing={false}>Selanjutnya</Button>
-                      <Button type={'reset'} className={'mt-6 ml-2'} processing={false} onClick={(_) => setShowModal(!showModal)}>Batal</Button>
-
-                    </form>
-                  </div>
-                </div>
-              </Modal.Body>
-            </Modal>
-          </React.Fragment>}
-        <h5 className={'block text-lg font-bold'}>Persyaratan</h5>
-        <div className={'bg-green-200 p-6 rounded mt-4 mb-4 text-green-800 font-bold'}>
-          <p>Berkas Upload :</p>
-          {requirements.map((v, i) => <p key={i}>{v.name}</p>)}
-          {/* {persyaratan.get(application.category)?.map((v, i) => <p key={i}>{v}</p>)} */}
-
-          {menu.description === null || menu.description === '' ? <div></div> : <div>
-            <p>Persyaratan Tambahan :</p>
-            <div className="prose">
-              {Parser().parse(menu.description)}
-            </div>
-          </div>}
-
+          }
         </div>
-        <table>
-          <tbody>
-            <tr>
-              <td>Ticket</td>
-              <td>:</td>
-              <td>{application.ticket}</td>
-            </tr>
-            <tr>
-              <td>Status</td>
-              <td>:</td>
-              <td>{getStatus(application.status ?? '')}</td>
-            </tr>
-            <tr>
-              <td>Nik</td>
-              <td>:</td>
-              <td>{application.id_card_number}</td>
-            </tr>
-            <tr>
-              <td>Nama</td>
-              <td>:</td>
-              <td>{application.name}</td>
-            </tr>
-            <tr>
-              <td>Nomor HP</td>
-              <td>:</td>
-              <td>{application.phone}</td>
-            </tr>
-            <tr>
-              <td>Email</td>
-              <td>:</td>
-              <td>{application.email}</td>
-            </tr>
-            <tr>
-              <td>Keterangan</td>
-              <td>:</td>
-              <td>{application.description}</td>
-            </tr>
-            <tr>
-              <td>Kategori</td>
-              <td>:</td>
-              <td>{application.category}</td>
-            </tr>
-          </tbody>
+        <div className='mt-6'>
+          <p className='sub-header inline-flex items-center gap-2'><BiUserCircle size={25} /> Informasi Pemohon : </p>
+          <Table>
+            <TableBody className='divide-y text-black'>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiUserCircle />Nama Pemohon</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{application.name}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiFile />Tiket</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{application.ticket}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiPhone />Nomor Telepon</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{application.phone}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiTime />Tanggal Pembuatan Permohonan</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{
+                  dateCreate + ','
+                } <TimeAgo
+                  date={dateCreated}
+                  formatter={intlFormatter}
+                ></TimeAgo></TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiText />Deskripsi Permohonan</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{
+                  application.description
+                }</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
 
-        </table>
+        <div className='mt-6'>
+          <p className='sub-header flex items-center gap-2'><BiHome size={25} /> Data Kepala Keluarga : </p>
+          <Table>
+            <TableBody className='divide-y text-black'>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiFace />Nama Kepala Keluarga</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{application.family_head_name}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiFile />Nomor Kartu Keluarga</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{application.family_card_number}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiMapPin />Dusun</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{hamlet?.name}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiMapAlt />Desa</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{application.ward}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiMap />Kecamatan</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{application.district}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+
+        <div className='mt-6'>
+          <p className='sub-header flex items-center gap-2 mb-2'><BiFile size={25} /> Lampiran Permohonan : </p>
+          <Table striped className='border rounded-lg border-collapse'>
+            <TableHead>
+              <TableRow>
+                <TableHeadCell>#</TableHeadCell>
+                <TableHeadCell>Nama Lampiran</TableHeadCell>
+                <TableHeadCell>Aksi</TableHeadCell>
+              </TableRow>
+            </TableHead>
+            <TableBody className='divide-y text-black'>
+              {
+                application.ticket !== null && application.ticket !== '' ?
+                  application.files !== null && application.files !== '' ? (JSON.parse(application.files!) as Array<FileTicket>).map((v, k) => {
+                    return (
+                      <TableRow key={k}>
+                        <TableCell>{k + 1}</TableCell>
+                        <TableCell>{v.TypeName}</TableCell>
+                        <TableCell>
+                          <Button
+                            size='xs'
+                            className='bg-green-400'
+                            onClick={() => handleClick(v.FileName)}
+                          >
+                            <HiEye className='mr-2' />
+                            Lihat
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  }) : <p>Berkas tidak lengkap</p> :
+                  files.filter(file => file.name.toLowerCase().includes('hasil') === false).map((file, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{file.name}</TableCell>
+                      <TableCell>
+                        <Button
+                          size='xs'
+                          className='bg-green-400'
+                          onClick={() => handleView(file)}
+                        >
+                          <HiEye className='mr-2' />
+                          Lihat
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+              }
+            </TableBody>
+          </Table>
+        </div>
+
         {
-          application.ticket !== null && application.ticket !== '' ?
-            application.files !== null && application.files !== '' ? <div>
-              Daftar berkas
-              {(JSON.parse(application.files!) as Array<FileTicket>).map((v, k) => {
-                return <div key={k}>
-                  <Link href='#' className={'text-blue-500'} type='button' onClick={(e) => handleClick(e, v.FileName)}>
-                    {v.TypeName}
-                  </Link>
-                </div>
-              })}
-            </div> : 'Berkas tidak lengakp' : <div>
-              <div className={'mt-6'}>
-                Foto Wajah jelas
-                <img src={`../../storage/images/${application.images}`} className={'h-40'} />
-
-
-              </div>
-              {files.map((v, k) => {
-                if (v.name.includes('Hasil')) {
-                  return <div></div>
-                }
-                return <div className={'mt-6'} key={k}>
-                  <p>{v.name}</p>
-                  <img src={`../../storage/${v.place}`} />
-                </div>
-              })}
-            </div>
+          files.filter(e => e.name.toLowerCase().includes('hasil')).length > 0 && (
+            <div className='mt-6'>
+              <p className='sub-header flex items-center gap-2 mb-2'><BiCheck size={25} /> Permohonan Disetujui : </p>
+              <Table striped className='border rounded-lg border-collapse'>
+                <TableHead>
+                  <TableRow>
+                    <TableHeadCell>#</TableHeadCell>
+                    <TableHeadCell>Dokumen yang dihasilkan</TableHeadCell>
+                    <TableHeadCell>Aksi</TableHeadCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody className='divide-y text-black'>
+                  {
+                    files.filter(e => e.name.toLowerCase().includes('hasil')).map((file, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>{file.name}</TableCell>
+                        <TableCell>
+                          <Button
+                            size='xs'
+                            className='bg-green-400'
+                            onClick={() => handleView(file)}
+                          >
+                            <HiEye className='mr-2' />
+                            Lihat
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  }
+                </TableBody>
+              </Table>
+            </div>)
         }
-
-
-
       </div>
     </Authenticated >
   )

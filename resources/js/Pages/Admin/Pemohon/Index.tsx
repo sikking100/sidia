@@ -211,7 +211,7 @@ export default function PemohonIndex(props: Props) {
           message={f.message}
         />
 
-        <p className='text-xl font-bold text-gray-500'>Data Semua Permohonan</p>
+        <p className='header'>Data Semua Permohonan</p>
         <div className='grid grid-cols-1 sm:grid-cols-6 gap-4 mt-6'>
           <Select id="kecamatan"
             value={idDistrict}

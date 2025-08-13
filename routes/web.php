@@ -63,6 +63,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::put('/ward/{ward}', [WardController::class, 'update'])->name('ward.update');
     Route::delete('/ward/{ward}', [WardController::class, 'destroy'])->name('ward.destroy');
     Route::get('/photo/{name}', [ApplicationController::class, 'photo'])->name('photo');
+    Route::get('/download-file', [ApplicationController::class, 'downloadFile'])->name('file.download');
     Route::post('/uploadFile/{id}/berkas', [ApplicationController::class, 'uploadBerkas'])->name('upload.berkas');
     Route::get('/open-file', [ApplicationController::class, 'openFile'])->name('file.open');
 });
