@@ -23,6 +23,7 @@ import { makeIntlFormatter } from 'react-timeago/defaultFormatter'
 import Label from '@/Components/Label'
 import Input from '@/Components/Input'
 import { ErrorText } from '@/Components/Error'
+import { BackButton } from '@/Components/Button'
 
 
 interface FileTicket {
@@ -207,15 +208,9 @@ export default function PemohonShow({ application, files, menu, requirements, ha
 
       <div className='flex flex-col'>
         <div>
-          <Button
-            // as={Link}
-            href={route('application.index')}
-            size='sm'
-            className='w-fit'
-            color={'dark'}
-          >
-            <ArrowLeftIcon />
-          </Button>
+          <BackButton
+            route='application'
+          />
         </div>
 
         <p className='mx-auto font-bold text-xl text-black'>{application.category}</p>

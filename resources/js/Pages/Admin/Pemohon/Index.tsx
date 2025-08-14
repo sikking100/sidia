@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from 'react'
 import Authenticated from '@/Layouts/Authenticated'
-import { Link, useForm, usePage } from '@inertiajs/inertia-react'
+import { Link, useForm, usePage, } from '@inertiajs/inertia-react'
+import { router } from '@inertiajs/react';
 import route from 'ziggy-js'
 import { Inertia } from '@inertiajs/inertia'
 import Alert from '@/Components/Alert'
 import { Applicant, District, Files, Hamlet, Meta, User, Ward } from '@/Interface/Interface'
-import { getStatus, useIsMobile } from '@/Functions/functions'
-import { Button, createTheme, Modal, ModalBody, ModalHeader, Pagination, Select, Spinner, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, TextInput, ThemeProvider } from 'flowbite-react'
+import { customTheme, getStatus, useIsMobile } from '@/Functions/functions'
+import { Button, createTheme, Modal, ModalBody, ModalFooter, ModalHeader, Pagination, Select, Spinner, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, TextInput, ThemeProvider } from 'flowbite-react'
 import { ErrorText } from '@/Components/Error'
 import Input from '@/Components/Input'
 import Label from '@/Components/Label'
@@ -14,6 +15,8 @@ import { HiDownload, HiEye, HiRefresh, HiSearch, HiShoppingCart, HiTrash, HiUplo
 import axios from 'axios'
 import TimeAgo from 'react-timeago'
 import { makeIntlFormatter } from 'react-timeago/defaultFormatter'
+import { CiWarning } from 'react-icons/ci'
+import { BiCheckCircle } from 'react-icons/bi';
 interface Props {
   data: Array<Applicant>
   meta: Meta
@@ -46,18 +49,14 @@ export default function PemohonIndex(props: Props) {
   const { flash } = usePage().props
   const { user } = usePage().props.auth as { user: User }
   const f = flash as { message: string }
-  const [showAlert, setShowAlert] = React.useState(true);
+  const [showAlert, setShowAlert] = React.useState(false);
   // const { current_page, last_page, per_page, total } = props.meta
   const [applicant, setApplicant] = React.useState<SearchApplicant>({
-    data: [],
-    meta: {
-      current_page: 1,
-      last_page: 1,
-      per_page: 10,
-      total: 10
-    }
+    data: props.data,
+    meta: props.meta
   })
   const [showModal, setShowModal] = React.useState(false);
+  const [showModalDelete, setShowModalDelete] = React.useState(false);
 
   const { data, setData, post, processing } = useForm<Berkas>(
     {
@@ -87,13 +86,14 @@ export default function PemohonIndex(props: Props) {
       const response = await axios.get('/years')
       setTahunOptions(response.data);
     }
-
     fetchTahun()
-    setApplicant({
-      data: props.data,
-      meta: props.meta
-    })
   }, [])
+
+  useEffect(() => {
+    if (f.message !== null && f.message !== '') {
+      setShowAlert(true)
+    }
+  }, [f])
 
 
 
@@ -170,46 +170,52 @@ export default function PemohonIndex(props: Props) {
     }
   }
 
-  const customTheme = createTheme({
-    pagination: {
-      "base": "text-xs",
-      "layout": {
-        "table": {
-          "base": "text-xs text-gray-700 dark:text-gray-400",
-          "span": "font-semibold text-gray-900 dark:text-white"
-        }
-      },
-      "pages": {
-        "base": "xs:mt-0 mt-0 inline-flex items-center -space-x-px",
-        "showIcon": "inline-flex",
-        "previous": {
-          "base": "ml-0 rounded-l-lg border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 enabled:hover:bg-gray-100 enabled:hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 enabled:dark:hover:bg-gray-700 enabled:dark:hover:text-white",
-          "icon": "h-3.5 w-3.5"
-        },
-        "next": {
-          "base": "rounded-r-lg border border-gray-300 bg-white px-3 py-2 leading-tight text-gray-500 enabled:hover:bg-gray-100 enabled:hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 enabled:dark:hover:bg-gray-700 enabled:dark:hover:text-white",
-          "icon": "h-3.5 w-3.5"
-        },
-        "selector": {
-          "base": "w-12 border border-gray-300 bg-white py-2 leading-tight text-gray-500 enabled:hover:bg-gray-100 enabled:hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 enabled:dark:hover:bg-gray-700 enabled:dark:hover:text-white",
-          "active": "bg-cyan-50 text-cyan-600 hover:bg-cyan-100 hover:text-cyan-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white",
-          "disabled": "cursor-not-allowed opacity-50"
-        }
-      }
-    },
-  });
-
-
   return (
     <Authenticated
       header={<h2>Pemohon</h2>}
     >
+      <Modal
+        show={showModalDelete}
+        // size="md"
+        popup={true}
+        onClose={() => setShowModalDelete(false)}
+      >
+        <ModalHeader>
+          <p className='ml-4'>Peringatan </p>
+        </ModalHeader>
+        <ModalBody className='justify-items-center'>
+          <CiWarning color='red' size={200} />
+          <p>Yakin ingin menghapus data?</p>
+        </ModalBody>
+        <ModalFooter>
+          <Button type={'reset'} color={'red'} onClick={_ => setShowModalDelete(false)}>Batal</Button>
+          <Button className={'blue-gradient'} onClick={async _ => {
+            // Inertia.delete(route('application.destroy', id.current))
+            await axios.delete(route('application.destroy', id.current))
+            Inertia.get(route('application.index'))
+          }}>Hapus Data</Button>
+        </ModalFooter>
+      </Modal>
+
+      <Modal
+        show={showAlert}
+        // size="md"
+        popup={true}
+        onClose={() => setShowAlert(false)}
+      >
+        <ModalHeader />
+        <ModalBody className='justify-items-center'>
+          <BiCheckCircle color='green' size={200} />
+          <p>{f.message}</p>
+        </ModalBody>
+      </Modal>
+
       <div>
-        <Alert
+        {/* <Alert
           showAlert={showAlert}
           setShowAlert={setShowAlert}
           message={f.message}
-        />
+        /> */}
 
         <p className='header'>Data Semua Permohonan</p>
         <div className='grid grid-cols-1 sm:grid-cols-6 gap-4 mt-6'>
@@ -307,7 +313,7 @@ export default function PemohonIndex(props: Props) {
             <ThemeProvider
               theme={customTheme}>
               <Pagination
-                currentPage={applicant.meta.current_page} totalPages={applicant.meta.total} onPageChange={(e) => search(e)} showIcons />
+                currentPage={applicant.meta.current_page} totalPages={applicant.meta.last_page} onPageChange={(e) => search(e)} showIcons />
             </ThemeProvider>
           </div>}
           <div className='inline-flex gap-2'>
@@ -478,12 +484,9 @@ export default function PemohonIndex(props: Props) {
                               <Button
                                 className='bg-red-500 hover:bg-red-800 text-white font-bold'
                                 size='xs'
-                                onClick={(ev) => {
-                                  ev.preventDefault()
-                                  if (confirm("Are you sure you want to delete this user?")) {
-                                    setShowAlert(true)
-                                    Inertia.delete(route('application.destroy', e.id));
-                                  }
+                                onClick={_ => {
+                                  id.current = e.id
+                                  setShowModalDelete(true)
                                 }}
                               >
                                 <HiTrash className='mr-2' />
@@ -526,9 +529,10 @@ export default function PemohonIndex(props: Props) {
                                     <Button
                                       color={"light"}
                                       size='xs'
+                                      className='text-'
                                     >
                                       <HiDownload className='mr-2' />
-                                      Lihat Hasil
+                                      Download
                                     </Button>
                                   </a>
                                 </div> :
@@ -609,12 +613,9 @@ export default function PemohonIndex(props: Props) {
                               <Button
                                 className='bg-red-500 hover:bg-red-800 text-white font-bold'
                                 size='xs'
-                                onClick={(ev) => {
-                                  ev.preventDefault()
-                                  if (confirm("Are you sure you want to delete this user?")) {
-                                    setShowAlert(true)
-                                    Inertia.delete(route('application.destroy', e.id));
-                                  }
+                                onClick={_ => {
+                                  id.current = e.id
+                                  setShowModalDelete(true)
                                 }}
                               >
                                 <HiTrash className='mr-2' />
@@ -639,7 +640,7 @@ export default function PemohonIndex(props: Props) {
           theme={customTheme}>
           <Pagination
 
-            layout={isMobile ? 'navigation' : undefined} currentPage={applicant.meta.current_page} totalPages={applicant.meta.total} onPageChange={(e) => search(e)} showIcons />
+            layout={isMobile ? 'navigation' : undefined} currentPage={applicant.meta.current_page} totalPages={applicant.meta.last_page} onPageChange={(e) => search(e)} showIcons />
         </ThemeProvider>
       </div>
     </Authenticated >

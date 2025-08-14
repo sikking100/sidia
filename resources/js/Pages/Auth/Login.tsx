@@ -2,11 +2,11 @@ import React, { useCallback, useEffect } from 'react';
 import { Head, useForm, usePage } from '@inertiajs/inertia-react';
 import Label from '@/Components/Label'
 import Input from '@/Components/Input'
-import Button from '@/Components/Button'
 import route from 'ziggy-js'
 import { GoogleReCaptcha, GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { ErrorBag, Errors, Page, PageProps } from '@inertiajs/inertia'
 import { ErrorText } from '@/Components/Error'
+import { Button } from 'flowbite-react';
 
 interface Props extends Page<PageProps> {
   props: {
@@ -109,7 +109,7 @@ export default function Login() {
 
 
             <div className="flex items-center justify-end mt-4">
-              <Button className="ml-4" processing={processing}>
+              <Button color={'blue'} className="ml-4" type='submit'>
                 Log in
               </Button>
             </div>

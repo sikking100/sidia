@@ -1,8 +1,10 @@
 import React from 'react'
 import { District } from '@/Interface/Interface'
 import { useForm } from '@inertiajs/inertia-react'
-import { BackButton } from '@/Components/Button'
 import route from 'ziggy-js'
+import { Button } from 'flowbite-react'
+import { HiSave } from 'react-icons/hi'
+import { BackButton } from '@/Components/Button'
 
 interface Props {
   district?: District
@@ -24,7 +26,7 @@ export default function DistrictForm({ district }: Props) {
     }
   }
   return (
-    <form className="w-full px-6" onSubmit={onSubmit}>
+    <form className="w-full" onSubmit={onSubmit}>
       <BackButton
         route={'district'}
       />
@@ -47,12 +49,14 @@ export default function DistrictForm({ district }: Props) {
         </div>
       </div>
       <div className="md:flex md:items-center">
-        <button
-          className="shadow bg-purple-500 hover:bg-purple-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
-          type="submit"
+        <Button
+          type='submit'
+          size='sm'
+          color={'purple'}
         >
+          <HiSave className={'mr-2'} />
           {title}
-        </button>
+        </Button>
       </div>
     </form>
   )

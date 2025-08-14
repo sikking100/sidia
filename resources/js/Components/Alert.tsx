@@ -1,3 +1,5 @@
+import { ModalProp } from '@/Interface/Interface'
+import { Button, CloseIcon, Modal, ModalBody, ModalFooter, ModalHeader, ModalProps } from 'flowbite-react'
 import React from 'react'
 
 interface Props {
@@ -21,5 +23,43 @@ export default function Alert({ message, showAlert, setShowAlert }: Props) {
         </button>
       </div>}
     </div>
+  )
+}
+
+
+
+export function ModalAlert(props: ModalProp) {
+  return (
+    <Modal
+      show={props.show}
+      onClose={() => props.close()}
+    >
+      {props.title !== null && <ModalHeader>
+        <p className='header'>{props.title}</p>
+      </ModalHeader>}
+      <ModalBody>
+        <p>{props.content}</p>
+      </ModalBody>
+      <ModalFooter>
+        <Button
+          onClick={props.close}
+          color={'red'}
+          size='xs'
+        >
+          <CloseIcon className={'mr-2'} />
+          Tutup
+        </Button>
+        {
+          props.function && <Button
+            onClick={props.function}
+            color={'green'}
+            size='xs'
+          >
+            <CloseIcon className={'mr-2'} />
+            {props.buttonTitle}
+          </Button>
+        }
+      </ModalFooter>
+    </Modal>
   )
 }

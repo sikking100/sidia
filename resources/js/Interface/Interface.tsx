@@ -124,6 +124,15 @@ export interface User {
   role: string
 }
 
+export interface ModalProp {
+  content: string
+  title?: string | null
+  buttonTitle?: string | null
+  function?: (() => void) | null
+  close: () => void | undefined
+  show: boolean
+}
+
 export const subtitle: Map<string, string> = new Map<string, string>([
   ['KTP-Pemula', 'KTP Baru'],
   ['KTP-Rusak', 'KTP Rusak'],

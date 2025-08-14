@@ -36,11 +36,13 @@ Route::get('/', function () {
 
 Route::group(['middleware' => 'auth'], function () {
     Route::resource('application', ApplicationController::class);
-    Route::get('/paging', [ApplicationController::class, 'paging'])->name('paging');
+    Route::get('/paging', [ApplicationController::class, 'paging']);
     Route::get('/years', [ApplicationController::class, 'get_years']);
     Route::resource('requirements', RequirementController::class);
     Route::resource('menu', MenuController::class);
+    Route::get('/menu-paging', [MenuController::class, 'pagination']);
     Route::resource('user', UserController::class);
+    Route::get('/user-paging', [UserController::class, 'pagination']);
     Route::resource('hamlet', HamletController::class);
 
     // desa
@@ -56,7 +58,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::put('/regen/{id}', [UserController::class, 'user_regen'])->name('regen');
     Route::put('/applicants/{id}', [ApplicationController::class, 'update_status'])->name('status');
     Route::get('/applicants', [ApplicationController::class, 'count'])->name('count');
+
     Route::resource('district',  DistrictController::class);
+    Route::get('/district-paging', [DistrictController::class, 'paging'])->name('district.paging');
+
+    Route::get('/ward', [WardController::class, 'index']);
     Route::get('/ward/create/{ward}', [WardController::class, 'create'])->name('ward.create');
     Route::post('/ward', [WardController::class, 'store'])->name('ward.store');
     Route::get('/ward/{ward}/edit', [WardController::class, 'edit'])->name('ward.edit');

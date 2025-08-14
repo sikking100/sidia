@@ -15,7 +15,10 @@ return new class extends Migration
     {
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('id_citigov');
             $table->string('name', 50);
+            $table->string('name_citigov', 255);
+            $table->text('description')->nullable();
         });
     }
 

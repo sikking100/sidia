@@ -32,7 +32,6 @@ class DesaUserSeeder extends Seeder
                     'password' => Hash::make(generateStrongPassword(6)), // Password default
                     'role' => 'desa',
                 ]);
-
                 // Update desa dengan admin_id
                 $desa->update(['user_id' => $user->id]);
 

@@ -1,11 +1,12 @@
 import React, { useRef } from 'react'
 import Authenticated from '@/Layouts/Authenticated'
 import { Menu } from '@/Interface/Interface'
-import Button, { BackButton } from '@/Components/Button'
+import { BackButton } from '@/Components/Button'
 import { useForm } from '@inertiajs/inertia-react'
-
 import route from 'ziggy-js'
 import { Editor } from '@tinymce/tinymce-react';
+import { HiSave } from 'react-icons/hi'
+import { Button } from 'flowbite-react'
 
 
 
@@ -30,7 +31,7 @@ export default function PersyaratanShow({ menu }: Props) {
 
         console.log(data.description);
 
-        patch(route('menu.update', menu))
+        patch(route('menu.update', menu.id))
         return
     }
 
@@ -55,30 +56,40 @@ export default function PersyaratanShow({ menu }: Props) {
                         rows={5}
                     >
                     </textarea> */}
-                    <Editor
-                        onInit={(_: any, editor: any) => editorRef.current = editor}
-                        // initialValue={data.description}
-                        value={data.description}
-                        apiKey='w5gb3ckudqrmm81mxsnsfh9699w33ctj0o0kcslp3scywmer'
-                        textareaName='description'
-                        onEditorChange={(e) => setData('description', e)}
-                        init={{
-                            height: 400,
-                            menubar: false,
-                            plugins: [
-                                'advlist', 'autolink', 'lists', 'link', 'charmap', 'preview',
-                                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                                'insertdatetime', 'media', 'table', 'help', 'wordcount'
-                            ],
-                            toolbar:
-                                'undo redo | formatselect | ' +
-                                'bold italic underline | alignleft aligncenter alignright alignjustify | ' +
-                                'bullist numlist outdent indent | removeformat | help',
-                            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-                        }}
-                    />
+                    <div className='my-6'>
+                        <Editor
+
+                            onInit={(_: any, editor: any) => editorRef.current = editor}
+                            // initialValue={data.description}
+                            value={data.description}
+                            apiKey='w5gb3ckudqrmm81mxsnsfh9699w33ctj0o0kcslp3scywmer'
+                            textareaName='description'
+                            onEditorChange={(e) => setData('description', e)}
+                            init={{
+                                height: 400,
+                                menubar: false,
+                                plugins: [
+                                    'advlist', 'autolink', 'lists', 'link', 'charmap', 'preview',
+                                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                    'insertdatetime', 'media', 'table', 'help', 'wordcount'
+                                ],
+                                toolbar:
+                                    'undo redo | formatselect | ' +
+                                    'bold italic underline | alignleft aligncenter alignright alignjustify | ' +
+                                    'bullist numlist outdent indent | removeformat | help',
+                                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                            }}
+                        />
+                    </div>
                     {errors.name && <p className="text-red-500 text-xs italic">{errors.name}</p>}
-                    <Button type='submit' processing={false} className={'mt-2'}>Perbaharui</Button>
+                    <Button
+                        type='submit'
+                        size='sm'
+                        color={'purple'}
+                    >
+                        <HiSave className={'mr-2'} />
+                        Perbaharui
+                    </Button>
                 </form>
             </div>
         </Authenticated>

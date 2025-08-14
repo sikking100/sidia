@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreDistrictRequest;
 use App\Http\Requests\UpdateDistrictRequest;
 use App\Models\District;
+use App\Models\Ward;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DistrictController extends Controller
@@ -16,8 +18,36 @@ class DistrictController extends Controller
      */
     public function index()
     {
-        $districts = District::all();
-        return Inertia::render('Admin/District/Index', compact('districts'));
+        $districts = District::paginate(10, ['*'], 'page', 1);
+        return Inertia::render('Admin/District/Index', [
+            'districts' => $districts->items(),
+            'meta' => [
+                'current_page' => $districts->currentPage(),
+                'last_page' => $districts->lastPage(),
+                'per_page' => $districts->perPage(),
+                'total' => $districts->total(),
+            ],
+        ]);
+    }
+
+    public function paging(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $query = District::query();
+        if ($request->has('q') && !empty($request->q)) {
+            $query->where('name', 'like', '%' . $request->q . '%');
+        }
+        $districts = $query->paginate($perPage, ['*'], 'page', $page);
+        return response()->json([
+            'districts' => $districts->items(),
+            'meta' => [
+                'current_page' => $districts->currentPage(),
+                'last_page' => $districts->lastPage(),
+                'per_page' => $districts->perPage(),
+                'total' => $districts->total(),
+            ],
+        ]);
     }
 
     /**
@@ -52,8 +82,17 @@ class DistrictController extends Controller
      */
     public function show(District $district)
     {
-        $wards = $district->wards()->get();
-        return Inertia::render('Admin/Ward/Index', ['district' => $district, 'wards' => $wards]);
+        $wards = Ward::where('district_id', $district->id)->paginate(10, ['*'], 'page', 1);
+        return Inertia::render('Admin/Ward/Index', [
+            'district' => $district,
+            'wards' => $wards->items(),
+            'meta' => [
+                'current_page' => $wards->currentPage(),
+                'last_page' => $wards->lastPage(),
+                'per_page' => $wards->perPage(),
+                'total' => $wards->total(),
+            ],
+        ]);
     }
 
     /**
@@ -78,6 +117,8 @@ class DistrictController extends Controller
     {
         $district->name = $request->name;
         $district->save();
+        session()->flash('message', 'Berhasil mengubah kecamatan');
+
         return redirect()->route('district.index');
     }
 
@@ -91,6 +132,10 @@ class DistrictController extends Controller
     {
         $district->delete();
         session()->flash('message', 'Berhasil menghapus kecamatan');
-        return redirect()->route('district.index');
+        // return redirect()->route('district.index');
+        return response()->json([
+            'message' => 'Berhasil menghapus kecamatan',
+            'status' => 'success'
+        ]);
     }
 }

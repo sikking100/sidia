@@ -3,83 +3,183 @@ import Authenticated from '@/Layouts/Authenticated'
 import { Link, usePage } from '@inertiajs/inertia-react'
 import route from 'ziggy-js'
 import { Inertia } from '@inertiajs/inertia'
-import Alert from '@/Components/Alert'
-import { Menu } from '@/Interface/Interface'
+import Alert, { ModalAlert } from '@/Components/Alert'
+import { Menu, Meta } from '@/Interface/Interface'
+import { useIsMobile } from '@/Functions/functions'
+import { Paginate } from '../District/Index'
+import axios from 'axios'
+import { GiPencil, GiTrashCan, GiVillage } from 'react-icons/gi'
+import { Button, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, TextInput } from 'flowbite-react'
+import { HiRefresh, HiSearch } from 'react-icons/hi'
 
 
 interface Props {
-  menus?: Array<Menu>
+  menus: Array<Menu>
+  meta: Meta
 }
 
-export default function DistrictIndex(props: Props) {
+export default function PersyaratanIndex(props: Props) {
   const { flash } = usePage().props
   const f = flash as { message: string }
-  const [showAlert, setShowAlert] = React.useState(true);
-  const { menus } = props;
-
-  const list: any = []
-  menus?.forEach((e, i) => {
-    list.push(
-      <tr key={i}>
-        <td className={'p-4 border border-slate-700'}><p className={'flex justify-center'}>{i + 1}</p></td>
-        <td className={'p-4 border border-slate-700'}>{e.name}</td>
-        <td className='p-4 border border-slate-700'>
-          <div className="flex flex-row gap-2">
-            <Link
-              href={route('menu.show', e.id)}
-              className={'bg-kemenag hover:bg-kemenag-dark text-white font-bold py-2 px-4 rounded'}>
-              Detail
-            </Link>
-            {/* <Link
-              href={route('district.edit', e.id)}
-              className={'bg-yellow-500 hover:bg-kemenag-dark text-white font-bold py-2 px-4 rounded'}>
-              Ubah
-            </Link> */}
-            {/* <button
-              onClick={(ef) => {
-                ef.preventDefault()
-                if (confirm("Are you sure you want to delete this user?")) {
-                  setShowAlert(true)
-                  Inertia.delete(route('district.destroy', e.id));
-                }
-              }}
-              className={'bg-red-500 hover:bg-kemenag-dark text-white font-bold py-2 px-4 rounded'}
-            >
-              Hapus
-            </button> */}
-          </div>
-        </td>
-      </tr>
-    )
+  const [showAlert, setShowAlert] = React.useState(false);
+  const [paging, setPaging] = React.useState<Props>({
+    meta: props.meta,
+    menus: props.menus,
   })
+  const [menu, setMenu] = React.useState<Menu | null>(null)
+  const [query, setQuery] = React.useState('')
+  const [loading, setLoading] = React.useState(false)
+  const [error, setError] = React.useState('')
+  const isMobile = useIsMobile()
+
+  React.useEffect(() => {
+    if ((f.message !== null && f.message !== '') || (error !== '')) {
+      setShowAlert(true)
+    }
+  }, [f, error])
+
+
+  const search = async (page?: number | null, perPage?: number | null) => {
+    try {
+      setLoading(true)
+
+      const params: { page: number, per_page: number, q?: string } = {
+        page: page ?? props.meta.current_page,
+        per_page: perPage ?? props.meta.per_page,
+        q: query
+      }
+      const response = await axios.get('/menu-paging', { params })
+      const result = response.data as Props
+      setPaging({
+        menus: result.menus,
+        meta: {
+          current_page: result.meta.current_page,
+          last_page: result.meta.last_page,
+          per_page: result.meta.per_page,
+          total: result.meta.total
+        }
+      }
+      )
+    } catch (error) {
+      setError(`Gagal ${error}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const reset = () => {
+    setQuery('')
+    setError('')
+    setPaging({
+      menus: props.menus,
+      meta: props.meta
+    })
+  }
+
   return (
     <Authenticated
-      header={<h2>Kecamatan</h2>}
+      header={<h2>Kategori</h2>}
     >
-      <div className={'mx-6'}>
-        <Alert
-          showAlert={showAlert}
-          setShowAlert={setShowAlert}
-          message={f.message}
-        />
-        {
-          menus?.length == 0 ? <p>Tidak ada data</p>
-            :
-            <table
-              className={'w-full'}
+      <ModalAlert
+        buttonTitle={menu !== null ? 'Hapus' : null}
+        function={menu !== null ? async () => {
+          await axios.delete(route('district.destroy', menu.id))
+
+          // setDistrict(null)
+          // setShowAlert(false)
+          Inertia.get(route('district.index'))
+        } : null}
+        show={showAlert} close={() => setShowAlert(false)}
+        content={error !== '' ? error : menu !== null ? 'Yakin ingin menghapus data?' : f.message}
+        title={error !== '' ? 'Error' : menu !== null ? 'Peringatan' : null}
+      />
+      <div>
+        <p className='header'>Kategori dan Persyaratan</p>
+        <div className={'flex justify-between mt-6'}>
+          <select id="view"
+            className={"w-fit block p-2 text-xs text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 h-8"}
+            onChange={(e) => {
+              e.preventDefault();
+              search(null, Number.parseInt(e.target.value))
+            }}
+          >
+            <option value={10} id='5'>10</option>
+            <option value={15} id='10'>15</option>
+            <option value={20} id='15'>20</option>
+            <option value={25} id='20'>25</option>
+          </select>
+          {isMobile ? <div></div> : Paginate(paging.meta, search)}
+
+          <div className='flex gap-2'>
+            <TextInput
+              sizing='sm'
+              id="search"
+              placeholder="Nama"
+              value={query}
+              onChange={(e) => { setQuery(e.target.value) }}
+            />
+            <Button
+              onClick={() => search()}
+              color={"cyan"}
+              size={"xs"}
+              disabled={loading}
             >
-              <thead>
-                <tr>
-                  <th className='p-4 border border-slate-600'>No</th>
-                  <th className='p-4 border border-slate-600'>Kategori</th>
-                  <th className='p-4 border border-slate-600'>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {list}
-              </tbody>
-            </table>
-        }
+              <HiSearch className="mr-2 h-5 w-5" />
+              Cari
+            </Button>
+            <Button
+              onClick={reset}
+              color={"red"}
+              size={"xs"}
+            >
+              <HiRefresh className="mr-2 h-5 w-5" />
+
+              Reset
+            </Button>
+          </div>
+        </div>
+        <div className='mt-2'>
+          {
+            props.menus?.length == 0 ? <p>Tidak ada data</p>
+              :
+              <Table striped>
+                <TableHead>
+                  <TableRow>
+                    <TableHeadCell>No</TableHeadCell>
+                    <TableHeadCell>Nama</TableHeadCell>
+                    <TableHeadCell>Aksi</TableHeadCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody className={'divider-y'}>
+                  {
+                    paging.menus.map((v, k) => {
+                      return (
+                        <TableRow key={k}>
+                          <TableCell>{((paging.meta.current_page - 1) * (paging.meta.per_page)) + k + 1}</TableCell>
+                          <TableCell>{v.name}</TableCell>
+                          <TableCell className='flex gap-2'>
+                            <Button
+                              color={'blue'}
+                              size='xs'
+                              href={route('menu.show', v.id)}
+                            >
+                              <GiPencil className='mr-2' />
+                              Ubah
+                            </Button>
+
+
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })
+                  }
+                </TableBody>
+              </Table>
+          }
+        </div >
+        <div className='flex overflow-x-auto sm:justify-center mt-6'>
+          {Paginate(paging.meta, search)}
+        </div>
       </div>
     </Authenticated>
   )

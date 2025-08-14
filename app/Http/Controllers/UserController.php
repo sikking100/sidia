@@ -18,8 +18,37 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::where('role', 'desa')->with('ddesa')->get();
-        return Inertia::render('Admin/User/Index', compact('users'));
+        $users = User::where('role', 'desa')->with('ddesa')->paginate(10, ['*'], 'page', 1);
+        return Inertia::render('Admin/User/Index', [
+            'users' => $users->items(),
+            'meta' => [
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total(),
+            ],
+        ]);
+    }
+
+    public function pagination(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $query = User::query();
+        $query->where('role', 'desa');
+        if ($request->has('d') && !empty($request->d)) {
+            $query->where('name', 'like', '%' . $request->d . '%');
+        }
+        $users = $query->with('ddesa')->paginate($perPage, ['*'], 'page', $page);
+        return response()->json([
+            'users' => $users->items(),
+            'meta' => [
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total(),
+            ],
+        ]);
     }
 
     /**

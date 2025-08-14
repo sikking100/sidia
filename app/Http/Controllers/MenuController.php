@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreMenuRequest;
 use App\Http\Requests\UpdateMenuRequest;
 use App\Models\Menu;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class MenuController extends Controller
@@ -16,8 +17,36 @@ class MenuController extends Controller
      */
     public function index()
     {
-        $menus = Menu::all();
-        return Inertia::render('Admin/Persyaratan/Index', compact('menus'));
+        $menus = Menu::paginate(10, ['*'], 'page', 1);
+        return Inertia::render('Admin/Persyaratan/Index', [
+            'menus' => $menus->items(),
+            'meta' => [
+                'current_page' => $menus->currentPage(),
+                'last_page' => $menus->lastPage(),
+                'per_page' => $menus->perPage(),
+                'total' => $menus->total(),
+            ],
+        ]);
+    }
+
+    public function pagination(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $query = Menu::query();
+        if ($request->has('q') && !empty($request->q)) {
+            $query->where('name', 'like', '%' . $request->q . '%');
+        }
+        $menus = $query->paginate($perPage, ['*'], 'page', $page);
+        return response()->json([
+            'menus' => $menus->items(),
+            'meta' => [
+                'current_page' => $menus->currentPage(),
+                'last_page' => $menus->lastPage(),
+                'per_page' => $menus->perPage(),
+                'total' => $menus->total(),
+            ],
+        ]);
     }
 
     /**

@@ -2,6 +2,9 @@ import React from 'react'
 import { useForm } from '@inertiajs/inertia-react'
 import route from 'ziggy-js'
 import { Ward } from '@/Pages/Admin/Ward/Index'
+import { BackButton } from '@/Components/Button'
+import { Button } from 'flowbite-react'
+import { HiSave } from 'react-icons/hi'
 
 interface Props {
   ward?: Ward
@@ -25,11 +28,13 @@ export default function WardForm({ ward, district_id }: Props) {
     }
   }
   return (
-    <form className="w-full px-6" onSubmit={onSubmit}>
-      {/*<BackButton*/}
-      {/*    route={'ward'}*/}
-      {/*/>*/}
-      <div className='grid grid-rows-3 grid-flow-col gap-6'>
+    <form className="w-full" onSubmit={onSubmit}>
+      <BackButton
+        route=''
+        id={district_id}
+        routess={'district.show'}
+      />
+      <div className='grid grid-rows-3 grid-flow-col gap-6 mt-6'>
         <div className='row-span-3'>
           <div className="flex flex-wrap -mx-3 mb-2">
             <div className="w-full px-3">
@@ -49,12 +54,14 @@ export default function WardForm({ ward, district_id }: Props) {
         </div>
       </div>
       <div className="md:flex md:items-center">
-        <button
-          className="shadow bg-purple-500 hover:bg-purple-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
-          type="submit"
+        <Button
+          type='submit'
+          size='sm'
+          color={'purple'}
         >
+          <HiSave className={'mr-2'} />
           {title}
-        </button>
+        </Button>
       </div>
     </form>
   )

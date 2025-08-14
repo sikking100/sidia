@@ -91,42 +91,12 @@ class ApplicationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
 
         $districts = District::all();
         $wards = Ward::all();
         $hamlets = Hamlet::all();
-
-        $query = Application::query();
-
-        if ($request->has('district') && !empty($request->district)) {
-            $query->where('district', 'like', '%' . $request->district . '%');
-        }
-
-        if ($request->has('ward') && !empty($request->ward)) {
-            $query->where('ward', 'like', '%' . $request->ward . '%');
-        }
-
-        if ($request->has('hamlet_id') && !empty($request->hamlet_id)) {
-            $query->where('hamlet_id', $request->hamlet_id);
-        }
-
-        if ($request->has('status') && !empty($request->status)) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->has('nikname') && !empty($request->nikname)) {
-            if (is_numeric($request->nikname)) {
-                $query->where('id_card_number', $request->nikname);
-            } else {
-                $query->where('name', 'like', '%' . $request->nikname . '%');
-            }
-        }
-
-        if ($request->has('tahun') && !empty($request->tahun)) {
-            $query->whereYear('created_at', $request->tahun);
-        }
 
         $application = Application::with('filess')->orderBy('created_at', 'desc')->paginate(10, ['*'], 'page', 1);
 
@@ -443,7 +413,10 @@ class ApplicationController extends Controller
         $this->up->deleteSurat($application->category, $application);
         $this->up->deleteImages('applicant', $application);
         $application->delete();
-        return redirect()->route('application.index');
+        session()->flash('message', 'Berhasil menghapus data');
+
+        // return redirect()->route('application.index');
+        return response()->json(200);
     }
 
     public function update_status(UpdateStatusRequest $request, $id)

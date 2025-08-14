@@ -91,8 +91,8 @@ export default function Authenticated({ children, header }: React.PropsWithChild
               <Button
                 pill
                 href={route('user.index')}
-                color={`${url === '/user' ? '' : 'light'}`}
-                className={`${url === '/user' ? 'blue-gradient' : ''}`}
+                color={`${url.toLowerCase().includes('/user') ? '' : 'light'}`}
+                className={`${url.toLowerCase().includes('/user') ? 'blue-gradient' : ''}`}
                 // gradientMonochrome={`${url === '/user' ? 'info' : ''}`}
                 size={"sm"}
               >
@@ -103,8 +103,8 @@ export default function Authenticated({ children, header }: React.PropsWithChild
               <Button
                 pill
                 href={route('district.index')}
-                color={`${url === '/district' ? '' : 'light'}`}
-                className={`${url === '/district' ? 'blue-gradient' : ''}`}
+                color={`${url.toLowerCase().includes('/district') ? '' : 'light'}`}
+                className={`${url.toLowerCase().includes('/district') ? 'blue-gradient' : ''}`}
                 // gradientMonochrome={`${url === '/district' ? 'info' : ''}`}
                 size={"sm"}
               >
@@ -115,8 +115,8 @@ export default function Authenticated({ children, header }: React.PropsWithChild
               <Button
                 pill
                 href={route('menu.index')}
-                color={`${url === '/menu' ? '' : 'light'}`}
-                className={`${url === '/menu' ? 'blue-gradient' : ''}`}
+                color={`${url.toLowerCase().includes('/menu') ? '' : 'light'}`}
+                className={`${url.toLowerCase().includes('/menu') ? 'blue-gradient' : ''}`}
                 // gradientMonochrome={`${url === '/menu' ? 'info' : ''}`}
                 size={"sm"}
               >
