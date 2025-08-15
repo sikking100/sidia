@@ -246,20 +246,6 @@ export default function PemohonIndex(props: Props) {
               ))
             }
           </Select>
-          {
-            user.role === 'desa' ?
-              <Select id="dusun"
-                value={idHamlet}
-                onChange={(e) => setIdHamlet(Number.parseInt(e.target.value))}
-              >
-                <option key={-1} value={-1}>Dusun</option>
-                {
-                  props.hamlets.filter((item) => item.ward.id === idWard).map((item) => (
-                    <option key={item.id} value={item.id}>{item.name}</option>
-                  ))
-                }
-              </Select> : <div></div>
-          }
           <Select id="status"
             value={status}
             onChange={(e) => setStatus(e.target.value)}

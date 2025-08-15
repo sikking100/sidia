@@ -11,7 +11,7 @@ export default function Welcome(props: any) {
       <Head title="Welcome" />
 
       <div className={'flex flex-row flex-wrap gap-11'}>
-        <div className={'shadow w-[18rem] bg-gray-200'}>
+        <div className={'shadow md:w-[15rem] md:h-fit bg-gray-200'}>
           <img
             src={'../../assets/2.webp'}
             className={'rounded-t-sm'}
@@ -57,7 +57,7 @@ export default function Welcome(props: any) {
           </div>
         </div>
 
-        <div className={'shadow w-[18rem] bg-gray-200'}>
+        <div className={'shadow md:w-[15rem] md:h-fit bg-gray-200'}>
           <img
             src={'../../assets/1.webp'}
             className={'rounded-t-sm'}
@@ -97,7 +97,7 @@ export default function Welcome(props: any) {
             </Dropdown>
           </div>
         </div>
-        <div className={'shadow w-[18rem] bg-gray-200'}>
+        <div className={'shadow md:w-[15rem] md:h-fit bg-gray-200'}>
           <img
             src={'../../assets/3.webp'}
             className={'rounded-t-sm'}
@@ -137,7 +137,7 @@ export default function Welcome(props: any) {
             </Dropdown>
           </div>
         </div>
-        <div className={'shadow w-[18rem] bg-gray-200'}>
+        <div className={'shadow md:w-[15rem] md:h-fit bg-gray-200'}>
           <img
             src={'../../assets/8.webp'}
             className={'rounded-t-sm'}
@@ -162,7 +162,7 @@ export default function Welcome(props: any) {
             </Dropdown>
           </div>
         </div>
-        <div className={'shadow w-[18rem] bg-gray-200'}>
+        <div className={'shadow md:w-[15rem] md:h-fit bg-gray-200'}>
           <img
             src={'../../assets/4.webp'}
             className={'rounded-t-sm'}
@@ -202,7 +202,7 @@ export default function Welcome(props: any) {
             </Dropdown>
           </div>
         </div>
-        <div className={'shadow w-[18rem] bg-gray-200'}>
+        <div className={'shadow md:w-[15rem] md:h-fit bg-gray-200'}>
           <img
             src={'../../assets/5.webp'}
             className={'rounded-t-sm'}
@@ -219,7 +219,7 @@ export default function Welcome(props: any) {
             </Link>
           </div>
         </div>
-        <div className={'shadow w-[18rem] bg-gray-200'}>
+        <div className={'shadow md:w-[15rem] md:h-fit bg-gray-200'}>
           <img
             src={'../../assets/6.webp'}
             className={'rounded-t-sm'}
@@ -236,7 +236,7 @@ export default function Welcome(props: any) {
             </Link>
           </div>
         </div>
-        <div className={'shadow w-[18rem] bg-gray-200'}>
+        <div className={'shadow md:w-[15rem] md:h-fit bg-gray-200'}>
           <img
             src={'../../assets/7.webp'}
             className={'rounded-t-sm'}
@@ -253,7 +253,7 @@ export default function Welcome(props: any) {
             </Link>
           </div>
         </div>
-        <div className={'shadow w-[18rem] bg-gray-200'}>
+        <div className={'shadow md:w-[15rem] md:h-fit bg-gray-200'}>
           <img
             src={'../../assets/9.webp'}
             className={'rounded-t-sm'}

@@ -25,6 +25,7 @@ export interface Applicant {
   upload?: string | null
   filess?: Array<Files>
   hamlet_id?: number | null
+  filessss: FilesForm[] | undefined
 }
 
 export interface DesaApplication {
@@ -78,6 +79,7 @@ export interface DesaApplicationPost {
 export interface District {
   id: number
   name: string
+  wards?: Ward[]
 }
 
 export const statusOptions = ['PENDING', 'DEFFICIENT', 'REVISED', 'VERIFIED', 'COMPLETED', 'CANCEL']

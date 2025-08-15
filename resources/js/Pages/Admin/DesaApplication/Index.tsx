@@ -27,9 +27,9 @@ interface PagingProps {
 
 export default function DesaApplicationIndex(props: Props) {
   const { flash } = usePage().props
+  const f = flash as { message: string }
   const { user } = usePage().props.auth as { user: User }
 
-  const f = flash as { message: string }
   const [showAlert, setShowAlert] = React.useState(true);
 
 

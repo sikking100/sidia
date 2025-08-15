@@ -83,9 +83,11 @@ Route::group(['middleware' => 'auth'], function () {
 
 Route::controller(GuestController::class)->group(function () {
     Route::get('/cek-permohonan', 'check')->name('check');
+    Route::get('/cek-permohonan/{id}', 'check_detail')->name('check.detail');
     Route::get('/applicant/{id}', 'applicant');
     Route::get('/form/{category}', 'form')->name('form');
     Route::post('/form', 'formAction')->name('form.action');
+    Route::put('/form', 'form_update')->name('form.update');
     Route::get('/uploadFile/{id}/{category}', 'uploadFile')->name('upload');
     Route::post('/uploadFile/{id}', 'uploadAction')->name('upload.action');
     Route::get('/wards/{id}', 'kelurahan');
@@ -93,8 +95,8 @@ Route::controller(GuestController::class)->group(function () {
 });
 
 
-// Route::get('/dashboard', function () {
-//     return Inertia::render('Dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 require __DIR__ . '/auth.php';

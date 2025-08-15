@@ -7,7 +7,7 @@ import Container from '@/Components/Container'
 import Label from '@/Components/Label'
 import Input from '@/Components/Input'
 import route from 'ziggy-js'
-import Button from '@/Components/Button'
+// import Button from '@/Components/Button'
 
 interface Props {
     id: number
@@ -76,7 +76,7 @@ export default function UploadFile({ id, requirements, category }: Props) {
                             />
                         </div>
                     })}
-                    <Button processing={processing}>Simpan</Button>
+                    {/* <Button processing={processing}>Simpan</Button> */}
                 </form>
             </Container>
         </Guest>

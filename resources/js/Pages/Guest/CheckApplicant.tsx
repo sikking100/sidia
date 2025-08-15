@@ -1,20 +1,26 @@
 import React, { useState } from 'react'
-import { Head } from '@inertiajs/inertia-react'
+import { Head, usePage } from '@inertiajs/inertia-react'
 import Guest from '@/Layouts/Guest'
-import Input from '@/Components/Input'
-import Label from '@/Components/Label'
 import axios from 'axios'
 import { Applicant } from '@/Interface/Interface'
-import Button from '@/Components/Button'
 import { useForm, Link } from '@inertiajs/inertia-react'
 import route from 'ziggy-js'
-import { getStatus } from '@/Functions/functions'
+import { getStatus, useIsMobile } from '@/Functions/functions'
+import { Button, Label, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, TextInput } from 'flowbite-react'
+import { ModalAlert } from '@/Components/Alert'
+import { makeIntlFormatter } from 'react-timeago/defaultFormatter'
+import { HiDownload, HiEye } from 'react-icons/hi'
+import TimeAgo from 'react-timeago'
 
 interface FormProps {
   nik: string
 }
 export default function CheckApplicant() {
+  const { flash } = usePage().props
+  const f = flash as { message: string }
   const [applicant, setStateApplicant] = useState<Array<Applicant>>()
+  const [showModal, setShowModal] = useState<boolean>(false)
+  const isMobile = useIsMobile()
   const { data, setData, progress } = useForm<FormProps>(
     {
       nik: ''
@@ -24,6 +30,19 @@ export default function CheckApplicant() {
     setData('nik', e.target.value)
     return
   }
+
+  React.useEffect(() => {
+    console.log(f.message);
+
+    if (f.message != null && f.message !== '') {
+      setShowModal(true)
+    } else {
+      setShowModal(false)
+    }
+
+    return
+  }, [flash])
+
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -48,110 +67,136 @@ export default function CheckApplicant() {
     <Guest
       title='Cek Permohonan'>
       <Head title={'Cek Permohonan'} />
+      <ModalAlert
+        title='Pemberitahun'
+        close={() => setShowModal(false)}
+        content={f.message}
+        show={showModal}
+      />
       <form onSubmit={onSubmit}>
-        <Label forInput={'nik'} value={'Nik pemohon'} className={'pt-6 pb-2'} />
-        <Input
+        <Label>NIK Pemohon</Label>
+        <TextInput
           name={'nik'}
-          handleChange={handleChange}
+          onChange={handleChange}
           className={'w-full'}
         />
-        <Button className={'mt-6'} processing={process}>Cari</Button>
+        <Button color={'blue'} className='mt-2' type='submit'>Cari</Button>
       </form>
-      {applicant && <div className={'mt-6'}>
-        <table className={'table-auto w-full border-collapse border border-slate-400'}>
-          <thead>
-            <tr>
-              <th className={'border border-slate-300 p-6 text-left'}>
-                No
-              </th>
-              <th className={'border border-slate-300 p-6 text-left'}>
-                Tanggal Pengajuan
-              </th>
-              <th className={'border border-slate-300 p-6 text-left'}>
-                No Tiket
-              </th>
-              <th className={'border border-slate-300 p-6 text-left'}>
-                Nik
-              </th>
-              <th className={'border border-slate-300 p-6 text-left'}>
-                Nama
-              </th>
-              <th className={'border border-slate-300 p-6 text-left'}>
-                Jenis Layanan
-              </th>
-              <th className={'border border-slate-300 p-6 text-left'}>
-                Status
-              </th>
-              <th className={'border border-slate-300 p-6 text-left'}>
-                Keterangan
-              </th>
-              <th className={'border border-slate-300 p-6 text-left'}>
-                Aksi
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {applicant.map((a, i) => {
-              const date = new Date(a.created_at ?? '')
-              const formattedDate = new Intl.DateTimeFormat('id-ID', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-              }).format(date)
-              return <tr key={i}>
-                <td className={'border border-slate-300 p-6'}>
-                  {i + 1}
-                </td>
-                <td className={'border border-slate-300 p-6'}>
-                  {formattedDate}
-                </td>
-                <td className={'border border-slate-300 p-6'}>
-                  {a.ticket}
-                </td>
-                <td className={'border border-slate-300 p-6'}>
-                  {a.id_card_number}
-                </td>
-                <td className={'border border-slate-300 p-6'}>
-                  {a.name}
-                </td>
-                <td className={'border border-slate-300 p-6'}>
-                  {a.category}
-                </td>
-                <td className={'border border-slate-300 p-6'}>
-                  {getStatus(a.status ?? '')}
-                </td>
-                <td className={'border border-slate-300 p-6'}>
-                  {a.status_description}
-                </td>
-                <td className={'border border-slate-300 p-6'}>
-                  {
-                    a.status == 'COMPLETED' && (a.filess !== null && a.filess!.length !== 0 && a.filess!.filter((e) => e.name.includes('Hasil')).length !== 0) ?
-                      // <Link
-                      //   className={'inline-block bg-green-600 px-4 py-2 text-white rounded-md font-semibold'}
-                      //   type={'a'}
-                      //   target="_blank"
-                      //   rel="noopener noreferrer"
-                      //   href={route('file.download', { 'place': a.filess!.filter((e) => e.name.includes('Hasil'))[0].place })}
-                      // >
-                      //   Download Hasil
+      {applicant && <Table striped className='mt-6'>
+        <TableHead className='divide-y'>
+          {
+            isMobile ? <TableRow>
+              <TableHeadCell>No</TableHeadCell>
+              <TableHeadCell>Status</TableHeadCell>
+              <TableHeadCell>Pemohon</TableHeadCell>
+              <TableHeadCell>Aksi</TableHeadCell>
 
-                      // </Link>
-                      <a className={'inline-block bg-green-600 px-4 py-2 text-white rounded-md font-semibold'} href={`/download-file?place=${a.filess!.filter((e) => e.name.includes('Hasil'))[0].place}`} target="_blank" rel="noopener noreferrer">Download Hasil</a>
-                      : <div></div>
-                  }
-                  {a.status == 'DEFFICIENT' && <Link
-                    className={'button inline-block'}
-                    type={'a'}
-                    href={route('upload', { 'id': a.id!, 'category': a.category })}
-                  >
-                    Upload Berkas
-                  </Link>}
-                </td>
-              </tr>
-            })}
-          </tbody>
-        </table>
-      </div>}
+
+            </TableRow> : <TableRow className=''>
+              <TableHeadCell>No</TableHeadCell>
+              <TableHeadCell>Tanggal</TableHeadCell>
+              <TableHeadCell>Status</TableHeadCell>
+              <TableHeadCell>Kategori</TableHeadCell>
+              <TableHeadCell>NIK</TableHeadCell>
+              <TableHeadCell>Pemohon</TableHeadCell>
+              <TableHeadCell>Aksi</TableHeadCell>
+            </TableRow>
+          }
+        </TableHead>
+        <TableBody className='divider-y'>
+          {applicant.map((e, i) => {
+            const date = new Date(e.created_at ?? '')
+            const formattedDate = new Intl.DateTimeFormat('id-ID', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            }).format(date)
+            const intlFormatter = makeIntlFormatter({
+              locale: "id-ID", // string
+            });
+            if (isMobile) return (
+              <TableRow key={i} className='bg-white dark:border-gray-700 dark:bg-gray-800'>
+                <TableCell>
+                  <p>{i + 1}</p>
+                </TableCell>
+
+                <TableCell className="whitespace-nowrap font-bold text-gray-900 dark:text-white">
+                  <p>{getStatus(e.status ?? '')} </p>
+                  <p className={'text-green-500'}>{(e.filess !== null && e.filess!.length !== 0 && e.filess!.filter((e) => e.name.includes('Hasil')).length !== 0) ? '(Berkas terupload)' : ''}</p>
+                </TableCell>
+
+                <TableCell>
+                  {e.name}
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-row justify-end gap-2">
+                    <Button
+                      // color={"green"}
+                      className='bg-blue-500 hover:bg-blue-800 text-white font-bold'
+                      href={route('application.show', e.id)}
+                      size='xs'
+                    >
+                      <HiEye className='mr-2' />
+                      Detail
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow >
+            )
+            return (
+              <TableRow key={i} className='bg-white dark:border-gray-700 dark:bg-gray-800'>
+                <TableCell>
+                  <p>{i + 1}</p>
+                </TableCell>
+                <TableCell>
+                  <p>{formattedDate}</p>
+                  <TimeAgo date={e.created_at ?? ''} formatter={intlFormatter} />
+                </TableCell>
+                <TableCell className="whitespace-nowrap font-bold text-gray-900 dark:text-white">
+                  <p>{getStatus(e.status ?? '')} </p>
+                </TableCell>
+                <TableCell>
+                  {e.category}
+                </TableCell>
+                <TableCell>
+                  {e.id_card_number}
+                </TableCell>
+                <TableCell>
+                  {e.name}
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-row justify-end gap-2">
+                    {
+                      e.status == 'COMPLETED' && (e.filess !== null && e.filess!.length !== 0 && e.filess!.filter((ee) => ee.name.includes('Hasil')).length !== 0) ?
+                        // <Link
+                        //   className={'inline-block bg-green-600 px-4 py-2 text-white rounded-md font-semibold'}
+                        //   type={'a'}
+                        //   target="_blank"
+                        //   rel="noopener noreferrer"
+                        //   href={route('file.download', { 'place': a.filess!.filter((e) => e.name.includes('Hasil'))[0].place })}
+                        // >
+                        //   Download Hasil
+
+                        // </Link>
+                        <a className={'inline-block bg-green-600 px-4 py-2 text-white rounded-md font-semibold'} href={`/download-file?place=${e.filess!.filter((ee) => ee.name.includes('Hasil'))[0].place}`} target="_blank" rel="noopener noreferrer">Download Hasil</a>
+                        : <div></div>
+                    }
+                    {<Button
+                      // color={"green"}
+                      className='bg-blue-500 hover:bg-blue-800 text-white font-bold'
+                      href={route('check.detail', e.id)}
+                      size='xs'
+                    >
+                      <HiEye className='mr-2' />
+                      Detail
+                    </Button>}
+                  </div>
+                </TableCell>
+              </TableRow >
+            )
+          })}
+        </TableBody>
+      </Table>}
     </Guest>
   )
 }

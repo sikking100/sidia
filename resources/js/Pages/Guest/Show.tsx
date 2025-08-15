@@ -1,29 +1,27 @@
 import React from 'react'
 import Authenticated from '@/Layouts/Authenticated'
-import { Applicant, persyaratan, Files, Menu, Requirement, Hamlet } from '@/Interface/Interface'
-
+import { Applicant, persyaratan, Files, Menu, Requirement, DesaApplication, Hamlet } from '@/Interface/Interface'
+import Label from '@/Components/Label'
+import Input from '@/Components/Input'
+import { ErrorText } from '@/Components/Error'
+import { Link, useForm, usePage } from '@inertiajs/inertia-react'
 import { Inertia } from '@inertiajs/inertia'
 
+import { ArrowLeftIcon, Avatar, Button, CloseIcon, Modal, ModalBody, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from 'flowbite-react'
 import route from 'ziggy-js'
-
-import { HiBackward } from 'react-icons/hi2'
-import { ArrowLeftIcon, Label, Avatar, Button, ButtonGroup, buttonTheme, CloseIcon, Modal, ModalBody, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Textarea, TextInput, ThemeProvider } from 'flowbite-react'
-import { Link, useForm } from '@inertiajs/inertia-react'
+import axios from 'axios'
+import { url } from 'inspector'
 import { getFileType, getStatus, getStatusBerkas } from '@/Functions/functions'
-import { MdArchive, MdCancel, MdDownloading, MdPrint, MdVerified } from 'react-icons/md'
-import { BsBack, BsDownload } from 'react-icons/bs'
-import { PiBackspace } from 'react-icons/pi'
-import { FcPrevious } from 'react-icons/fc'
-import { GiPreviousButton } from 'react-icons/gi'
-import { HiAdjustments, HiClock, HiCloudDownload, HiEye, HiPhone, HiTicket, HiUserCircle } from 'react-icons/hi'
+import { Parser } from 'html-to-react'
+import { BackButton } from '@/Components/Button'
+import { MdVerified } from 'react-icons/md'
+import { BiCheck, BiCheckCircle, BiFace, BiFile, BiHome, BiMap, BiMapAlt, BiMapPin, BiPhone, BiPrinter, BiRevision, BiText, BiTime, BiUserCircle } from 'react-icons/bi'
 import { SiTicktick } from 'react-icons/si'
-import { BiCheck, BiCode, BiFace, BiFile, BiHome, BiMap, BiMapAlt, BiMapPin, BiPhone, BiPrinter, BiRevision, BiText, BiTime, BiUser, BiUserCircle } from 'react-icons/bi'
 import TimeAgo from 'react-timeago'
 import { makeIntlFormatter } from 'react-timeago/defaultFormatter'
-import { ErrorText } from '@/Components/Error'
-import { BackButton } from '@/Components/Button'
-import { GoVerified } from 'react-icons/go'
-import axios from 'axios'
+import { HiEye } from 'react-icons/hi'
+import { BsDownload } from 'react-icons/bs'
+import Guest from '@/Layouts/Guest'
 
 
 interface FileTicket {
@@ -33,10 +31,7 @@ interface FileTicket {
 }
 interface Props {
   application: Applicant
-  files: Array<Files>
-  menu: Menu
   requirements: Array<Requirement>
-  hamlet?: Hamlet
 }
 
 interface FormUpdateStatus {
@@ -44,98 +39,31 @@ interface FormUpdateStatus {
   status_description: string
 }
 
-export default function PemohonShow({ application, files, menu, requirements, hamlet }: Props) {
-  const [showModal, setShowModal] = React.useState<boolean>(false)
-  const [showModalRevisi, setShowModalRevisi] = React.useState<boolean>(false)
-  const [showModalPenolakan, setShowModalPenolakan] = React.useState<boolean>(false)
+export default function GuesApplicationShow({ application, requirements }: Props) {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [showAlert, setShowAlert] = React.useState(false);
   const [selectedFile, setSelectedFile] = React.useState<Files | null>(null);
-  const [comment, setComment] = React.useState<string>('');
 
-  const [error, setError] = React.useState<string>('');
+  const { flash } = usePage().props
+  const f = flash as { message: string }
 
-
-  const { data, errors, setData, put, get, post } = useForm<FormUpdateStatus>({
-    status: '',
-    status_description: ''
-  })
-
-  function onClick(e: React.FormEvent<HTMLButtonElement>) {
-    e.preventDefault()
-    window.open(route('application.edit', application.id))
-  }
-
-  function onSelesai(e: React.FormEvent<HTMLButtonElement>) {
-    e.preventDefault()
-    Inertia.post(route('status', application.id), {
-      'status': 'COMPLETED',
-      'status_description': 'Selesai',
-      '_method': 'PUT',
-    })
-  }
-
-  function onRevisi(e: React.FormEvent<HTMLButtonElement>) {
-    e.preventDefault()
-    setData('status', 'DEFFICIENT')
-    setShowModal(!showModal)
-  }
-
-  function onTolak(e: React.FormEvent<HTMLButtonElement>) {
-    e.preventDefault()
-    setData('status', 'CANCEL')
-    setShowModalPenolakan(!showModalPenolakan)
-  }
-
-  function onVerified(e: React.FormEvent<HTMLButtonElement>) {
-    e.preventDefault()
-    const check = files.filter(e => e.status != 1)
-    if (check.length > 0) {
-      setError('Berkas belum diverifikasi, silahkan verifikasi semua berkas terlebih dahulu')
-      return
+  React.useEffect(() => {
+    if (f.message !== null && f.message !== '') {
+      setShowAlert(true)
     }
-    setData('status', 'VERIFIED')
-    setShowModal(!showModal)
-    return
-  }
-
-  function onVerifiedBerkas(e: React.FormEvent<HTMLButtonElement>) {
-    e.preventDefault()
-    const formData = new FormData()
-    formData.append('status', '1')
-    formData.append('id', `${selectedFile?.id}`)
-    formData.append('comment', '-')
-    formData.append('_method', 'put');
-    Inertia.post(route('files.update', selectedFile?.id), formData, {
-      onError: (e) => {
-        console.log(e)
-      },
-      onSuccess: () => {
-        window.location.reload()
-
-      }
-    })
-    return
-  }
-
-
-
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    console.log(data)
-    put(route('status', application.id))
-    setShowModal(!showModal)
-    return
-  }
+  }, [f])
 
   function handleClick(name: string) {
     window.open(route('photo', name))
   }
 
+
+
   const handleView = (file: Files) => {
     setSelectedFile(file);
     setIsModalOpen(true);
   };
+
 
   const dateCreated = Date.parse(application.created_at ?? '')
   const dateCreate = Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(dateCreated)
@@ -145,44 +73,28 @@ export default function PemohonShow({ application, files, menu, requirements, ha
 
   const checkFile = (name: string, id: number): Files | undefined => {
 
-    const file = files.find(e => {
+    const file = application.filess?.find(e => {
       if (e.requirement_id === null) return e.name === name
       return e.requirement_id === id
     })
     return file === undefined ? undefined : file
 
   }
-
-  const handleSubmitRevisiBerkas = (e: any) => {
-    e.preventDefault();
-    const formData = new FormData()
-    formData.append('status', '2')
-    formData.append('id', `${selectedFile?.id}`)
-    formData.append('comment', comment)
-    formData.append('_method', 'put');
-    Inertia.post(route('files.update', selectedFile?.id), formData, {
-      onError: (e) => {
-        console.log(e)
-      },
-      onSuccess: () => {
-        window.location.reload()
-      }
-    })
-  }
-
   return (
-    <Authenticated
-      header={<h2>Pemohon</h2>}
-    >
-      {error && <Modal show={true} onClose={() => setError('')} size="md">
-        <ModalHeader>Error</ModalHeader>
-        <ModalBody>
-          <p>{error}</p>
+    <Guest>
+      <Modal
+        show={showAlert}
+        // size="md"
+        popup={true}
+        onClose={() => setShowAlert(false)}
+      >
+        <ModalHeader>
+          <p className='header'>Pemberitahuan</p>
+        </ModalHeader>
+        <ModalBody className='justify-items-center'>
+          <p>{f.message}</p>
         </ModalBody>
-        <ModalFooter>
-          <Button onClick={() => setError('')}>Close</Button>
-        </ModalFooter>
-      </Modal>}
+      </Modal>
       {isModalOpen && selectedFile && (
         <Modal show={isModalOpen} onClose={() => setIsModalOpen(false)} size="4xl">
           <ModalHeader>Pratinjau File {getStatusBerkas(selectedFile.status)}</ModalHeader>
@@ -214,117 +126,20 @@ export default function PemohonShow({ application, files, menu, requirements, ha
               <BsDownload className='me-2 h-4 w-4' />
               Download
             </Button>
-            {
-              (selectedFile.status == 0 || selectedFile.status == 2) &&
-              <Button className={"bg-yellow-400"} size='xs' onClick={() => { setShowModalRevisi(true) }}>
-                <BiRevision className='me-2 h-4 w-4' />
-                Revisi
-              </Button>
-            }
-            {
-              selectedFile.status == 0 &&
-              <Button className={"bg-green-400"} size='xs' onClick={onVerifiedBerkas}>
-                <GoVerified className='me-2 h-4 w-4' />
-                Verifikasi
-              </Button>
-            }
           </ModalFooter>
         </Modal>
       )}
-
-      <Modal
-        show={showModal}
-        // size="xl"
-        popup={true}
-        onClose={showModal ? () => setShowModal(!showModal) : undefined}
-      >
-        <ModalHeader>
-          <p className='ml-4'>Berikan alasan revisi</p>
-        </ModalHeader>
-        <ModalBody
-        >
-          <form onSubmit={handleSubmit}>
-            <Textarea
-              rows={10}
-              className='min-w-screen'
-              name='status_description'
-              value={data.status_description}
-              onChange={e => setData('status_description', e.target.value)}
-            >
-            </Textarea>
-            <ErrorText message={errors.status_description} />
-            <Button type={'submit'} className={'blue-gradient mt-6 mr-2'}>Revisi</Button>
-          </form>
-        </ModalBody>
-        <ModalFooter>
-          <Button type={'reset'} color={'red'} className={'mt-6 ml-2'} onClick={(_) => setShowModal(!showModal)}>Batal</Button>
-        </ModalFooter>
-      </Modal>
-
-      <Modal
-        show={showModalPenolakan}
-        // size="md"
-        popup={true}
-        onClose={() => setShowModalPenolakan(false)}
-      >
-        <ModalHeader>
-          <p className='ml-4'>Berikan Alasan penolakan</p>
-
-
-        </ModalHeader>
-        <ModalBody>
-          <form onSubmit={handleSubmit}>
-            <Textarea
-              name='status_description'
-              onChange={e => setData('status_description', e.target.value)}
-              // className={'w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm'}
-              rows={5}
-              value={data.status_description}
-            >
-            </Textarea>
-            <ErrorText message={errors.status_description} />
-          </form>
-        </ModalBody>
-        <ModalFooter>
-          <Button type={'reset'} color={'red'} onClick={_ => setShowModalPenolakan(!showModalPenolakan)}>Batal</Button>
-          <Button type={'submit'} className={'blue-gradient'}>Tolak</Button>
-        </ModalFooter>
-      </Modal>
-      {
-        showModalRevisi && (
-          <Modal show={showModalRevisi} onClose={() => setShowModalRevisi(false)} size="md">
-            <form onSubmit={handleSubmitRevisiBerkas}>
-              <ModalHeader>Revisi Berkas</ModalHeader>
-              <ModalBody>
-                <p>Apakah Anda yakin ingin merevisi berkas ini?</p>
-                <div className='mt-6 mb-2'>
-                  <Label>Alasan</Label>
-                </div>
-                <TextInput
-                  required
-                  onChange={e => setComment(e.target.value)}
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button className={"bg-red-500"} size='xs' onClick={() => setShowModalRevisi(false)}>
-                  <CloseIcon className="me-2 h-4 w-4" />
-                  Tutup
-                </Button>
-                <Button className={"bg-yellow-400"} size='xs' type='submit'>
-                  <BiRevision className='me-2 h-4 w-4' />
-                  Revisi
-                </Button>
-              </ModalFooter>
-            </form>
-          </Modal>
-        )
-      }
-
-      <div className='flex flex-col'>
+      <div className='flex flex-col bg-white p-6 rounded-md'>
         <div>
-          <BackButton
-            route='application'
-          />
+          <Button
+            // as={Link}
+            href={route('check')}
+            size='xs'
+            className='w-fit'
+            color={'dark'}
+          >
+            <ArrowLeftIcon />
+          </Button>
         </div>
 
         <p className='mx-auto font-bold text-xl text-black'>{application.category}</p>
@@ -336,54 +151,20 @@ export default function PemohonShow({ application, files, menu, requirements, ha
 
 
         <div className='flex flex-auto flex-wrap self-center gap-4 mt-6'>
-          {(application.status == 'VERIFIED' || application.status == 'COMPLETED') &&
-            <Button
-              color={'blue'}
-              onClick={onClick}
-            >
-              <BiPrinter className="me-2 h-4 w-4" />
-              Print PDF
-            </Button>}
-          {
-            (application.status == 'VERIFIED') &&
-            <Button
-              color={'green'}
-              onClick={onSelesai}
-            >
-              <SiTicktick className="me-2 h-4 w-4" />
-              Selesai
-            </Button>
-          }
-          {(application.status == 'PENDING' || application.status == 'REVISED') &&
+
+          {(application.status == 'DEFFICIENT') &&
             <Button
               color={'yellow'}
-              onClick={onRevisi}
-
+              href={route('form', {
+                'category': application.category,
+                'id': application.id
+              })}
             >
               <BiRevision className="me-2 h-4 w-4" />
-              {application.status === 'REVISED' ? 'Revisi Ulang' : 'Revisi Berkas'}
+              Revisi Berkas
             </Button>
           }
-          {(application.status == 'PENDING' || application.status == 'REVISED') &&
-            <Button
-              color={'green'}
-              onClick={onVerified}
 
-            >
-              <GoVerified className="me-2 h-4 w-4" />
-              Verifikasi
-            </Button>
-          }
-          {(application.status == 'PENDING') &&
-            <Button
-              color={'red'}
-              onClick={onTolak}
-
-            >
-              <BiRevision className="me-2 h-4 w-4" />
-              Tolak
-            </Button>
-          }
         </div>
         <div className='mt-6'>
           <p className='sub-header inline-flex items-center gap-2'><BiUserCircle size={25} /> Informasi Pemohon : </p>
@@ -444,11 +225,11 @@ export default function PemohonShow({ application, files, menu, requirements, ha
                 <TableCell>:</TableCell>
                 <TableCell>{application.family_card_number}</TableCell>
               </TableRow>
-              <TableRow>
+              {/* <TableRow>
                 <TableCell className='flex gap-2 items-center'><BiMapPin />Dusun</TableCell>
                 <TableCell>:</TableCell>
                 <TableCell>{hamlet?.name}</TableCell>
-              </TableRow>
+              </TableRow> */}
               <TableRow>
                 <TableCell className='flex gap-2 items-center'><BiMapAlt />Desa</TableCell>
                 <TableCell>:</TableCell>
@@ -527,7 +308,7 @@ export default function PemohonShow({ application, files, menu, requirements, ha
         </div>
 
         {
-          files.filter(e => e.name.toLowerCase().includes('hasil')).length > 0 && (
+          application.filess && application.filess?.filter(e => e.name.toLowerCase().includes('hasil')).length > 0 && (
             <div className='mt-6'>
               <p className='sub-header flex items-center gap-2 mb-2'><BiCheck size={25} /> Permohonan Disetujui : </p>
               <Table striped className='border rounded-lg border-collapse'>
@@ -540,7 +321,7 @@ export default function PemohonShow({ application, files, menu, requirements, ha
                 </TableHead>
                 <TableBody className='divide-y text-black'>
                   {
-                    files.filter(e => e.name.toLowerCase().includes('hasil')).map((file, index) => (
+                    application.filess?.filter(e => e.name.toLowerCase().includes('hasil')).map((file, index) => (
                       <TableRow key={index}>
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>{file.name}</TableCell>
@@ -562,6 +343,6 @@ export default function PemohonShow({ application, files, menu, requirements, ha
             </div>)
         }
       </div>
-    </Authenticated >
+    </Guest >
   )
 }

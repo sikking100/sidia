@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class GuestController extends Controller
@@ -46,6 +47,17 @@ class GuestController extends Controller
         return Inertia::render('Guest/CheckApplicant');
     }
 
+    public function check_detail($id)
+    {
+        $application = Application::with('filess')->find($id);
+        $menu = Menu::firstWhere('name', $application->category);
+        $requirements = $menu->requirements;
+        return Inertia::render('Guest/Show', [
+            'application' => $application,
+            'requirements' => $requirements,
+        ]);
+    }
+
     public function applicant($id)
     {
         $applicant = Application::with('filess')->where('id_card_number', $id)->orderBy('created_at', 'desc')->get();
@@ -54,57 +66,137 @@ class GuestController extends Controller
         );
     }
 
-    public function form($category)
+    public function form($category, Request $request)
     {
+        $districts = District::with('wards')->get();
         $menu = Menu::firstWhere('name', $category);
         $requirements = $menu->requirements;
-        return Inertia::render('Guest/Form', ['category' => $category, 'menu' => $menu, 'requirements' => $requirements]);
+        $application = Application::with('filess')->find($request->id);
+        return Inertia::render('Guest/Form', ['category' => $category, 'menu' => $menu, 'requirements' => $requirements, 'districts' => $districts, 'application' => $application]);
     }
 
     public function formAction(StoreApplicationRequest $request)
     {
         $applicant = Application::make($request->all());
-
+        $applicant->ward_id = $request->ward_id;
+        $applicant->district_id = $request->district_id;
+        $applicant->hamlet_id = 0;
         $this->upload->uploadImages($request, 'images', $applicant);
         $applicant->status_description = "Mohon cek secara berkala, sementara permohonan Anda sedang diverifikasi";
         $applicant->save();
+        if ($request->filessss != null) {
+            foreach ($request->filessss as $key => $file) {
+                // hapus terlebih dahulu gambarnya
+                LOG::info('perulangan ke = ' . $key);
 
-        $currentTimestamp = strtotime("now");
-        $key = config('services.external_api.symmetric');
-        $payload = [
-            "iss" => "lumen-jwt",
-            "iat" => $currentTimestamp
-        ];
+                if ($file['place'] != null && $file['place'] !== "") {
+                    $this->upload->deleteBerkas($file['place']);
+                    File::where('place', $file['place'])->delete();
+                }
+                LOG::info('file place = ' . $file['place']);
+                LOG::info('file filenya = ' . $file['filenya']);
 
-        $token = JWT::encode($payload, $key, 'HS256');
-        $data = [
-            "nama_aplikasi" => "sidia",
-            "nama_layanan" => $applicant->cat->name_citigov,
-            "id_layanan" => $applicant->cat->id_citigov,
-            "nomor_tiket" => $applicant->id . "/" . $applicant->id_card_number . "/" . $applicant->created_at->format('d') . "/" . $applicant->created_at->format('m') . "/" . $applicant->created_at->format('Y'),
-            "status" => 1,
-            "nama_pemohon" => $applicant->name,
-            "nik_pemohon" => $applicant->id_card_number,
-            "email_pemohon" => $applicant->email,
-            "telepon_pemohon" => $applicant->phone,
-            "nip_petugas" => "198709032020122002",
-            "nama_petugas" => "FATMAWATI",
-            "bidang_petugas" => "PENDAFTARAN PENDUDUK",
-            "jabatan_petugas" => "PENGAWAS KEPENDUDUKAN",
-        ];
-        $ext_url = config('services.external_api.url');
 
-        $result = Http::withHeaders([
-            'token' => $token,
-            'symmetric' => $key,
-        ])->post($ext_url . "application/ticket/insert", $data);
+                $nameExt = $key . '-' . time() . '.' . $file['filenya']->extension();
+                $file['filenya']->storeAs($request->category, $nameExt, 'public');
+                $files = new File();
+                $files->name = $file['name'];
+                $files->place = $request->category . '/' . $nameExt;
+                $files->status = '0';
+                $files->comment = '-';
+                $applicant->filess()->save($files);
+            }
+        }
+
+
+        // $currentTimestamp = strtotime("now");
+        // $key = config('services.external_api.symmetric');
+        // $payload = [
+        //     "iss" => "lumen-jwt",
+        //     "iat" => $currentTimestamp
+        // ];
+
+        // $token = JWT::encode($payload, $key, 'HS256');
+        // $data = [
+        //     "nama_aplikasi" => "sidia",
+        //     "nama_layanan" => $applicant->cat->name_citigov,
+        //     "id_layanan" => $applicant->cat->id_citigov,
+        //     "nomor_tiket" => $applicant->id . "/" . $applicant->id_card_number . "/" . $applicant->created_at->format('d') . "/" . $applicant->created_at->format('m') . "/" . $applicant->created_at->format('Y'),
+        //     "status" => 1,
+        //     "nama_pemohon" => $applicant->name,
+        //     "nik_pemohon" => $applicant->id_card_number,
+        //     "email_pemohon" => $applicant->email,
+        //     "telepon_pemohon" => $applicant->phone,
+        //     "nip_petugas" => "198709032020122002",
+        //     "nama_petugas" => "FATMAWATI",
+        //     "bidang_petugas" => "PENDAFTARAN PENDUDUK",
+        //     "jabatan_petugas" => "PENGAWAS KEPENDUDUKAN",
+        // ];
+        // $ext_url = config('services.external_api.url');
+
+        // $result = Http::withHeaders([
+        //     'token' => $token,
+        //     'symmetric' => $key,
+        // ])->post($ext_url . "application/ticket/insert", $data);
         $category = $request->category;
 
         // dd(gettype($syarat));
-        session()->flash('message', 'Silakan upload file yang dibutuhkan');
+        session()->flash('message', 'Berhasil mengajukan permohonan untuk NIK : ' . $applicant->id_card_number . '\nCek data pengajuan secara berkala');
         // return redirect()->route($name.'.upload', [$applicant]);
         // return Inertia::render('Guest/UploadFile', ['applicant' => $applicant, 'requirements' => $syarat]);
-        return redirect()->route('upload', [$applicant->id, $category]);
+        // return redirect()->route('upload', [$applicant->id, $category]);
+        return redirect()->route('check');
+    }
+
+    public function form_update(Request $request)
+    {
+        $applicant = Application::find($request->id);
+        $menu = Menu::firstWhere('name', $applicant->category);
+        // dd($applicant->category);
+        // dd($request->category);
+
+        if ($request->hasFile('images')) {
+            $this->upload->deleteImages('images', $applicant);
+            $this->upload->uploadImages($request, 'images', $applicant);
+        }
+
+        if ($request->filessss != null) {
+            foreach ($request->filessss as $key => $file) {
+                // hapus terlebih dahulu gambarnya
+                LOG::info('perulangan ke = ' . $key);
+
+                if ($file['place'] != null && $file['place'] !== "") {
+                    $this->upload->deleteBerkas($file['place']);
+                    File::where('place', $file['place'])->delete();
+                }
+                LOG::info('file place = ' . $file['place']);
+                LOG::info('file filenya = ' . $file['filenya']);
+
+
+                $nameExt = $key . '-' . time() . '.' . $file['filenya']->extension();
+                $file['filenya']->storeAs($request->category, $nameExt, 'public');
+                $desaFile = new File();
+                $desaFile->name = $file['name'];
+                $desaFile->place = $request->category . '/' . $nameExt;
+                $desaFile->status = '0';
+                $desaFile->comment = 'sudah direvisi';
+                LOG::info('desafile name = ' . $desaFile->name);
+                LOG::info('desafile place = ' . $desaFile->place);
+                $applicant->filess()->save($desaFile);
+            }
+        }
+
+        $applicant->fill($request->all());
+        if ($request->filessss == null && $request->hasFile('images') == false && $applicant->isClean()) {
+            session()->flash('message', 'Anda belum merevisi berkas : ' . $applicant->id_card_number);
+            return redirect()->route('check.detail', $applicant->id);
+        }
+
+        $applicant->status = 'REVISED';
+        $applicant->status_description = 'Berkas sudah direvisi';
+        $applicant->save();
+        session()->flash('message', 'Berhasil merevisi berkas : ' . $applicant->id_card_number . '\nCek data pengajuan secara berkala');
+        return redirect()->route('check.detail', $applicant->id);
     }
 
     public function uploadFile($id, $category)
