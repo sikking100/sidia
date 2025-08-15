@@ -8,6 +8,7 @@ use App\Http\Controllers\WardController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\DesaApplicationController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\HamletController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\RequirementController;
@@ -44,15 +45,19 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('user', UserController::class);
     Route::get('/user-paging', [UserController::class, 'pagination']);
     Route::resource('hamlet', HamletController::class);
+    Route::get('/hamlet-paging', [HamletController::class, 'pagination']);
 
     // desa
     Route::get('/desa', [DesaApplicationController::class, 'index'])->name('desa.index');
     Route::post('/desa', [DesaApplicationController::class, 'store'])->name('desa.store');
-    Route::get('/desa/buat', [DesaApplicationController::class, 'buat'])->name('buat');
+    Route::get('/desa-years', [DesaApplicationController::class, 'get_years']);
+    Route::get('/desa-paging', [DesaApplicationController::class, 'paging']);
+    Route::get('/buat', [DesaApplicationController::class, 'buat'])->name('buat');
     Route::get('/desa/create/{category}', [DesaApplicationController::class, 'create'])->name('desa.create');
     Route::get('/desa/{id}', [DesaApplicationController::class, 'show'])->name('desa.show');
     Route::get('/desa/{id}/edit', [DesaApplicationController::class, 'edit'])->name('desa.edit');
     Route::put('/desa/{id}', [DesaApplicationController::class, 'update'])->name('desa.update');
+    Route::put('/desa/{id}/status', [DesaApplicationController::class, 'update_status'])->name('desa.status');
     // end desa
 
     Route::put('/regen/{id}', [UserController::class, 'user_regen'])->name('regen');
@@ -72,6 +77,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/download-file', [ApplicationController::class, 'downloadFile'])->name('file.download');
     Route::post('/uploadFile/{id}/berkas', [ApplicationController::class, 'uploadBerkas'])->name('upload.berkas');
     Route::get('/open-file', [ApplicationController::class, 'openFile'])->name('file.open');
+
+    Route::put('/files/{id}', [FileController::class, 'update'])->name('files.update');
 });
 
 Route::controller(GuestController::class)->group(function () {

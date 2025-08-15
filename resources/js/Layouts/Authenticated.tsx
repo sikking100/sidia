@@ -54,20 +54,33 @@ export default function Authenticated({ children, header }: React.PropsWithChild
         }}>
           <NavbarToggle />
           <NavbarCollapse>
-            <NavbarLink href="#">
-              <HiTicket className={'mr-2'} />
-              Pemohon
-            </NavbarLink>
-            <NavbarLink href="#">
-              <HiUser className={'mr-2'} />
-              Pengguna
-            </NavbarLink>
-            <NavbarLink href="#">
-              <HiOfficeBuilding className={'mr-2'} />
-              Kecamatan</NavbarLink>
-            <NavbarLink href="#">
-              <HiDocument className={'mr-2'} />
-              Persyaratan</NavbarLink>
+            {user.role === 'desa' ? <>
+              <NavbarLink href={route('buat')}>
+                <HiTicket className={'mr-2'} />
+                Buat Permohonan
+              </NavbarLink>
+              <NavbarLink href={route('desa.index')}>
+                <HiUser className={'mr-2'} />
+                Pemohon
+              </NavbarLink>
+              <NavbarLink href={route('hamlet.index')}>
+                <HiOfficeBuilding className={'mr-2'} />
+                Dusun</NavbarLink>
+            </> : <>
+              <NavbarLink href={route('application.index')}>
+                <HiTicket className={'mr-2'} />
+                Pemohon
+              </NavbarLink>
+              <NavbarLink href={route('user.index')}>
+                <HiUser className={'mr-2'} />
+                Pengguna
+              </NavbarLink>
+              <NavbarLink href={route('district.index')}>
+                <HiOfficeBuilding className={'mr-2'} />
+                Kecamatan</NavbarLink>
+              <NavbarLink href={route('menu.index')}>
+                <HiDocument className={'mr-2'} />
+                Persyaratan</NavbarLink></>}
             <NavbarLink onClick={(e) => Inertia.post(route('logout'))} as={Link}>
               <HiLogout className={'mr-2'} />
               Logout</NavbarLink>
@@ -75,7 +88,58 @@ export default function Authenticated({ children, header }: React.PropsWithChild
         </Navbar> :
         <nav>
           <div className="w-full mx-auto pt-6 px-6">
-            <div className='w-full flex gap-x-2'>
+            {user.role === 'desa' ? <div className='w-full flex gap-x-2'>
+              <Button
+                pill
+                href={route('buat')}
+                color={`${url.toLowerCase().includes('/buat') ? '' : 'light'}`}
+                className={`${url.toLowerCase().includes('/buat') ? 'blue-gradient' : ''}`}
+                // gradientMonochrome={`${url === '/user' ? 'info' : ''}`}
+                size={"sm"}
+              >
+                <HiUser className={'mr-2'} />
+
+                Buat Permohonan
+              </Button>
+              <Button
+                pill
+                href={route('desa.index')}
+                color={`${url === ('/desa') ? '' : 'light'}`}
+                className={`${url === ('/desa') ? 'blue-gradient' : ''}`}
+                // gradientMonochrome={`${url === '/application' ? 'info' : ''}`}
+                type='button'
+                size={"sm"}
+              >
+                <HiTicket className={'mr-2'} />
+                Pemohon
+              </Button>
+              <Button
+                pill
+                href={route('hamlet.index')}
+                color={`${url.toLowerCase().includes('/hamlet') ? '' : 'light'}`}
+                className={`${url.toLowerCase().includes('/hamlet') ? 'blue-gradient' : ''}`}
+                // gradientMonochrome={`${url === '/district' ? 'info' : ''}`}
+                size={"sm"}
+              >
+                <HiOfficeBuilding className={'mr-2'} />
+
+                Dusun
+              </Button>
+              <div
+                className='ml-auto'>
+                <Button
+                  pill
+                  color={"light"}
+                  size={"sm"}
+                  as={Link}
+                  onClick={(e) => Inertia.post(route('logout'))}
+
+                >
+                  <HiLogout className={'mr-2'} />
+                  Logout
+                </Button>
+              </div>
+            </div> : <div className='w-full flex gap-x-2'>
               <Button
                 pill
                 href={route('application.index')}
@@ -97,7 +161,6 @@ export default function Authenticated({ children, header }: React.PropsWithChild
                 size={"sm"}
               >
                 <HiUser className={'mr-2'} />
-
                 Pengguna
               </Button>
               <Button
@@ -109,7 +172,6 @@ export default function Authenticated({ children, header }: React.PropsWithChild
                 size={"sm"}
               >
                 <HiOfficeBuilding className={'mr-2'} />
-
                 Kecamatan
               </Button>
               <Button
@@ -139,7 +201,7 @@ export default function Authenticated({ children, header }: React.PropsWithChild
                 </Button>
               </div>
             </div>
-
+            }
           </div>
         </nav >
       }

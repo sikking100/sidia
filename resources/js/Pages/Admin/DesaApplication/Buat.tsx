@@ -3,16 +3,21 @@ import { Link, Head } from '@inertiajs/inertia-react';
 import route from 'ziggy-js'
 import Dropdown from '@/Components/Dropdown'
 import Authenticated from '@/Layouts/Authenticated';
+import { BackButton } from '@/Components/Button';
+import { ArrowLeftIcon, Button } from 'flowbite-react';
 
 export default function Buat() {
+
     return (
         <Authenticated
             header={'Buat Permohonan'}>
+
             <div className=''>
+
                 <div className={'flex flex-row flex-wrap gap-11 justify-center'}>
-                    <div className={'shadow w-[18rem] bg-gray-200'}>
+                    <div className={'shadow w-[15rem] bg-gray-200 h-fit'}>
                         <img
-                            src={'../../assets/ktp.png'}
+                            src={'../../assets/2.webp'}
                             className={'rounded-t-sm'}
                         />
                         <div
@@ -56,9 +61,9 @@ export default function Buat() {
                         </div>
                     </div>
 
-                    <div className={'shadow w-[18rem] bg-gray-200'}>
+                    <div className={'shadow w-[15rem] h-fit bg-gray-200'}>
                         <img
-                            src={'../../assets/kk.png'}
+                            src={'../../assets/1.webp'}
                             className={'rounded-t-sm'}
                         />
                         <div
@@ -96,9 +101,9 @@ export default function Buat() {
                             </Dropdown>
                         </div>
                     </div>
-                    <div className={'shadow w-[18rem] bg-gray-200'}>
+                    <div className={'shadow w-[15rem] h-fit bg-gray-200'}>
                         <img
-                            src={'../../assets/kia.png'}
+                            src={'../../assets/3.webp'}
                             className={'rounded-t-sm'}
                         />
                         <div
@@ -136,9 +141,9 @@ export default function Buat() {
                             </Dropdown>
                         </div>
                     </div>
-                    <div className={'shadow w-[18rem] bg-gray-200'}>
+                    <div className={'shadow w-[15rem] h-fit bg-gray-200'}>
                         <img
-                            src={'../../assets/skpwni.png'}
+                            src={'../../assets/8.webp'}
                             className={'rounded-t-sm'}
                         />
                         <div
@@ -161,9 +166,9 @@ export default function Buat() {
                             </Dropdown>
                         </div>
                     </div>
-                    <div className={'shadow w-[18rem] bg-gray-200'}>
+                    <div className={'shadow w-[15rem] h-fit bg-gray-200'}>
                         <img
-                            src={'../../assets/akta.png'}
+                            src={'../../assets/4.webp'}
                             className={'rounded-t-sm'}
                         />
                         <div
@@ -201,9 +206,9 @@ export default function Buat() {
                             </Dropdown>
                         </div>
                     </div>
-                    <div className={'shadow w-[18rem] bg-gray-200'}>
+                    <div className={'shadow w-[15rem] h-fit bg-gray-200'}>
                         <img
-                            src={'../../assets/perkawinan.png'}
+                            src={'../../assets/5.webp'}
                             className={'rounded-t-sm'}
                         />
                         <div
@@ -218,9 +223,9 @@ export default function Buat() {
                             </Link>
                         </div>
                     </div>
-                    <div className={'shadow w-[18rem] bg-gray-200'}>
+                    <div className={'shadow w-[15rem] h-fit bg-gray-200'}>
                         <img
-                            src={'../../assets/cerai.png'}
+                            src={'../../assets/6.webp'}
                             className={'rounded-t-sm'}
                         />
                         <div
@@ -235,9 +240,9 @@ export default function Buat() {
                             </Link>
                         </div>
                     </div>
-                    <div className={'shadow w-[18rem] bg-gray-200'}>
+                    <div className={'shadow w-[15rem] h-fit bg-gray-200'}>
                         <img
-                            src={'../../assets/kematian.png'}
+                            src={'../../assets/7.webp'}
                             className={'rounded-t-sm'}
                         />
                         <div
@@ -252,9 +257,9 @@ export default function Buat() {
                             </Link>
                         </div>
                     </div>
-                    <div className={'shadow w-[18rem] bg-gray-200'}>
+                    <div className={'shadow w-[15rem] h-fit bg-gray-200'}>
                         <img
-                            src={'../../assets/nikmasalah.png'}
+                            src={'../../assets/9.webp'}
                             className={'rounded-t-sm'}
                         />
                         <div

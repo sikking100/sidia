@@ -14,6 +14,24 @@ export const getStatus = (status: string): string => {
     }
 }
 
+export const getStatusBerkas = (status: string|number): string => {
+    switch (status) {
+        case '1': return 'Disetujui'
+        case '2': return 'Ditolak'
+        default: return 'Pending'
+    }
+}
+
+export const checkFile = (name: string, id: number, files: Files[]): Files | undefined => {
+
+    const file = files.find(e => {
+      if (e.requirement_id === null) return e.name === name
+      return e.requirement_id === id
+    })
+    return file === undefined ? undefined : file
+
+  }
+
 export function useIsMobile(breakpoint: number = 768): boolean {
   const [isMobile, setIsMobile] = useState(false);
 

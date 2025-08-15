@@ -15,11 +15,11 @@ return new class extends Migration
     {
         Schema::create('applications', function (Blueprint $table) {
             $table->id();
-            $table->string('ticket', 255);
+            $table->string('ticket', 255)->nullable();
             $table->string('id_card_number', 20);
             $table->string('family_card_number', 20);
             $table->string('family_head_name', 255);
-            $table->bigInteger('id_category');
+            $table->bigInteger('id_category')->nullable();
             $table->string('category', 255);
             $table->string('name', 255);
             $table->string('phone', 20);
@@ -34,9 +34,9 @@ return new class extends Migration
             $table->enum('status', ['PENDING', 'DEFFICIENT', 'REVISED', 'VERIFIED', 'COMPLETED', 'CANCEL'])->default('PENDING');
             $table->text('status_description')->nullable();
             $table->text('files')->nullable();
-            $table->bigInteger('ward_id');
-            $table->bigInteger('district_id');
-            $table->bigInteger('hamlet_id');
+            $table->bigInteger('ward_id')->nullable();
+            $table->bigInteger('district_id')->nullable();
+            $table->bigInteger('hamlet_id')->nullable();
             $table->timestamps();
         });
     }

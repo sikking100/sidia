@@ -29,11 +29,13 @@ export interface Applicant {
 
 export interface DesaApplication {
   id?: number
-  hamlet: Hamlet
+  ticket?: string | null
   id_card_number: string
   family_card_number: string
   family_head_name: string
   category: string
+  district: string
+  ward: string
   name: string
   phone: string
   email: string
@@ -46,6 +48,7 @@ export interface DesaApplication {
   status_description?: string | null
   created_at?: string | null
   files?: string | null
+  filess?: Array<Files>
 }
 
 export interface Meta {
@@ -76,6 +79,8 @@ export interface District {
   id: number
   name: string
 }
+
+export const statusOptions = ['PENDING', 'DEFFICIENT', 'REVISED', 'VERIFIED', 'COMPLETED', 'CANCEL']
 
 export interface Hamlet {
   id: number
@@ -111,8 +116,12 @@ export interface FilesForm {
 }
 
 export interface Files {
+  id: number
+  requirement_id?: number | null
   name: string
   place: string
+  status: number
+  comment: string
 }
 
 export interface User {

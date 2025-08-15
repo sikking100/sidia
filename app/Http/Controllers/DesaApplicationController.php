@@ -6,10 +6,12 @@ use App\Models\Application;
 use App\Models\DesaApplication;
 use App\Models\DesaFile;
 use App\Models\File;
+use App\Models\Hamlet;
 use App\Models\Menu;
 use App\Support\MyUploadFile;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 class DesaApplicationController extends Controller
 {
@@ -32,6 +34,7 @@ class DesaApplicationController extends Controller
      */
     public function index(Request $request)
     {
+        $hamlets = Hamlet::with('ward')->get();
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
 
@@ -39,6 +42,7 @@ class DesaApplicationController extends Controller
 
         $desaApps = Application::with('filess')->where('ward_id', $user->ddesa->id)->orderBy('created_at', 'desc')->paginate($perPage, ['*'], 'page', $page);
         return Inertia::render('Admin/DesaApplication/Index', [
+            'hamlets' => $hamlets,
             'desaApps' => $desaApps->items(),
             'meta' => [
                 'current_page' => $desaApps->currentPage(),
@@ -47,6 +51,49 @@ class DesaApplicationController extends Controller
                 'total' => $desaApps->total(),
             ]
         ]);
+    }
+
+    public function paging(Request $request)
+    {
+
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+
+        $query = Application::query();
+
+        if ($request->has('hamlet_id') && !empty($request->hamlet_id) && $request->hamlet_id != -1) {
+            $query->where('hamlet_id', $request->hamlet_id);
+        }
+
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('q') && !empty($request->q)) {
+            $query->where('name', 'like', '%' . $request->q . '%');
+        }
+
+        if ($request->has('tahun') && !empty($request->tahun) && $request->tahun != -1) {
+            $query->whereYear('created_at', $request->tahun);
+        }
+        $application = $query->with('filess')->orderBy('created_at', 'desc')->paginate($perPage, ['*'], 'page', $page);
+
+        return response()->json([
+            'data' => $application->items(),
+            'meta' => [
+                'current_page' => $application->currentPage(),
+                'last_page' => $application->lastPage(),
+                'per_page' => $application->perPage(),
+                'total' => $application->total(),
+            ],
+        ]);
+    }
+
+    public function get_years()
+    {
+        $user = auth()->user();
+        $years = Application::selectRaw('DISTINCT YEAR(created_at) as year')->where('ward_id', $user->ddesa->id)->groupBy('year')->orderBy('year')->pluck('year');
+        return response()->json($years);
     }
 
     /**
@@ -75,6 +122,8 @@ class DesaApplicationController extends Controller
         // try {
         $user = auth()->user();
         $applicant = Application::make($request->all());
+        $applicant->ticket = '-';
+        $applicant->id_category = 0;
         $applicant->hamlet_id = $request->hamlet_id;
         $applicant->ward_id = $user->ddesa->id;
         $applicant->district_id = $user->ddesa->district_id;
@@ -89,6 +138,7 @@ class DesaApplicationController extends Controller
             $desaFile = new File();
             $desaFile->name = $file['name'];
             $desaFile->place = $request->category . '/' . $nameExt;
+            $desaFile->status = 0;
             $applicant->filess()->save($desaFile);
         }
         // $desaApplication = DesaApplication::make($request->all());
@@ -127,7 +177,8 @@ class DesaApplicationController extends Controller
         $files = $desaApplication->filess;
         $menu = Menu::firstWhere('name', $desaApplication->category);
         $requirements = $menu->requirements;
-        return Inertia::render('Admin/DesaApplication/Show', compact('desaApplication', 'files', 'requirements', 'menu'));
+        $hamlet = Hamlet::find($desaApplication->hamlet_id);
+        return Inertia::render('Admin/DesaApplication/Show', compact('desaApplication', 'files', 'requirements', 'menu', 'hamlet'));
     }
 
     /**
@@ -170,24 +221,35 @@ class DesaApplicationController extends Controller
         if ($request->filessss != null) {
             foreach ($request->filessss as $key => $file) {
                 // hapus terlebih dahulu gambarnya
+                LOG::info('perulangan ke = ' . $key);
 
                 if ($file['place'] != null && $file['place'] !== "") {
                     $this->upload->deleteBerkas($file['place']);
                     File::where('place', $file['place'])->delete();
                 }
+                LOG::info('file place = ' . $file['place']);
+                LOG::info('file filenya = ' . $file['filenya']);
 
-                $nameExt = time() . '.' . $file['filenya']->extension();
+
+                $nameExt = $key . '-' . time() . '.' . $file['filenya']->extension();
                 $file['filenya']->storeAs($request->category, $nameExt, 'public');
                 $desaFile = new File();
                 $desaFile->name = $file['name'];
                 $desaFile->place = $request->category . '/' . $nameExt;
+                $desaFile->status = '0';
+                $desaFile->comment = 'sudah direvisi';
+                LOG::info('desafile name = ' . $desaFile->name);
+                LOG::info('desafile place = ' . $desaFile->place);
                 $desaApplication->filess()->save($desaFile);
             }
         }
         $desaApplication->status = 'REVISED';
         $desaApplication->status_description = 'Berkas sudah direvisi';
         $desaApplication->save();
-        return Inertia::render('Admin/DesaApplication/Show', compact('desaApplication', 'files', 'requirements', 'menu'));
+
+        $hamlet = Hamlet::find($desaApplication->hamlet_id);
+
+        return Inertia::render('Admin/DesaApplication/Show', compact('desaApplication', 'files', 'requirements', 'menu', 'hamlet'));
     }
 
     /**
@@ -217,6 +279,16 @@ class DesaApplicationController extends Controller
         $applicant->save();
         $desaApplication->update([
             'status' => 'SENDED',
+        ]);
+        return redirect()->route('desaApplications.show', $desaApplication);
+    }
+
+    public function update_status(Request $request)
+    {
+        $desaApplication = DesaApplication::find($request->id);
+        $desaApplication->update([
+            'status' => $request->status,
+            'status_description' => $request->status_description,
         ]);
         return redirect()->route('desaApplications.show', $desaApplication);
     }

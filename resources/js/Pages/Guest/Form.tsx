@@ -6,11 +6,12 @@ import Label from '@/Components/Label'
 import Input from '@/Components/Input'
 import { ErrorText } from '@/Components/Error'
 import route from 'ziggy-js'
-import Button from '@/Components/Button'
 import { defImage } from '@/Components/Constant'
 import Guest from '@/Layouts/Guest'
 import { Head } from '@inertiajs/inertia-react'
 import { Parser } from 'html-to-react'
+import { HiSave } from 'react-icons/hi'
+import { Button } from 'flowbite-react'
 
 interface Props {
   subtitle: string
@@ -262,7 +263,15 @@ export default function Form({ category, menu, requirements }: Props) {
 
           <ErrorText message={errors.images} />
           <p className={'text-red-900 mt-6'}>* Harus diisi</p>
-          <Button className={'mt-2'} processing={process}>Selanjutnya</Button>
+          <Button
+            className='mt-2'
+            type='submit'
+            size='sm'
+            color={'purple'}
+          >
+            <HiSave className={'mr-2'} />
+            Selanjutnya
+          </Button>
         </form>
       </div>}
     </Guest>

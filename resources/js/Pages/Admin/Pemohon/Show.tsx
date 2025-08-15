@@ -7,9 +7,9 @@ import { Inertia } from '@inertiajs/inertia'
 import route from 'ziggy-js'
 
 import { HiBackward } from 'react-icons/hi2'
-import { ArrowLeftIcon, Avatar, Button, ButtonGroup, buttonTheme, CloseIcon, Modal, ModalBody, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Textarea, ThemeProvider } from 'flowbite-react'
+import { ArrowLeftIcon, Label, Avatar, Button, ButtonGroup, buttonTheme, CloseIcon, Modal, ModalBody, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Textarea, TextInput, ThemeProvider } from 'flowbite-react'
 import { Link, useForm } from '@inertiajs/inertia-react'
-import { getFileType, getStatus } from '@/Functions/functions'
+import { getFileType, getStatus, getStatusBerkas } from '@/Functions/functions'
 import { MdArchive, MdCancel, MdDownloading, MdPrint, MdVerified } from 'react-icons/md'
 import { BsBack, BsDownload } from 'react-icons/bs'
 import { PiBackspace } from 'react-icons/pi'
@@ -20,10 +20,10 @@ import { SiTicktick } from 'react-icons/si'
 import { BiCheck, BiCode, BiFace, BiFile, BiHome, BiMap, BiMapAlt, BiMapPin, BiPhone, BiPrinter, BiRevision, BiText, BiTime, BiUser, BiUserCircle } from 'react-icons/bi'
 import TimeAgo from 'react-timeago'
 import { makeIntlFormatter } from 'react-timeago/defaultFormatter'
-import Label from '@/Components/Label'
-import Input from '@/Components/Input'
 import { ErrorText } from '@/Components/Error'
 import { BackButton } from '@/Components/Button'
+import { GoVerified } from 'react-icons/go'
+import axios from 'axios'
 
 
 interface FileTicket {
@@ -46,9 +46,19 @@ interface FormUpdateStatus {
 
 export default function PemohonShow({ application, files, menu, requirements, hamlet }: Props) {
   const [showModal, setShowModal] = React.useState<boolean>(false)
+  const [showModalRevisi, setShowModalRevisi] = React.useState<boolean>(false)
   const [showModalPenolakan, setShowModalPenolakan] = React.useState<boolean>(false)
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [selectedFile, setSelectedFile] = React.useState<Files | null>(null);
+  const [comment, setComment] = React.useState<string>('');
+
+  const [error, setError] = React.useState<string>('');
+
+
+  const { data, errors, setData, put, get, post } = useForm<FormUpdateStatus>({
+    status: '',
+    status_description: ''
+  })
 
   function onClick(e: React.FormEvent<HTMLButtonElement>) {
     e.preventDefault()
@@ -56,7 +66,6 @@ export default function PemohonShow({ application, files, menu, requirements, ha
   }
 
   function onSelesai(e: React.FormEvent<HTMLButtonElement>) {
-    console.log('tes')
     e.preventDefault()
     Inertia.post(route('status', application.id), {
       'status': 'COMPLETED',
@@ -79,21 +88,43 @@ export default function PemohonShow({ application, files, menu, requirements, ha
 
   function onVerified(e: React.FormEvent<HTMLButtonElement>) {
     e.preventDefault()
+    const check = files.filter(e => e.status != 1)
+    if (check.length > 0) {
+      setError('Berkas belum diverifikasi, silahkan verifikasi semua berkas terlebih dahulu')
+      return
+    }
     setData('status', 'VERIFIED')
     setShowModal(!showModal)
     return
   }
 
-  const { data, errors, setData, put, get } = useForm<FormUpdateStatus>({
-    status: '',
-    status_description: ''
-  })
+  function onVerifiedBerkas(e: React.FormEvent<HTMLButtonElement>) {
+    e.preventDefault()
+    const formData = new FormData()
+    formData.append('status', '1')
+    formData.append('id', `${selectedFile?.id}`)
+    formData.append('comment', '-')
+    formData.append('_method', 'put');
+    Inertia.post(route('files.update', selectedFile?.id), formData, {
+      onError: (e) => {
+        console.log(e)
+      },
+      onSuccess: () => {
+        window.location.reload()
+
+      }
+    })
+    return
+  }
+
+
+
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     console.log(data)
     put(route('status', application.id))
-    // setShowModal(!showModal)
+    setShowModal(!showModal)
     return
   }
 
@@ -111,13 +142,50 @@ export default function PemohonShow({ application, files, menu, requirements, ha
   const intlFormatter = makeIntlFormatter({
     locale: "id-ID", // string
   });
+
+  const checkFile = (name: string, id: number): Files | undefined => {
+
+    const file = files.find(e => {
+      if (e.requirement_id === null) return e.name === name
+      return e.requirement_id === id
+    })
+    return file === undefined ? undefined : file
+
+  }
+
+  const handleSubmitRevisiBerkas = (e: any) => {
+    e.preventDefault();
+    const formData = new FormData()
+    formData.append('status', '2')
+    formData.append('id', `${selectedFile?.id}`)
+    formData.append('comment', comment)
+    formData.append('_method', 'put');
+    Inertia.post(route('files.update', selectedFile?.id), formData, {
+      onError: (e) => {
+        console.log(e)
+      },
+      onSuccess: () => {
+        window.location.reload()
+      }
+    })
+  }
+
   return (
     <Authenticated
       header={<h2>Pemohon</h2>}
     >
+      {error && <Modal show={true} onClose={() => setError('')} size="md">
+        <ModalHeader>Error</ModalHeader>
+        <ModalBody>
+          <p>{error}</p>
+        </ModalBody>
+        <ModalFooter>
+          <Button onClick={() => setError('')}>Close</Button>
+        </ModalFooter>
+      </Modal>}
       {isModalOpen && selectedFile && (
         <Modal show={isModalOpen} onClose={() => setIsModalOpen(false)} size="4xl">
-          <ModalHeader>Pratinjau File</ModalHeader>
+          <ModalHeader>Pratinjau File {getStatusBerkas(selectedFile.status)}</ModalHeader>
           <ModalBody>
             {getFileType(selectedFile) === 'pdf' ? (
               <iframe
@@ -133,6 +201,9 @@ export default function PemohonShow({ application, files, menu, requirements, ha
                 className="max-w-full max-h-[600px] mx-auto"
               />
             )}
+            {
+              selectedFile.comment !== '' && <p>{selectedFile.comment}</p>
+            }
           </ModalBody>
           <ModalFooter>
             <Button className={"bg-red-500"} size='xs' onClick={() => setIsModalOpen(false)}>
@@ -143,6 +214,20 @@ export default function PemohonShow({ application, files, menu, requirements, ha
               <BsDownload className='me-2 h-4 w-4' />
               Download
             </Button>
+            {
+              (selectedFile.status == 0 || selectedFile.status == 2) &&
+              <Button className={"bg-yellow-400"} size='xs' onClick={() => { setShowModalRevisi(true) }}>
+                <BiRevision className='me-2 h-4 w-4' />
+                Revisi
+              </Button>
+            }
+            {
+              selectedFile.status == 0 &&
+              <Button className={"bg-green-400"} size='xs' onClick={onVerifiedBerkas}>
+                <GoVerified className='me-2 h-4 w-4' />
+                Verifikasi
+              </Button>
+            }
           </ModalFooter>
         </Modal>
       )}
@@ -168,11 +253,11 @@ export default function PemohonShow({ application, files, menu, requirements, ha
             >
             </Textarea>
             <ErrorText message={errors.status_description} />
+            <Button type={'submit'} className={'blue-gradient mt-6 mr-2'}>Revisi</Button>
           </form>
         </ModalBody>
         <ModalFooter>
           <Button type={'reset'} color={'red'} className={'mt-6 ml-2'} onClick={(_) => setShowModal(!showModal)}>Batal</Button>
-          <Button type={'submit'} className={'blue-gradient mt-6 mr-2'}>Revisi</Button>
         </ModalFooter>
       </Modal>
 
@@ -205,6 +290,35 @@ export default function PemohonShow({ application, files, menu, requirements, ha
           <Button type={'submit'} className={'blue-gradient'}>Tolak</Button>
         </ModalFooter>
       </Modal>
+      {
+        showModalRevisi && (
+          <Modal show={showModalRevisi} onClose={() => setShowModalRevisi(false)} size="md">
+            <form onSubmit={handleSubmitRevisiBerkas}>
+              <ModalHeader>Revisi Berkas</ModalHeader>
+              <ModalBody>
+                <p>Apakah Anda yakin ingin merevisi berkas ini?</p>
+                <div className='mt-6 mb-2'>
+                  <Label>Alasan</Label>
+                </div>
+                <TextInput
+                  required
+                  onChange={e => setComment(e.target.value)}
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button className={"bg-red-500"} size='xs' onClick={() => setShowModalRevisi(false)}>
+                  <CloseIcon className="me-2 h-4 w-4" />
+                  Tutup
+                </Button>
+                <Button className={"bg-yellow-400"} size='xs' type='submit'>
+                  <BiRevision className='me-2 h-4 w-4' />
+                  Revisi
+                </Button>
+              </ModalFooter>
+            </form>
+          </Modal>
+        )
+      }
 
       <div className='flex flex-col'>
         <div>
@@ -248,6 +362,16 @@ export default function PemohonShow({ application, files, menu, requirements, ha
             >
               <BiRevision className="me-2 h-4 w-4" />
               {application.status === 'REVISED' ? 'Revisi Ulang' : 'Revisi Berkas'}
+            </Button>
+          }
+          {(application.status == 'PENDING' || application.status == 'REVISED') &&
+            <Button
+              color={'green'}
+              onClick={onVerified}
+
+            >
+              <GoVerified className="me-2 h-4 w-4" />
+              Verifikasi
             </Button>
           }
           {(application.status == 'PENDING') &&
@@ -341,17 +465,19 @@ export default function PemohonShow({ application, files, menu, requirements, ha
               <TableRow>
                 <TableHeadCell>#</TableHeadCell>
                 <TableHeadCell>Nama Lampiran</TableHeadCell>
+                <TableHeadCell>status</TableHeadCell>
                 <TableHeadCell>Aksi</TableHeadCell>
               </TableRow>
             </TableHead>
             <TableBody className='divide-y text-black'>
               {
-                application.ticket !== null && application.ticket !== '' ?
+                application.ticket !== null && application.ticket !== '' && application.ticket !== '-' ?
                   application.files !== null && application.files !== '' ? (JSON.parse(application.files!) as Array<FileTicket>).map((v, k) => {
                     return (
                       <TableRow key={k}>
                         <TableCell>{k + 1}</TableCell>
                         <TableCell>{v.TypeName}</TableCell>
+                        <TableCell>{ }</TableCell>
                         <TableCell>
                           <Button
                             size='xs'
@@ -364,20 +490,29 @@ export default function PemohonShow({ application, files, menu, requirements, ha
                         </TableCell>
                       </TableRow>
                     )
-                  }) : <p>Berkas tidak lengkap</p> :
-                  files.filter(file => file.name.toLowerCase().includes('hasil') === false).map((file, index) => (
+                  }) : <TableRow>
+                    <TableCell colSpan={3} className='text-center'>Berkas tidak lengkap</TableCell>
+                  </TableRow> :
+                  requirements.map((file, index) => (
                     <TableRow key={index}>
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{file.name}</TableCell>
+                      <TableCell>{checkFile(file.name, file.id) !== undefined ? getStatusBerkas(checkFile(file.name, file.id)?.status ?? 0) : ''}</TableCell>
                       <TableCell>
-                        <Button
-                          size='xs'
-                          className='bg-green-400'
-                          onClick={() => handleView(file)}
-                        >
-                          <HiEye className='mr-2' />
-                          Lihat
-                        </Button>
+                        {
+                          checkFile(file.name, file.id) !== undefined ?
+                            < Button
+                              size='xs'
+                              className='bg-green-400'
+                              onClick={() => {
+                                return handleView(checkFile(file.name, file.id)!)
+                              }}
+                            >
+                              <HiEye className='mr-2' />
+                              Lihat
+                            </Button>
+                            : <p className='text-red-400'>Tidak diupload</p>
+                        }
                       </TableCell>
                     </TableRow>
                   ))

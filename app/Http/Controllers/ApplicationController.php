@@ -424,7 +424,7 @@ class ApplicationController extends Controller
         $application = Application::where('id', $id)->first();
 
         try {
-            if (($application->ticket != null && $application->ticket != '') && ($request->status == "VERIFIED" || $request->status == "DEFFICIENT" || $request->status == "COMPLETED")) {
+            if (($application->ticket != null && $application->ticket != '' && $application->ticket != '-') && ($request->status == "VERIFIED" || $request->status == "DEFFICIENT" || $request->status == "COMPLETED")) {
                 $key = config('services.external_api.symmetric');
                 $status = 0;
                 switch ($request->status) {

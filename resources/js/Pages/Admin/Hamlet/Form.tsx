@@ -3,6 +3,8 @@ import { District, Hamlet } from '@/Interface/Interface'
 import { useForm } from '@inertiajs/inertia-react'
 import { BackButton } from '@/Components/Button'
 import route from 'ziggy-js'
+import { Button } from 'flowbite-react'
+import { HiSave } from 'react-icons/hi'
 
 interface Props {
   hamlet?: Hamlet
@@ -24,11 +26,11 @@ export default function HamletForm({ hamlet }: Props) {
     }
   }
   return (
-    <form className="w-full px-6" onSubmit={onSubmit}>
+    <form className="w-full" onSubmit={onSubmit}>
       <BackButton
         route={'hamlet'}
       />
-      <div className='grid grid-rows-3 grid-flow-col gap-6'>
+      <div className='grid grid-rows-3 grid-flow-col gap-6 mt-6'>
         <div className='row-span-3'>
           <div className="flex flex-wrap -mx-3 mb-2">
             <div className="w-full px-3">
@@ -47,12 +49,14 @@ export default function HamletForm({ hamlet }: Props) {
         </div>
       </div>
       <div className="md:flex md:items-center">
-        <button
-          className="shadow bg-purple-500 hover:bg-purple-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
-          type="submit"
+        <Button
+          type='submit'
+          size='sm'
+          color={'purple'}
         >
+          <HiSave className={'mr-2'} />
           {title}
-        </button>
+        </Button>
       </div>
     </form>
   )

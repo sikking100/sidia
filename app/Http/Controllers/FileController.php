@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreFileRequest;
 use App\Http\Requests\UpdateFileRequest;
+use App\Models\Application;
 use App\Models\File;
 
 class FileController extends Controller
@@ -70,7 +71,17 @@ class FileController extends Controller
      */
     public function update(UpdateFileRequest $request, File $file)
     {
-        //
+        $file = File::findOrFail($request->id);
+        $file->comment =  $request->comment;
+        $file->status = $request->status;
+        $file->save();
+        $application = $file->application;
+        if ($request->status == '2' || $request->status == 2) {
+            $application->status = 'DEFFICIENT';
+            $application->status_description = 'Ada berkas yang kurang';
+            $application->save();
+        }
+        return;
     }
 
     /**

@@ -1,19 +1,26 @@
 import React from 'react'
 import Authenticated from '@/Layouts/Authenticated'
-import { Applicant, persyaratan, Files, Menu, Requirement, DesaApplication } from '@/Interface/Interface'
-import Button from '@/Components/Button'
+import { Applicant, persyaratan, Files, Menu, Requirement, DesaApplication, Hamlet } from '@/Interface/Interface'
 import Label from '@/Components/Label'
 import Input from '@/Components/Input'
 import { ErrorText } from '@/Components/Error'
 import { Link, useForm } from '@inertiajs/inertia-react'
 import { Inertia } from '@inertiajs/inertia'
 
-import { Modal } from 'flowbite-react'
+import { Avatar, Button, CloseIcon, Modal, ModalBody, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from 'flowbite-react'
 import route from 'ziggy-js'
 import axios from 'axios'
 import { url } from 'inspector'
-import { getStatus } from '@/Functions/functions'
+import { getFileType, getStatus, getStatusBerkas } from '@/Functions/functions'
 import { Parser } from 'html-to-react'
+import { BackButton } from '@/Components/Button'
+import { MdVerified } from 'react-icons/md'
+import { BiCheck, BiFace, BiFile, BiHome, BiMap, BiMapAlt, BiMapPin, BiPhone, BiPrinter, BiRevision, BiText, BiTime, BiUserCircle } from 'react-icons/bi'
+import { SiTicktick } from 'react-icons/si'
+import TimeAgo from 'react-timeago'
+import { makeIntlFormatter } from 'react-timeago/defaultFormatter'
+import { HiEye } from 'react-icons/hi'
+import { BsDownload } from 'react-icons/bs'
 
 
 interface FileTicket {
@@ -26,6 +33,7 @@ interface Props {
   files: Array<Files>
   menu: Menu
   requirements: Array<Requirement>
+  hamlet: Hamlet
 }
 
 interface FormUpdateStatus {
@@ -33,158 +41,259 @@ interface FormUpdateStatus {
   status_description: string
 }
 
-export default function DesaApplicationShow({ desaApplication, files, menu, requirements }: Props) {
-  const [showModal, setShowModal] = React.useState<boolean>(false)
-  function onReady(e: React.FormEvent<HTMLButtonElement>) {
-    e.preventDefault()
-    Inertia.get(route('desa.edit', desaApplication.id))
-  }
-
-  function onSelesai(e: React.FormEvent<HTMLButtonElement>) {
-    console.log('tes')
-    e.preventDefault()
-    Inertia.post(route('status', desaApplication.id), {
-      'status': 'COMPLETED',
-      'status_description': 'Selesai',
-      '_method': 'PUT',
-    })
-  }
-
-  function onRevisi(e: React.FormEvent<HTMLButtonElement>) {
-    e.preventDefault()
-    setData('status', 'DEFFICIENT')
-    setShowModal(!showModal)
-  }
-
-  function onTolak(e: React.FormEvent<HTMLButtonElement>) {
-    e.preventDefault()
-    setData('status', 'CANCEL')
-    setShowModal(!showModal)
-  }
-
-  function onVerified(e: React.FormEvent<HTMLButtonElement>) {
-    e.preventDefault()
-    setData('status', 'VERIFIED')
-    setShowModal(!showModal)
-    return
-  }
+export default function DesaApplicationShow({ desaApplication, files, menu, requirements, hamlet }: Props) {
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [selectedFile, setSelectedFile] = React.useState<Files | null>(null);
 
   const { data, errors, setData, put, get } = useForm<FormUpdateStatus>({
     status: '',
     status_description: ''
   })
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    console.log(data)
-    put(route('status', desaApplication.id))
-    // setShowModal(!showModal)
-    return
-  }
 
-  function handleClick(e: React.MouseEvent<HTMLAnchorElement> | React.KeyboardEvent<HTMLAnchorElement>, name: string) {
-    e.preventDefault()
+  function handleClick(name: string) {
     window.open(route('photo', name))
   }
 
+  const handleView = (file: Files) => {
+    setSelectedFile(file);
+    setIsModalOpen(true);
+  };
+
+
+  const dateCreated = Date.parse(desaApplication.created_at ?? '')
+  const dateCreate = Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(dateCreated)
+  const intlFormatter = makeIntlFormatter({
+    locale: "id-ID", // string
+  });
+
+  const checkFile = (name: string, id: number): Files | undefined => {
+
+    const file = files.find(e => {
+      if (e.requirement_id === null) return e.name === name
+      return e.requirement_id === id
+    })
+    return file === undefined ? undefined : file
+
+  }
   return (
     <Authenticated
       header={<h2>Pemohon</h2>}
     >
-      <div className={'container mx-auto bg-white rounded w-full p-6'}>
-        {
-          desaApplication.status === 'DEFFICIENT' ? <Button
-            onClick={onReady}
-            type={'button'}
-            className={'mb-6 mr-6'}
-            processing={false}
-          >
-            REVISI DATA
-          </Button> : <div></div>
-        }
-        <h5 className={'block text-lg font-bold'}>Persyaratan</h5>
-        <div className={'bg-green-200 p-6 rounded mt-4 mb-4 text-green-800 font-bold'}>
-          <p>Berkas Upload :</p>
-          {requirements.map((v, i) => <p key={i}>{v.name}</p>)}
-          {/* {persyaratan.get(desaApplication.category)?.map((v, i) => <p key={i}>{v}</p>)} */}
+      {isModalOpen && selectedFile && (
+        <Modal show={isModalOpen} onClose={() => setIsModalOpen(false)} size="4xl">
+          <ModalHeader>Pratinjau File {getStatusBerkas(selectedFile.status)}</ModalHeader>
+          <ModalBody>
+            {getFileType(selectedFile) === 'pdf' ? (
+              <iframe
+                src={`../../storage/${selectedFile.place}`}
+                width="100%"
+                height="600px"
+                title="PDF Viewer"
+              />
+            ) : (
+              <img
+                src={`../../storage/${selectedFile.place}`}
+                alt={selectedFile.name}
+                className="max-w-full max-h-[600px] mx-auto"
+              />
+            )}
+            {
+              selectedFile.comment !== '' && <p>{selectedFile.comment}</p>
+            }
+          </ModalBody>
+          <ModalFooter>
+            <Button className={"bg-red-500"} size='xs' onClick={() => setIsModalOpen(false)}>
+              <CloseIcon className="me-2 h-4 w-4" />
+              Tutup
+            </Button>
+            <Button className={"bg-cyan-600"} size='xs' href={route('file.download', { place: selectedFile.place })}>
+              <BsDownload className='me-2 h-4 w-4' />
+              Download
+            </Button>
+          </ModalFooter>
+        </Modal>
+      )}
+      <div className='flex flex-col'>
+        <div>
+          <BackButton
+            route='desa'
+          />
+        </div>
 
-          {menu.description === null || menu.description === '' ? <div></div> : <div>
-            <p>Persyaratan Tambahan :</p>
-            <div className="prose">
-              {Parser().parse(menu.description)}
-            </div>
-          </div>}
+        <p className='mx-auto font-bold text-xl text-black'>{desaApplication.category}</p>
+        <Avatar className='mt-2' img={`../../storage/images/${desaApplication.images}`} rounded size='xl' />
+        <p className={`justify-center inline-flex mt-2 text-center text-2xl font-extrabold ${desaApplication.status === 'COMPLETED' ? 'text-green-400' : desaApplication.status === 'CANCEL' ? 'text-red-600' : 'text-yellow-400'}`}>
+          <MdVerified className='mr-1' size={'30'} />
+          {getStatus(desaApplication.status ?? '')}</p>
+        <span className='text-center'>{desaApplication.status_description}</span>
+
+
+        <div className='flex flex-auto flex-wrap self-center gap-4 mt-6'>
+
+          {(desaApplication.status == 'DEFFICIENT') &&
+            <Button
+              color={'yellow'}
+              href={route('desa.edit', desaApplication.id)}
+            >
+              <BiRevision className="me-2 h-4 w-4" />
+              Revisi Berkas
+            </Button>
+          }
 
         </div>
-        <table>
-          <tbody>
+        <div className='mt-6'>
+          <p className='sub-header inline-flex items-center gap-2'><BiUserCircle size={25} /> Informasi Pemohon : </p>
+          <Table>
+            <TableBody className='divide-y text-black'>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiUserCircle />Nama Pemohon</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{desaApplication.name}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiUserCircle />NIK Pemohon</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{desaApplication.id_card_number}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiFile />Tiket</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{desaApplication.ticket}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiPhone />Nomor Telepon</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{desaApplication.phone}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiTime />Tanggal Pembuatan Permohonan</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{
+                  dateCreate + ','
+                } <TimeAgo
+                  date={dateCreated}
+                  formatter={intlFormatter}
+                ></TimeAgo></TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiText />Deskripsi Permohonan</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{
+                  desaApplication.description
+                }</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
 
+        <div className='mt-6'>
+          <p className='sub-header flex items-center gap-2'><BiHome size={25} /> Data Kepala Keluarga : </p>
+          <Table>
+            <TableBody className='divide-y text-black'>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiFace />Nama Kepala Keluarga</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{desaApplication.family_head_name}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiFile />Nomor Kartu Keluarga</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{desaApplication.family_card_number}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiMapPin />Dusun</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{hamlet.name}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiMapAlt />Desa</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{desaApplication.ward}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className='flex gap-2 items-center'><BiMap />Kecamatan</TableCell>
+                <TableCell>:</TableCell>
+                <TableCell>{desaApplication.district}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
 
-            <tr>
-              <td>Status</td>
-              <td>:</td>
-              <td>{getStatus(desaApplication.status ?? '')}</td>
-            </tr>
-            <tr>
-              <td>Deskripsi Status</td>
-              <td>:</td>
-              <td>{desaApplication.status_description}</td>
-            </tr>
-            <tr>
-              <td>Nik</td>
-              <td>:</td>
-              <td>{desaApplication.id_card_number}</td>
-            </tr>
-            <tr>
-              <td>Nama</td>
-              <td>:</td>
-              <td>{desaApplication.name}</td>
-            </tr>
-            <tr>
-              <td>Nomor HP</td>
-              <td>:</td>
-              <td>{desaApplication.phone}</td>
-            </tr>
-            <tr>
-              <td>Email</td>
-              <td>:</td>
-              <td>{desaApplication.email}</td>
-            </tr>
-            <tr>
-              <td>Keterangan</td>
-              <td>:</td>
-              <td>{desaApplication.description}</td>
-            </tr>
-            <tr>
-              <td>Kategori</td>
-              <td>:</td>
-              <td>{desaApplication.category}</td>
-            </tr>
-          </tbody>
-
-        </table>
-        {
-          <div>
-            <div className={'mt-6'}>
-              Foto Wajah jelas
-              <img src={`../../storage/images/${desaApplication.images}`} className={'h-40'} />
-
-
-            </div>
-            {files.map((v, k) => {
-              if (v.name.includes('Hasil')) {
-                return <div></div>
+        <div className='mt-6'>
+          <p className='sub-header flex items-center gap-2 mb-2'><BiFile size={25} /> Lampiran Permohonan : </p>
+          <Table striped className='border rounded-lg border-collapse'>
+            <TableHead>
+              <TableRow>
+                <TableHeadCell>#</TableHeadCell>
+                <TableHeadCell>Nama Lampiran</TableHeadCell>
+                <TableHeadCell>Aksi</TableHeadCell>
+              </TableRow>
+            </TableHead>
+            <TableBody className='divide-y text-black'>
+              {
+                requirements.map((file, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{file.name}</TableCell>
+                    <TableCell>
+                      {
+                        checkFile(file.name, file.id) !== undefined ?
+                          < Button
+                            size='xs'
+                            className='bg-green-400'
+                            onClick={() => {
+                              return handleView(checkFile(file.name, file.id)!)
+                            }}
+                          >
+                            <HiEye className='mr-2' />
+                            Lihat
+                          </Button>
+                          : <p className='text-red-400'>Tidak diupload</p>
+                      }
+                    </TableCell>
+                  </TableRow>
+                ))
               }
-              return <div className={'mt-6'} key={k}>
-                <p>{v.name}</p>
-                <img src={`../../storage/${v.place}`} />
-              </div>
-            })}
-          </div>
+            </TableBody>
+          </Table>
+        </div>
+
+        {
+          files.filter(e => e.name.toLowerCase().includes('hasil')).length > 0 && (
+            <div className='mt-6'>
+              <p className='sub-header flex items-center gap-2 mb-2'><BiCheck size={25} /> Permohonan Disetujui : </p>
+              <Table striped className='border rounded-lg border-collapse'>
+                <TableHead>
+                  <TableRow>
+                    <TableHeadCell>#</TableHeadCell>
+                    <TableHeadCell>Dokumen yang dihasilkan</TableHeadCell>
+                    <TableHeadCell>Aksi</TableHeadCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody className='divide-y text-black'>
+                  {
+                    files.filter(e => e.name.toLowerCase().includes('hasil')).map((file, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>{file.name}</TableCell>
+                        <TableCell>
+                          <Button
+                            size='xs'
+                            className='bg-green-400'
+                            onClick={() => handleView(file)}
+                          >
+                            <HiEye className='mr-2' />
+                            Lihat
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  }
+                </TableBody>
+              </Table>
+            </div>)
         }
-
-
-
       </div>
     </Authenticated >
   )

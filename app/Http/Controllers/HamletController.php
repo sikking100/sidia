@@ -15,8 +15,38 @@ class HamletController extends Controller
      */
     public function index()
     {
-        $hamlets = Hamlet::all();
-        return Inertia::render('Admin/Hamlet/Index', compact('hamlets'));
+        $hamlets = Hamlet::paginate(10, ['*'], 'page', 1);
+        return Inertia::render('Admin/Hamlet/Index', [
+            'hamlets' => $hamlets->items(),
+            'meta' => [
+                'current_page' => $hamlets->currentPage(),
+                'last_page' => $hamlets->lastPage(),
+                'per_page' => $hamlets->perPage(),
+                'total' => $hamlets->total(),
+            ],
+        ]);
+    }
+
+    public function pagination(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $query = Hamlet::query();
+
+        if ($request->has('q') && !empty($request->q)) {
+            $query->where('name', 'like', '%' . $request->q . '%');
+        }
+
+        $hamlets = $query->paginate($perPage, ['*'], 'page', $page);
+        return response()->json([
+            'hamlets' => $hamlets->items(),
+            'meta' => [
+                'current_page' => $hamlets->currentPage(),
+                'last_page' => $hamlets->lastPage(),
+                'per_page' => $hamlets->perPage(),
+                'total' => $hamlets->total(),
+            ],
+        ]);
     }
 
     /**
@@ -92,6 +122,9 @@ class HamletController extends Controller
     {
         $hamlet->delete();
         session()->flash('message', 'Data berhasil dihapus');
-        return redirect()->route('hamlet.index');
+        return response()->json([
+            'message' => 'Berhasil menghapus kecamatan',
+            'status' => 'success'
+        ]);
     }
 }

@@ -5,7 +5,7 @@ import { router } from '@inertiajs/react';
 import route from 'ziggy-js'
 import { Inertia } from '@inertiajs/inertia'
 import Alert from '@/Components/Alert'
-import { Applicant, District, Files, Hamlet, Meta, User, Ward } from '@/Interface/Interface'
+import { Applicant, District, Files, Hamlet, Meta, statusOptions, User, Ward } from '@/Interface/Interface'
 import { customTheme, getStatus, useIsMobile } from '@/Functions/functions'
 import { Button, createTheme, Modal, ModalBody, ModalFooter, ModalHeader, Pagination, Select, Spinner, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, TextInput, ThemeProvider } from 'flowbite-react'
 import { ErrorText } from '@/Components/Error'
@@ -77,7 +77,6 @@ export default function PemohonIndex(props: Props) {
   const [error, setError] = React.useState('')
   const [isSearch, setIsSearch] = React.useState(false)
 
-  const statusOptions = ['PENDING', 'DEFFICIENT', 'REVISED', 'VERIFIED', 'COMPLETED', 'CANCEL']
 
   const isMobile = useIsMobile();
 
@@ -217,7 +216,7 @@ export default function PemohonIndex(props: Props) {
           message={f.message}
         /> */}
 
-        <p className='header'>Data Semua Permohonan</p>
+        <p className='header'>Data Semua Pemohon</p>
         <div className='grid grid-cols-1 sm:grid-cols-6 gap-4 mt-6'>
           <Select id="kecamatan"
             value={idDistrict}
