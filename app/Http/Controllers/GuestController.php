@@ -13,6 +13,7 @@ use App\Support\MyUploadFile;
 use App\Http\Requests\KKFileRequest;
 use App\Http\Requests\KKKtpFileRequest;
 use App\Http\Requests\AllFileRequest;
+use App\Models\SupportFile;
 use Illuminate\Support\Facades\Route;
 
 use Firebase\JWT\JWT;
@@ -20,6 +21,8 @@ use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+
+use function App\Support\kirimEmail;
 
 class GuestController extends Controller
 {
@@ -49,7 +52,7 @@ class GuestController extends Controller
 
     public function check_detail($id)
     {
-        $application = Application::with('filess')->find($id);
+        $application = Application::with(['filess', 'supports'])->find($id);
         $menu = Menu::firstWhere('name', $application->category);
         $requirements = $menu->requirements;
         return Inertia::render('Guest/Show', [
@@ -84,6 +87,19 @@ class GuestController extends Controller
         $this->upload->uploadImages($request, 'images', $applicant);
         $applicant->status_description = "Mohon cek secara berkala, sementara permohonan Anda sedang diverifikasi";
         $applicant->save();
+        // email ke pemohon
+        kirimEmail(
+            $request->email,
+            'Permohonan telah diregister',
+            'Permohonan ' . $request->cateogry . ' telah diregister. Mohon cek email dan website secara berkala untuk mengetahui status permohonan'
+        );
+
+        // email ke dukcapil
+        kirimEmail(
+            'disdukcapilkabmorut@gmail.com',
+            'Permohonan baru',
+            'Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.'
+        );
         if ($request->filessss != null) {
             foreach ($request->filessss as $key => $file) {
                 // hapus terlebih dahulu gambarnya
@@ -105,6 +121,17 @@ class GuestController extends Controller
                 $files->status = '0';
                 $files->comment = '-';
                 $applicant->filess()->save($files);
+            }
+        }
+
+        if ($request->pendukung != null) {
+            foreach ($request->pendukung as $key => $file) {
+                $nameExt =  $key . '-' . time() . '.' . $file['filenya']->extension();
+                $file['filenya']->storeAs('pendukung', $nameExt, 'public');
+                $desaFile = new SupportFile();
+                $desaFile->name = $file['name'];
+                $desaFile->place = 'pendukung' . '/' . $nameExt;
+                $applicant->supports()->save($desaFile);
             }
         }
 
@@ -183,6 +210,17 @@ class GuestController extends Controller
                 LOG::info('desafile name = ' . $desaFile->name);
                 LOG::info('desafile place = ' . $desaFile->place);
                 $applicant->filess()->save($desaFile);
+            }
+        }
+
+        if ($request->pendukung != null) {
+            foreach ($request->pendukung as $key => $file) {
+                $nameExt =  $key . '-' . time() . '.' . $file['filenya']->extension();
+                $file['filenya']->storeAs('pendukung', $nameExt, 'public');
+                $desaFile = new SupportFile();
+                $desaFile->name = $file['name'];
+                $desaFile->place = 'pendukung' . '/' . $nameExt;
+                $applicant->supports()->save($desaFile);
             }
         }
 

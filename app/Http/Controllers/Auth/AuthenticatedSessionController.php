@@ -17,11 +17,12 @@ class AuthenticatedSessionController extends Controller
      *
      * @return \Inertia\Response
      */
-    public function create()
+    public function create($role)
     {
         return Inertia::render('Auth/Login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),
+            'role' => $role,
         ]);
     }
 
@@ -33,11 +34,13 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request)
     {
-        $request->authenticate();
-
-        $request->session()->regenerate();
-
-        return redirect()->intended(RouteServiceProvider::HOME);
+        $credentials = $request->only('email', 'password');
+        if (auth()->attempt(array_merge($credentials, ['role' => $request->role]))) {
+            $request->authenticate();
+            $request->session()->regenerate();
+            return redirect()->intended(RouteServiceProvider::HOME);
+        }
+        return back()->withErrors(['email' => 'Email atau password salah, atau bukan akun ' . $request->role . '.']);
     }
 
     /**
@@ -54,6 +57,18 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return;
     }
+
+    // public function loginDesa(Request $request)
+    // {
+    //     $credentials = $request->only('email', 'password');
+    //     if (auth()->attempt(array_merge($credentials, ['role' => 'desa']))) {
+    //         $request->authenticate();
+    //         $request->session()->regenerate();
+    //         return redirect()->route('dashboard');
+    //     }
+
+    //     return back()->withErrors(['email' => 'Email atau password salah, atau bukan akun desa.']);
+    // }
 }

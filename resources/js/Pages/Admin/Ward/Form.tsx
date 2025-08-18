@@ -28,7 +28,7 @@ export default function WardForm({ ward, district_id }: Props) {
     }
   }
   return (
-    <form className="w-full" onSubmit={onSubmit}>
+    <form className="p-6 bg-white shadow-md rounded-md w-full" onSubmit={onSubmit}>
       <BackButton
         route=''
         id={district_id}

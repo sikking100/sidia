@@ -107,7 +107,7 @@ export default function DistrictIndex(props: Props) {
         title={error !== '' ? 'Error' : district !== null ? 'Peringatan' : null}
       />
 
-      <div>
+      <div className='p-6 bg-white shadow-md rounded-md'>
         <div className='flex gap-2 items-center'>
           <p className='header'>Data Kecamatan</p>
 

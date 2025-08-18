@@ -65,8 +65,8 @@ export default function PemohonIndex(props: Props) {
   )
   const id = useRef<number>()
   // const idDistrict = useRef<number>()
-  const [idDistrict, setIdDistrict] = React.useState<number>(-1)
-  const [idWard, setIdWard] = React.useState<number>(-1)
+  const [district, setDistrict] = React.useState<District | null>()
+  const [ward, setWard] = React.useState<Ward | null>()
   const [tahunOptions, setTahunOptions] = React.useState<number[]>([]);
   const [status, setStatus] = React.useState('')
   const [tahun, setTahun] = React.useState(0)
@@ -113,8 +113,8 @@ export default function PemohonIndex(props: Props) {
   }
 
   const reset = () => {
-    setIdDistrict(-1)
-    setIdWard(-1)
+    setDistrict(null)
+    setWard(null)
     setIdHamlet(-1)
     setStatus('')
     setNikname('')
@@ -126,20 +126,22 @@ export default function PemohonIndex(props: Props) {
     }))
   }
 
+
+
   const search = async (page?: number | null, perPage?: number | null) => {
     try {
       setLoading(true)
-      var district = ''
-      if (idDistrict !== -1) {
-        district = props.districts.filter((e) => e.id === idDistrict)[0].name
-      }
-      var ward = ''
-      if (idWard !== -1) {
-        ward = props.wards.filter((e) => e.id === idWard)[0].name
-      }
+      // var district = ''
+      // if (district !== null) {
+      //   district = district.name
+      // }
+      // var ward = ''
+      // if (idWard !== -1) {
+      //   ward = props.wards.filter((e) => e.id === idWard)[0].name
+      // }
       const params: SearchParam = {
-        district: district,
-        ward: ward,
+        district: district?.name ?? '',
+        ward: ward?.name ?? '',
         hamlet_id: idHamlet,
         status: status,
         nikname: nikname,
@@ -148,8 +150,6 @@ export default function PemohonIndex(props: Props) {
         per_page: perPage ?? applicant.meta.per_page,
       }
       const response = await axios.get('/paging', { params })
-      console.log(response);
-
       const result = response.data as SearchApplicant
       setApplicant({
         // ...prev,
@@ -209,7 +209,7 @@ export default function PemohonIndex(props: Props) {
         </ModalBody>
       </Modal>
 
-      <div>
+      <div className='p-6 bg-white shadow-md rounded-md'>
         {/* <Alert
           showAlert={showAlert}
           setShowAlert={setShowAlert}
@@ -219,10 +219,10 @@ export default function PemohonIndex(props: Props) {
         <p className='header'>Data Semua Pemohon</p>
         <div className='grid grid-cols-1 sm:grid-cols-6 gap-4 mt-6'>
           <Select id="kecamatan"
-            value={idDistrict}
+            value={district?.id}
             onChange={(e) => {
               e.preventDefault();
-              setIdDistrict(Number.parseInt(e.target.value));
+              setDistrict(props.districts.find(ee => ee.id === Number.parseInt(e.target.value)));
             }}
           >
             <option key={-1} value={-1}>Kecamatan</option>
@@ -233,15 +233,29 @@ export default function PemohonIndex(props: Props) {
             }
           </Select>
           <Select id="desa"
-            value={idWard}
+            value={ward?.id}
             onChange={(e) => {
               e.preventDefault();
-              setIdWard(Number.parseInt(e.target.value));
+              setWard(district?.wards?.find(ee => ee.id === Number.parseInt(e.target.value)));
             }}
           >
             <option key={-1} value={-1}>Desa</option>
             {
-              props.wards.filter((item) => item.district_id === idDistrict).map((item) => (
+              district?.wards?.map((item) => (
+                <option key={item.id} value={item.id}>{item.name}</option>
+              ))
+            }
+          </Select>
+          <Select id="desa"
+            value={idHamlet}
+            onChange={(e) => {
+              e.preventDefault();
+              setIdHamlet(Number.parseInt(e.target.value));
+            }}
+          >
+            <option key={-1} value={-1}>Dusun</option>
+            {
+              ward?.hamlets?.map((item) => (
                 <option key={item.id} value={item.id}>{item.name}</option>
               ))
             }
@@ -352,7 +366,7 @@ export default function PemohonIndex(props: Props) {
                   {
 
                     applicant.data.map((e, i) => {
-                      const date = new Date(e.created_at ?? '')
+                      const date = new Date(e.created_at ?? 1692230400000)
                       const formattedDate = new Intl.DateTimeFormat('id-ID', {
                         day: 'numeric',
                         month: 'short',
@@ -618,16 +632,16 @@ export default function PemohonIndex(props: Props) {
 
           </div>
         }
+        <div className="flex overflow-x-auto sm:justify-center mt-6">
+          <ThemeProvider
+            theme={customTheme}>
+            <Pagination
+
+              layout={isMobile ? 'navigation' : undefined} currentPage={applicant.meta.current_page} totalPages={applicant.meta.last_page} onPageChange={(e) => search(e)} showIcons />
+          </ThemeProvider>
+        </div>
       </div>
 
-      <div className="flex overflow-x-auto sm:justify-center mt-6">
-        <ThemeProvider
-          theme={customTheme}>
-          <Pagination
-
-            layout={isMobile ? 'navigation' : undefined} currentPage={applicant.meta.current_page} totalPages={applicant.meta.last_page} onPageChange={(e) => search(e)} showIcons />
-        </ThemeProvider>
-      </div>
     </Authenticated >
   )
 }

@@ -42,7 +42,7 @@ export default function PersyaratanShow({ menu }: Props) {
         <Authenticated
             header={<h2>Persyaratan</h2>}
         >
-            <div className={'mx-6'}>
+            <div className={'p-6 bg-white shadow-md rounded-md'}>
                 {menu.name}
                 <form onSubmit={handleSubmit} className='mt-6'>
                     <BackButton

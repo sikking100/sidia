@@ -147,7 +147,7 @@ export default function DesaApplicationIndex(props: Props) {
       header={<h2>Permohonan</h2>}
     >
 
-      <div>
+      <div className='p-6 bg-white shadow-md rounded-md w-full px-6'>
         <p className='header'>Data Semua Pemohon</p>
         <div className='grid grid-cols-1 sm:grid-cols-6 gap-4 mt-6'>
           <Select id="dusun"
@@ -156,7 +156,7 @@ export default function DesaApplicationIndex(props: Props) {
           >
             <option key={-1} value={-1}>Dusun</option>
             {user.ddesa !== null && user.ddesa !== undefined &&
-              props.hamlets.filter((item) => item.ward.id === user.ddesa.id).map((item) => (
+              props.hamlets.filter((item) => item.ward?.id === user.ddesa.id).map((item) => (
                 <option key={item.id} value={item.id}>{item.name}</option>
               ))
             }

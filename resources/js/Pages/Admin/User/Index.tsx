@@ -5,12 +5,13 @@ import route from 'ziggy-js'
 import { Inertia } from '@inertiajs/inertia'
 import Alert from '@/Components/Alert'
 import { Meta, User } from '@/Interface/Interface'
-import { Button, CloseIcon, Modal, ModalBody, ModalFooter, Pagination, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, TextInput, ThemeProvider } from 'flowbite-react'
+import { Button, CloseIcon, Modal, ModalBody, ModalFooter, ModalHeader, Pagination, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, TextInput, ThemeProvider } from 'flowbite-react'
 import axios from 'axios'
 import { customTheme, useIsMobile } from '@/Functions/functions'
 import { HiPencil, HiRefresh, HiSearch } from 'react-icons/hi'
 import { RiAiGenerate } from 'react-icons/ri'
 import { CgAdd } from 'react-icons/cg'
+import { BiCheckCircle } from 'react-icons/bi'
 
 
 interface Props {
@@ -27,7 +28,7 @@ interface PropsPaging {
 export default function UserIndex(props: Props) {
   const { flash } = usePage().props
   const f = flash as { message: string }
-  const [showAlert, setShowAlert] = React.useState(true);
+  const [showAlert, setShowAlert] = React.useState(false);
   const [openModal, setOpenModal] = React.useState(false);
   const [newPass, setNewPass] = React.useState('');
   const [error, setError] = React.useState('');
@@ -39,6 +40,12 @@ export default function UserIndex(props: Props) {
     users: props.users,
     meta: props.meta,
   })
+
+  useEffect(() => {
+    if (f.message !== null && f.message !== '') {
+      setShowAlert(true)
+    }
+  }, [f])
 
 
   useEffect(() => {
@@ -109,7 +116,19 @@ export default function UserIndex(props: Props) {
     <Authenticated
       header={<h2>User</h2>}
     >
-      <div>
+      <Modal
+        show={showAlert}
+        // size="md"
+        popup={true}
+        onClose={() => setShowAlert(false)}
+      >
+        <ModalHeader />
+        <ModalBody className='justify-items-center'>
+          <BiCheckCircle color='green' size={200} />
+          <p>{f.message}</p>
+        </ModalBody>
+      </Modal>
+      <div className='p-6 bg-white shadow-md rounded-md'>
         <div>
           <Modal show={openModal} onClose={() => setOpenModal(false)}>
             <ModalBody>
@@ -156,14 +175,22 @@ export default function UserIndex(props: Props) {
         <div className='flex gap-2 items-center'>
           <p className='header'>Data Semua Pengguna</p>
 
-          <CgAdd
+          {/* <CgAdd
             size={25}
             className={'cursor-pointer'}
             color='green'
             onClick={_ => Inertia.get(route('user.create'))}
-          />
+          /> */}
         </div>
-        <div className={'flex justify-between mt-6'}>
+        {isMobile && <div className='mt-6'>
+          <TextInput
+            sizing='sm'
+            id="search"
+            placeholder="Nama"
+            value={desa}
+            onChange={(e) => { setDesa(e.target.value) }}
+          /></div>}
+        <div className={'flex justify-between sm:mt-6 mt-2'}>
           <select id="view"
 
             // value={per_page}
@@ -190,13 +217,13 @@ export default function UserIndex(props: Props) {
           </div>}
 
           <div className='flex gap-2'>
-            <TextInput
+            {!isMobile && <TextInput
               sizing='sm'
               id="search"
-              placeholder="Nik atau Nama"
+              placeholder="Nama"
               value={desa}
               onChange={(e) => { setDesa(e.target.value) }}
-            />
+            />}
             <Button
               onClick={() => search()}
               color={"cyan"}
@@ -227,6 +254,7 @@ export default function UserIndex(props: Props) {
                     <TableHeadCell>No</TableHeadCell>
                     <TableHeadCell>Kel / Des</TableHeadCell>
                     <TableHeadCell>Nama</TableHeadCell>
+                    <TableHeadCell>Telp</TableHeadCell>
                     <TableHeadCell>Email</TableHeadCell>
                     <TableHeadCell>Aksi</TableHeadCell>
                   </TableRow>
@@ -236,8 +264,9 @@ export default function UserIndex(props: Props) {
                     return (
                       <TableRow key={i}>
                         <TableCell>{((user.meta.current_page - 1) * (user.meta.per_page)) + i + 1}</TableCell>
-                        <TableCell>{v.ddesa.name}</TableCell>
+                        <TableCell>{v.ddesa?.name}</TableCell>
                         <TableCell>{v.name}</TableCell>
+                        <TableCell>{v.phone}</TableCell>
                         <TableCell>{v.email}</TableCell>
                         <TableCell className={'flex gap-2'}>
 

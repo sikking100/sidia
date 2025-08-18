@@ -13,6 +13,7 @@ use App\Http\Controllers\HamletController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Mail;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,21 +33,11 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('/');
 
+Route::post('pass-reset', [UserController::class, 'kirim_pass'])->name('pass.reset');
 
-Route::group(['middleware' => 'auth'], function () {
-    Route::resource('application', ApplicationController::class);
-    Route::get('/paging', [ApplicationController::class, 'paging']);
-    Route::get('/years', [ApplicationController::class, 'get_years']);
-    Route::resource('requirements', RequirementController::class);
-    Route::resource('menu', MenuController::class);
-    Route::get('/menu-paging', [MenuController::class, 'pagination']);
-    Route::resource('user', UserController::class);
-    Route::get('/user-paging', [UserController::class, 'pagination']);
-    Route::resource('hamlet', HamletController::class);
-    Route::get('/hamlet-paging', [HamletController::class, 'pagination']);
-
+Route::middleware(['auth', 'role:desa'])->group(function () {
     // desa
     Route::get('/desa', [DesaApplicationController::class, 'index'])->name('desa.index');
     Route::post('/desa', [DesaApplicationController::class, 'store'])->name('desa.store');
@@ -58,7 +49,30 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/desa/{id}/edit', [DesaApplicationController::class, 'edit'])->name('desa.edit');
     Route::put('/desa/{id}', [DesaApplicationController::class, 'update'])->name('desa.update');
     Route::put('/desa/{id}/status', [DesaApplicationController::class, 'update_status'])->name('desa.status');
+    Route::resource('hamlet', HamletController::class);
+    Route::get('/hamlet-paging', [HamletController::class, 'pagination']);
+    Route::get('/user/{user}', [UserController::class, 'show'])->name('user.show');
+    Route::put('/user/{id}/update', [UserController::class, 'updates'])->name('user.updates');
     // end desa
+});
+
+
+Route::middleware(['auth', 'role:superadmin'])->group(function () {
+    Route::resource('application', ApplicationController::class);
+    Route::get('/paging', [ApplicationController::class, 'paging']);
+    Route::get('/years', [ApplicationController::class, 'get_years']);
+    Route::resource('requirements', RequirementController::class);
+    Route::resource('menu', MenuController::class);
+    Route::get('/menu-paging', [MenuController::class, 'pagination']);
+    // Route::resource('user', UserController::class);
+    Route::get('/user', [UserController::class, 'index'])->name('user.index');
+    Route::post('/user', [UserController::class, 'store'])->name('user.store');
+    Route::get('/user/create', [UserController::class, 'create'])->name('user.create');
+    Route::put('/user/{user}', [UserController::class, 'update'])->name('user.update');
+    Route::get('/user/{user}/edit', [UserController::class, 'edit'])->name('user.edit');
+
+    Route::get('/user-paging', [UserController::class, 'pagination']);
+
 
     Route::put('/regen/{id}', [UserController::class, 'user_regen'])->name('regen');
     Route::put('/applicants/{id}', [ApplicationController::class, 'update_status'])->name('status');
@@ -94,9 +108,19 @@ Route::controller(GuestController::class)->group(function () {
     Route::get('/download-file', 'downloadFile')->name('file.download');
 });
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [ApplicationController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard-statistic', [ApplicationController::class, 'dashboard_statistic'])->name('dashboard.statistic');
+});
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/test-email', function () {
+    Mail::raw('Ini pesan uji coba dari Laravel via Hostinger 🚀', function ($message) {
+        $message->to('sigithadiprawira@gmail.com')
+            ->subject('Test Email Laravel');
+    });
+
+    return 'Email terkirim!';
+});
 
 require __DIR__ . '/auth.php';

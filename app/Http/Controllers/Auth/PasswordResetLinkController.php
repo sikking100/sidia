@@ -15,10 +15,11 @@ class PasswordResetLinkController extends Controller
      *
      * @return \Inertia\Response
      */
-    public function create()
+    public function create($role)
     {
-        return Inertia::render('Auth/ForgotPassword', [
+        return Inertia::render('Auth/ForgotPass', [
             'status' => session('status'),
+            'role' => $role,
         ]);
     }
 

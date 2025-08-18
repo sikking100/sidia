@@ -99,7 +99,7 @@ export default function Ward(props: Props) {
         }}
       />
 
-      <div>
+      <div className='p-6 bg-white shadow-md rounded-md'>
         <div className='flex gap-2 items-center'>
           <BackButton route='district' />
           <p className='header'>Data Kelurahan / Desa Kecamatan {props.district.name}</p>

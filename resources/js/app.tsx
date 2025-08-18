@@ -7,6 +7,7 @@ import { createInertiaApp } from '@inertiajs/inertia-react';
 import { InertiaProgress } from '@inertiajs/progress';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
+import { registerSW } from 'virtual:pwa-register';
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
@@ -51,3 +52,13 @@ InertiaProgress.init({
   includeCSS: true,
   showSpinner: true,
 });
+
+registerSW({
+  immediate: true,
+  onNeedRefresh() {
+    console.log('New content available; please refresh.')
+  },
+  onOfflineReady() {
+    console.log('App ready to work offline')
+  },
+})

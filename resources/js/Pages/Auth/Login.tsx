@@ -6,21 +6,22 @@ import route from 'ziggy-js'
 import { GoogleReCaptcha, GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 import { ErrorBag, Errors, Page, PageProps } from '@inertiajs/inertia'
 import { ErrorText } from '@/Components/Error'
-import { Button } from 'flowbite-react';
+import { Button, HomeIcon } from 'flowbite-react';
+import { BiHome } from 'react-icons/bi';
 
 interface Props extends Page<PageProps> {
   props: {
     siteKey: string
     errors: Errors & ErrorBag
   }
-
 }
 
-export default function Login() {
+export default function Login({ role }: { role: string }) {
   const { data, setData, post, processing, errors, reset } = useForm({
     email: '',
     password: '',
-    token: ''
+    token: '',
+    role: role
   });
 
   const siteKey = usePage<Props>()
@@ -34,10 +35,12 @@ export default function Login() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    post(route('login'));
+    post(route('login', { role: role }));
   };
 
-  console.log(siteKey)
+  // console.log(siteKey)
+  console.log(role);
+
 
   const YourReCaptchaComponent = () => {
     const { executeRecaptcha } = useGoogleReCaptcha();
@@ -54,20 +57,25 @@ export default function Login() {
     }, [executeRecaptcha]);
 
     // You can use useEffect to trigger the verification as soon as the component being loaded
-    useEffect(() => {
-      handleReCaptchaVerify();
-    }, [handleReCaptchaVerify]);
+    // useEffect(() => {
+    //   handleReCaptchaVerify();
+    // }, [handleReCaptchaVerify]);
 
     return <button onClick={handleReCaptchaVerify}>Verify recaptcha</button>;
   };
-
+  const bg = role === 'desa' ? "bg-[url('/assets/bgbola.png')]" : "bg-[url('/assets/bglogin.png')]"
+  const borders = role === 'desa' ? "border-blue-400" : "border-blue-600"
   return (
-    <div className='min-h-screen bg-blue-400 content-center'>
-      <div className={'border-blue-600 bg-white border-solid border-4 w-fit  md:flex md:flex-row rounded-md mx-auto min-h-fit items-center'}>
-        <img src="/assets/loginbupati.webp" alt="" className={'h-96 rounded-sm'} />
-        <div className={'w-full h-full sm:max-w-md px-6 py-4 overflow-hidden'}>
-          <form onSubmit={submit}>
-
+    <div className={`min-h-screen content-center ${bg}`}>
+      <div className={`${borders} bg-white border-solid border-4 w-fit  md:flex md:flex-row rounded-md mx-auto min-h-fit items-center`}>
+        <img src={`/assets/${role == 'desa' ? 'logindesa.webp' : 'loginbupati.webp'}`} alt="" className={'h-96 rounded-sm'} />
+        <div className={'w-full h-full sm:max-w-md px-6 overflow-hidden'}>
+          <a href={route('/')} className='flex items-center text-blue-600 gap-2 cursor-pointer'>
+            <HomeIcon className='h-10 w-10' />
+            Kembali ke SI-DiA
+          </a>
+          <p className='w-full mt-2 animate-pulse text-center'>SELAMAT DATANG</p>
+          <form onSubmit={submit} className='mt-2'>
             <div>
               <Label forInput="email" value="Email" />
               <Input
@@ -93,8 +101,15 @@ export default function Login() {
               />
             </div>
 
+            <div className='mt-2'>
+              <a href={route('password.request', { role: role })} className="ml-auto text-sm link" tabIndex={5}>
+                Forgot password?
+              </a>
+            </div>
+
+
             <div className="block mt-4">
-              <GoogleReCaptchaProvider
+              {/* <GoogleReCaptchaProvider
                 reCaptchaKey={siteKey.props.siteKey}
               >
                 <GoogleReCaptcha onVerify={e => {
@@ -104,9 +119,8 @@ export default function Login() {
                     }
                   }
                 }} />
-              </GoogleReCaptchaProvider>
+              </GoogleReCaptchaProvider> */}
             </div>
-
 
             <div className="flex items-center justify-end mt-4">
               <Button color={'blue'} className="ml-4" type='submit'>

@@ -8,10 +8,13 @@ use App\Models\DesaFile;
 use App\Models\File;
 use App\Models\Hamlet;
 use App\Models\Menu;
+use App\Models\SupportFile;
 use App\Support\MyUploadFile;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
+
+use function App\Support\kirimEmail;
 
 class DesaApplicationController extends Controller
 {
@@ -132,14 +135,40 @@ class DesaApplicationController extends Controller
         $this->upload->uploadImages($request, 'images', $applicant);
         $applicant->status_description = "Mohon cek secara berkala, sementara permohonan Anda sedang diverifikasi";
         $applicant->save();
+        // email ke pemohon
+        kirimEmail(
+            $request->email,
+            'Permohonan telah diproses dan dikirim ke Dukcapil',
+            'Permohonan ' . $request->cateogry . ' telah diproses dan dikirim ke Dukcapil. Mohon cek email dan website secara berkala untuk mengetahui status permohonan'
+        );
+
+
+        // email ke dukcapil
+        kirimEmail(
+            'disdukcapilkabmorut@gmail.com',
+            'Permohonan baru',
+            'Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.'
+        );
         foreach ($request->filessss as $key => $file) {
-            $nameExt = time() . '.' . $file['filenya']->extension();
+            $nameExt = $key . '-' . time() . '.' . $file['filenya']->extension();
             $file['filenya']->storeAs($request->category, $nameExt, 'public');
             $desaFile = new File();
             $desaFile->name = $file['name'];
             $desaFile->place = $request->category . '/' . $nameExt;
-            $desaFile->status = 0;
+            $desaFile->status = '0';
+            $desaFile->requirement_id = $file['requirement_id'] ?? 0;
             $applicant->filess()->save($desaFile);
+        }
+
+        if ($request->pendukung != null) {
+            foreach ($request->pendukung as $key => $file) {
+                $nameExt =  $key . '-' . time() . '.' . $file['filenya']->extension();
+                $file['filenya']->storeAs('pendukung', $nameExt, 'public');
+                $desaFile = new SupportFile();
+                $desaFile->name = $file['name'];
+                $desaFile->place = 'pendukung' . '/' . $nameExt;
+                $applicant->supports()->save($desaFile);
+            }
         }
         // $desaApplication = DesaApplication::make($request->all());
         // $this->upload->uploadImages($request, 'images', $desaApplication);
@@ -173,12 +202,11 @@ class DesaApplicationController extends Controller
      */
     public function show(Request $request)
     {
-        $desaApplication = Application::find($request->id);
-        $files = $desaApplication->filess;
+        $desaApplication = Application::with(['filess', 'supports'])->find($request->id);
         $menu = Menu::firstWhere('name', $desaApplication->category);
         $requirements = $menu->requirements;
         $hamlet = Hamlet::find($desaApplication->hamlet_id);
-        return Inertia::render('Admin/DesaApplication/Show', compact('desaApplication', 'files', 'requirements', 'menu', 'hamlet'));
+        return Inertia::render('Admin/DesaApplication/Show', compact('desaApplication', 'requirements', 'menu', 'hamlet'));
     }
 
     /**
@@ -241,6 +269,16 @@ class DesaApplicationController extends Controller
                 LOG::info('desafile name = ' . $desaFile->name);
                 LOG::info('desafile place = ' . $desaFile->place);
                 $desaApplication->filess()->save($desaFile);
+            }
+        }
+        if ($request->pendukung != null) {
+            foreach ($request->pendukung as $key => $file) {
+                $nameExt =  $key . '-' . time() . '.' . $file['filenya']->extension();
+                $file['filenya']->storeAs('pendukung', $nameExt, 'public');
+                $desaFile = new SupportFile();
+                $desaFile->name = $file['name'];
+                $desaFile->place = 'pendukung' . '/' . $nameExt;
+                $desaApplication->supports()->save($desaFile);
             }
         }
         $desaApplication->status = 'REVISED';

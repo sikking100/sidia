@@ -47,7 +47,7 @@ class HandleInertiaRequests extends Middleware
             'siteKey' => env('CAPTCHA_SITE_KEY'),
             'district' => District::all(),
             'flash' => [
-                'message' => fn () => $request->session()->get('message')
+                'message' => fn() => $request->session()->get('message')
             ]
         ]);
     }

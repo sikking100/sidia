@@ -13,12 +13,13 @@ import { ArrowLeftIcon, Button, FileInput, Label, Select, Textarea, TextInput } 
 import { LuAtSign, LuFileDigit, LuPhone, LuUser } from 'react-icons/lu'
 import { GoNumber, GoPerson } from 'react-icons/go'
 import { FaRestroom } from 'react-icons/fa'
-import { BiBuilding, BiHome, BiUserCircle } from 'react-icons/bi'
+import { BiBuilding, BiFile, BiHome, BiUserCircle } from 'react-icons/bi'
 import { GiVillage } from 'react-icons/gi'
 import { Inertia } from '@inertiajs/inertia'
 import { BackButton } from '@/Components/Button'
 import { ModalAlert } from '@/Components/Alert'
 import { checkFile } from '@/Functions/functions'
+import { CgAdd, CgRemove } from 'react-icons/cg'
 
 interface Props {
   subtitle: string
@@ -47,7 +48,8 @@ export default function Form({ category, menu, requirements, districts, applicat
       description: application?.description ?? '',
       sex: application?.sex ?? '',
       images: application?.images ?? undefined,
-      filessss: undefined
+      filessss: undefined,
+      pendukung: []
     }
   )
 
@@ -58,6 +60,8 @@ export default function Form({ category, menu, requirements, districts, applicat
   const [stateDistrict, setStateDistrict] = React.useState<District | null>()
   const [error, setError] = React.useState<Record<keyof Applicant, string> | null>()
   const [showModal, setShowModal] = React.useState(false);
+  const [pendukung, setPendukung] = React.useState<(FilesForm | null)[]>([])
+
 
   // function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
   //   setData('district', e.target.value)
@@ -95,6 +99,12 @@ export default function Form({ category, menu, requirements, districts, applicat
       formData.append(`filessss[${index}][filenya]`, fileObj.filenya);
       formData.append(`filessss[${index}][place]`, fileObj.place);
     });
+
+    // berkas pendukung
+    data.pendukung?.forEach((v, i) => {
+      formData.append(`pendukung[${i}][name]`, v?.name ?? '')
+      formData.append(`pendukung[${i}][filenya]`, v?.filenya ?? '')
+    })
 
     formData.append('ward', data.ward);
     formData.append('ward_id', String(stateDistrict?.wards?.find(e => e.name === data.ward)?.id ?? 0));
@@ -435,6 +445,64 @@ export default function Form({ category, menu, requirements, districts, applicat
                   }}
                   name={v.name}
                 />
+              </div>
+            })}
+          </div>
+          <div className='mt-6 w-full'>
+
+            <p className='sub-header inline-flex items-center gap-2 mt-6'><BiFile size={25} /> Berkas lainnya : <CgAdd
+              size={25}
+              className={'cursor-pointer'}
+              color='green'
+              onClick={_ => {
+                setPendukung([...pendukung, null])
+                setData('pendukung', [...data.pendukung, { name: '', filenya: undefined }])
+              }}
+            /></p>
+
+            {pendukung?.map((v, k) => {
+              // const checkFiles = checkFile(v.name, v.id, filess ?? [])
+              // if (checkFiles !== undefined && checkFiles.status == 1) return null
+              return <div key={k} className='mt-3'>
+                <Label>{`Berkas ${k + 1}`}</Label>
+                <div className='flex gap-2 items-center mt-2'>
+                  <CgRemove
+                    size={25}
+                    className={'cursor-pointer'}
+                    color='red'
+                    onClick={_ => {
+                      setPendukung(pendukung.filter((_, i) => i !== k))
+                    }}
+                  />
+                  <TextInput
+                    className='w-full'
+                    placeholder='Nama berkas'
+                    onChange={e => {
+                      // return setPendukungName({ k: e.target.value })
+                      const updated = [...data.pendukung]
+                      updated[k].name = e.target.value
+                      setData('pendukung', updated)
+                    }}
+                  />
+                  <FileInput
+
+                    onChange={e => {
+                      const listFiles = e.target.files
+                      if (listFiles != null) {
+                        // if (applicant !== null && applicant !== undefined && applicant.filess?.filter((e) => e.name === v.name)[0] !== undefined) {
+                        //   filessRef.current.push({ name: v.name, filenya: listFiles[0], place: applicant.filess?.filter((e) => e.name === v.name)[0].place ?? '' })
+                        // } else {
+                        // pendukungRef.current.push({ name: `${k}`, filenya: listFiles[0], place: '' })
+                        const updated = [...data.pendukung]
+                        updated[k].filenya = listFiles[0]
+
+                        setData('pendukung', updated)
+                        // }
+                      }
+                    }}
+                    name={`${k + 1}`}
+                  />
+                </div>
               </div>
             })}
           </div>

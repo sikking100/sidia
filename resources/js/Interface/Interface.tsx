@@ -26,6 +26,9 @@ export interface Applicant {
   filess?: Array<Files>
   hamlet_id?: number | null
   filessss: FilesForm[] | undefined
+  pendukung: Pendukung[]
+  supports?: Array<Files>
+
 }
 
 export interface DesaApplication {
@@ -50,6 +53,7 @@ export interface DesaApplication {
   created_at?: string | null
   files?: string | null
   filess?: Array<Files>
+  supports?: Array<Files>
 }
 
 export interface Meta {
@@ -74,6 +78,7 @@ export interface DesaApplicationPost {
   description: string
   problem?: string
   filessss: FilesForm[] | undefined
+  pendukung: Pendukung[]
 }
 
 export interface District {
@@ -87,13 +92,14 @@ export const statusOptions = ['PENDING', 'DEFFICIENT', 'REVISED', 'VERIFIED', 'C
 export interface Hamlet {
   id: number
   name: string
-  ward: Ward
+  ward?: Ward
 }
 
 export interface Ward {
   id: number
   district_id: number
   name: string
+  hamlets: Hamlet[]
 }
 
 export interface Requirement {
@@ -111,10 +117,16 @@ export interface Menu {
   description: string
 }
 
+export type Pendukung = {
+  name: string
+  filenya?: File
+}
+
 export interface FilesForm {
   name: string
   filenya: File
   place: string
+  requirement_id?: number
 }
 
 export interface Files {
@@ -122,17 +134,18 @@ export interface Files {
   requirement_id?: number | null
   name: string
   place: string
-  status: number
-  comment: string
+  status?: number
+  comment?: string
 }
 
 export interface User {
   id: number
-  ddesa: Ward
+  ddesa?: Ward
   name: string
   email: string
   password: string
   role: string
+  phone: string
 }
 
 export interface ModalProp {
@@ -165,10 +178,10 @@ export const subtitle: Map<string, string> = new Map<string, string>([
   ['Akta-Kelahiran-Rusak', 'Akta Kelahiran Rusak'],
   ['Akta-Kelahiran-Hilang', 'Akta Kelahiran Hilang'],
   ['Akta-Kelahiran-Perubahan', 'Akta Kelahiran Perubahan'],
-  ['Perkawinan', 'Akta Perkawinan'],
-  ['Perceraian', 'Akta Perceraian'],
-  ['Kematian', 'Akta Kematian'],
-  ['Pengaduan-Data-Kependudukan', 'Pengaduan Data Kependudukan'],
+  ['PERKAWINAN', 'Akta Perkawinan'],
+  ['PERCERAIAN', 'Akta Perceraian'],
+  ['KEMATIAN', 'Akta Kematian'],
+  ['PENGADUAN', 'Pengaduan Data Kependudukan'],
 ]);
 
 export const persyaratan: Map<string, string[]> = new Map<string, string[]>([
@@ -270,7 +283,7 @@ export const persyaratan: Map<string, string[]> = new Map<string, string[]>([
     '1.Membawa Fotokopi Ijazah ( atau berkas data dukung perubahan data lainnya )',
     '2.Membawa Akta Lahir asli',
   ]],
-  ['Perkawinan', [
+  ['PERKAWINAN', [
     '1.Membawa Formulir N1-N4 dari desa/kelurahan',
     '2.Surat Nikah Agama',
     '3.KK orang tua',
@@ -278,13 +291,13 @@ export const persyaratan: Map<string, string[]> = new Map<string, string[]>([
     '5.KTP-El masing-masing saksi',
     '6.Membawa Pas foto kembar 4X6 (3 lembar)',
   ]],
-  ['Perceraian', [
+  ['PERCERAIAN', [
     '1.Membawa Salinan Putusan Pengadilan',
     '2.Membawa Akta Perkawinan asli',
     '3.KTP-El suami-istri',
     '4.Membawa Kartu Keluarga Asli',
   ]],
-  ['Kematian', [
+  ['KEMATIAN', [
     '1.Membawa Surat keterangan kematian dari Desa / Kelurahan',
     '2.Membawa KTP-El asli yang bersangkutan',
     '3.Membawa KK Asli yang bersangkutan',
@@ -294,7 +307,7 @@ export const persyaratan: Map<string, string[]> = new Map<string, string[]>([
     '',
     'Diharapkan untuk membawa persyaratan di atas pada saat pengambilan Akta'
   ]],
-  ['Pengaduan-Data-Kependudukan', [
+  ['PENGADUAN', [
     '1.KTP',
     '2.KK',
   ]],

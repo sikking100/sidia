@@ -10,7 +10,7 @@ import { ErrorText } from '@/Components/Error'
 import Container from '@/Components/Container'
 import { Inertia, Method } from '@inertiajs/inertia'
 import Alert from '@/Components/Alert'
-import { ArrowLeftIcon, Button, CloseIcon, FileInput, Label, Modal, ModalBody, ModalFooter, ModalHeader, Select, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Textarea, TextInput } from 'flowbite-react'
+import { ArrowLeftIcon, Button, CloseIcon, FileInput, HelperText, Label, Modal, ModalBody, ModalFooter, ModalHeader, Select, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Textarea, TextInput } from 'flowbite-react'
 import { HiEye, HiSave } from 'react-icons/hi'
 import { BiFile, BiHome, BiUserCircle } from 'react-icons/bi'
 import { log } from 'console'
@@ -25,6 +25,7 @@ import { FcPicture } from 'react-icons/fc'
 import { GiVillage } from 'react-icons/gi'
 import { checkFile, getFileType } from '@/Functions/functions'
 import { BsDownload } from 'react-icons/bs'
+import { CgAdd, CgRemove } from 'react-icons/cg'
 
 interface Props {
   filess?: Array<Files>
@@ -41,8 +42,10 @@ export default function DesaApplicationForm({ filess, applicant, category, hamle
   const f = flash as { message: string }
   const [showAlert, setShowAlert] = React.useState(true);
   const filessRef = useRef<FilesForm[]>([])
+  const pendukungRef = useRef<FilesForm[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false)
+  const [pendukung, setPendukung] = React.useState<(FilesForm | null)[]>([])
 
   const { data, errors, setData, post, put, progress, processing } = useForm<DesaApplicationPost>(
     {
@@ -55,11 +58,13 @@ export default function DesaApplicationForm({ filess, applicant, category, hamle
       description: applicant?.description ?? '',
       email: applicant?.email ?? '',
       filessss: undefined,
+      pendukung: [],
       hamlet_id: applicant?.hamlet_id ?? 0,
       phone: applicant?.phone ?? '',
       religion: applicant?.religion ?? '',
       sex: applicant?.sex ?? '',
       problem: applicant?.problem ?? '',
+
     }
   )
   function handleSubmit(e: React.FormEvent) {
@@ -85,7 +90,15 @@ export default function DesaApplicationForm({ filess, applicant, category, hamle
         formData.append(`filessss[${index}][name]`, fileObj.name);
         formData.append(`filessss[${index}][filenya]`, fileObj.filenya);
         formData.append(`filessss[${index}][place]`, fileObj.place);
+        formData.append(`filessss[${index}][requirement_id]`, String(fileObj?.requirement_id) ?? '');
       });
+
+      // berkas pendukung
+      pendukung?.forEach((v, i) => {
+        formData.append(`pendukung[${i}][name]`, v?.name ?? '')
+        formData.append(`pendukung[${i}][filenya]`, v?.filenya ?? '')
+        formData.append(`pendukung[${i}][place]`, v?.place ?? '')
+      })
 
       formData.append('hamlet_id', String(data.hamlet_id ?? 0));
       formData.append('phone', data.phone);
@@ -96,6 +109,7 @@ export default function DesaApplicationForm({ filess, applicant, category, hamle
       Inertia.post(route('desa.update', applicant?.id), formData)
       return
     }
+
     post(route('desa.store'), {
       onError: () => {
         setShowAlert(true)
@@ -177,7 +191,7 @@ export default function DesaApplicationForm({ filess, applicant, category, hamle
         </Modal>
       )}
       <div
-        className={'bg-white rounded'}
+        className={'p-6 bg-white shadow-md rounded-md w-full px-6'}
       >
         <Button
           // as={Link}
@@ -206,7 +220,7 @@ export default function DesaApplicationForm({ filess, applicant, category, hamle
 
       </div>
       {category.split('-')[0] != '' && <div
-        className={'bg-white rounded mt-6'}
+        className={'p-6 bg-white shadow-md rounded-md w-full px-6'}
       >
         <h5 className={'text-lg font-bold'}>
           Formulir Persyaratan
@@ -296,6 +310,9 @@ export default function DesaApplicationForm({ filess, applicant, category, hamle
                 onChange={e => setData('email', e.target.value)}
                 className={'w-full'}
               />
+              <HelperText>
+                Pastikan email yang diinput valid karena digunakan untuk menerima notifikasi.
+              </HelperText>
               <ErrorText message={errors.email} />
             </div>
           </div>
@@ -425,9 +442,9 @@ export default function DesaApplicationForm({ filess, applicant, category, hamle
                       if (applicant !== null && applicant !== undefined && applicant.filess?.filter((e) => e.name === v.name)[0] !== undefined) {
                         console.log(v.name);
                         console.log(applicant.filess?.filter((e) => e.name === v.name));
-                        filessRef.current.push({ name: v.name, filenya: listFiles[0], place: applicant.filess?.filter((e) => e.name === v.name)[0].place ?? '' })
+                        filessRef.current.push({ name: v.name, filenya: listFiles[0], place: applicant.filess?.filter((e) => e.name === v.name)[0].place ?? '', requirement_id: v.id })
                       } else {
-                        filessRef.current.push({ name: v.name, filenya: listFiles[0], place: '' })
+                        filessRef.current.push({ name: v.name, filenya: listFiles[0], place: '', requirement_id: v.id })
                       }
                       console.log(filessRef.current.length);
                       setData('filessss', filessRef.current)
@@ -436,6 +453,64 @@ export default function DesaApplicationForm({ filess, applicant, category, hamle
                   }}
                   name={v.name}
                 />
+              </div>
+            })}
+          </div>
+          <div className='mt-6 w-full'>
+
+            <p className='sub-header inline-flex items-center gap-2 mt-6'><BiFile size={25} /> Berkas pendukung (foto acara, foto nisan, dsb) : <CgAdd
+              size={25}
+              className={'cursor-pointer'}
+              color='green'
+              onClick={_ => {
+                setPendukung([...pendukung, null])
+                setData('pendukung', [...data.pendukung, { name: '', filenya: undefined }])
+              }}
+            /></p>
+
+            {pendukung?.map((v, k) => {
+              // const checkFiles = checkFile(v.name, v.id, filess ?? [])
+              // if (checkFiles !== undefined && checkFiles.status == 1) return null
+              return <div key={k} className='mt-3'>
+                <Label>{`Berkas ${k + 1}`}</Label>
+                <div className='flex gap-2 items-center mt-2'>
+                  <CgRemove
+                    size={25}
+                    className={'cursor-pointer'}
+                    color='red'
+                    onClick={_ => {
+                      setPendukung(pendukung.filter((_, i) => i !== k))
+                    }}
+                  />
+                  <TextInput
+                    className='w-full'
+                    placeholder='Nama berkas'
+                    onChange={e => {
+                      // return setPendukungName({ k: e.target.value })
+                      const updated = [...data.pendukung]
+                      updated[k].name = e.target.value
+                      setData('pendukung', updated)
+                    }}
+                  />
+                  <FileInput
+
+                    onChange={e => {
+                      const listFiles = e.target.files
+                      if (listFiles != null) {
+                        // if (applicant !== null && applicant !== undefined && applicant.filess?.filter((e) => e.name === v.name)[0] !== undefined) {
+                        //   filessRef.current.push({ name: v.name, filenya: listFiles[0], place: applicant.filess?.filter((e) => e.name === v.name)[0].place ?? '' })
+                        // } else {
+                        // pendukungRef.current.push({ name: `${k}`, filenya: listFiles[0], place: '' })
+                        const updated = [...data.pendukung]
+                        updated[k].filenya = listFiles[0]
+
+                        setData('pendukung', updated)
+                        // }
+                      }
+                    }}
+                    name={`${k + 1}`}
+                  />
+                </div>
               </div>
             })}
           </div>

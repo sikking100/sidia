@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\Mail;
+
 function generateStrongPassword($length = 8)
 {
     $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -19,4 +21,12 @@ function generateStrongPassword($length = 8)
 
     // Acak lagi susunannya
     return str_shuffle($password);
+}
+
+function kirimEmail($to, $subject, $pesan)
+{
+    Mail::raw($pesan, function ($message) use ($to, $subject) {
+        $message->to($to)
+            ->subject($subject);
+    });
 }

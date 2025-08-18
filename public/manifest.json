@@ -1,0 +1,36 @@
+{
+  "name": "Sidia",
+  "short_name": "Sidia",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d6efd",
+  "icons": [
+    {
+      "src": "/192morut.webp",
+      "sizes": "192x192",
+      "type": "image/webp"
+    },
+    {
+      "src": "/512morut.webp",
+      "sizes": "512x512",
+      "type": "image/webp"
+    }
+  ],
+  "screenshots": [
+            {
+              "src": "/mobile.png",
+              "type": "image/png",
+              "sizes": "540x720",
+              "form_factor": "narrow",
+              "label": "Tampilan Mobile"
+            },
+            {
+              "src": "/desktop.png",
+              "type": "image/png",
+              "sizes": "1200x800",
+              "form_factor": "wide",
+              "label": "Tampilan Desktop"
+            }
+          ]
+}

@@ -213,7 +213,7 @@ export default function Welcome(props: any) {
             <span className={'block pb-4'}>Perkawinan</span>
             <Link
               className={'rounded bg-kemenag text-white py-2 px-4'}
-              href={route('form', 'Perkawinan')}
+              href={route('form', 'PERKAWINAN')}
             >
               Layanan
             </Link>
@@ -230,7 +230,7 @@ export default function Welcome(props: any) {
             <span className={'block pb-4'}>Perceraian</span>
             <Link
               className={'rounded bg-kemenag text-white py-2 px-4'}
-              href={route('form', 'Perceraian')}
+              href={route('form', 'PERCERAIAN')}
             >
               Layanan
             </Link>
@@ -247,7 +247,7 @@ export default function Welcome(props: any) {
             <span className={'block pb-4'}>Kematian</span>
             <Link
               className={'rounded bg-kemenag text-white py-2 px-4'}
-              href={route('form', 'Kematian')}
+              href={route('form', 'KEMATIAN')}
             >
               Layanan
             </Link>
@@ -270,7 +270,7 @@ export default function Welcome(props: any) {
                 align={'left'}
               >
                 <Dropdown.Link
-                  href={route('form', 'Pengaduan-Data-Kependudukan')}
+                  href={route('form', 'PENGADUAN')}
                 >
                   Pengaduan Data Kependudukan (NIK)
                 </Dropdown.Link>

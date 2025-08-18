@@ -44,4 +44,9 @@ class Application extends Model
   {
     return $this->belongsTo(Hamlet::class);
   }
+
+  function supports()
+  {
+    return $this->hasMany(SupportFile::class);
+  }
 }

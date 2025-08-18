@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 use function App\Support\generateStrongPassword;
@@ -85,7 +88,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        //
+        return Inertia::render('Admin/User/Show', compact('user'));
     }
 
     /**
@@ -108,8 +111,26 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, User $user)
     {
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
         $user->save();
         session()->flash('message', 'Data berhasil diubah');
+        return redirect()->route('user.index');
+    }
+
+    public function updates(UserRequest $request, $id)
+    {
+        $user = User::find($id);
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
+        $user->password = bcrypt($request->password);
+        $user->save();
+        session()->flash('message', 'Data berhasil diubah');
+        if ($user->role == 'desa') {
+            return redirect()->route('dashboard');
+        }
         return redirect()->route('user.index');
     }
 
@@ -138,5 +159,25 @@ class UserController extends Controller
         return response()->json([
             'password' => $pass
         ]);
+    }
+
+    public function kirim_pass(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        if ($user == null) {
+            throw ValidationException::withMessages([
+                'email' => ['email tidak tidak terkait dengan akun apapun'],
+            ]);
+        }
+        $pass = generateStrongPassword(6);
+        $user->password = bcrypt($pass);
+        $user->save();
+
+        Mail::html('Ini adalah password terbaru Anda <strong>' . $pass . '</strong>.  Silakan untuk mengubah password tersebut setelah Anda login.', function ($message) use ($request) {
+            $message->to($request->email)
+                ->subject('Password baru');
+        });
+
+        return back()->with('status', __('Silakan cek email Anda'));
     }
 }

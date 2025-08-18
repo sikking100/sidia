@@ -185,7 +185,7 @@ export default function PemohonShow({ application, files, menu, requirements, ha
       </Modal>}
       {isModalOpen && selectedFile && (
         <Modal show={isModalOpen} onClose={() => setIsModalOpen(false)} size="4xl">
-          <ModalHeader>Pratinjau File {getStatusBerkas(selectedFile.status)}</ModalHeader>
+          <ModalHeader>Pratinjau File {getStatusBerkas(selectedFile?.status ?? 0)}</ModalHeader>
           <ModalBody>
             {getFileType(selectedFile) === 'pdf' ? (
               <iframe
@@ -320,7 +320,7 @@ export default function PemohonShow({ application, files, menu, requirements, ha
         )
       }
 
-      <div className='flex flex-col'>
+      <div className='p-6 bg-white shadow-md rounded-md flex flex-col'>
         <div>
           <BackButton
             route='application'

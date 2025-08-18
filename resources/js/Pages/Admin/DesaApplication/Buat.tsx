@@ -217,7 +217,7 @@ export default function Buat() {
                             <span className={'block pb-4'}>Perkawinan</span>
                             <Link
                                 className={'rounded bg-kemenag text-white py-2 px-4'}
-                                href={route('desa.create', 'Perkawinan')}
+                                href={route('desa.create', 'PERKAWINAN')}
                             >
                                 Layanan
                             </Link>
@@ -234,7 +234,7 @@ export default function Buat() {
                             <span className={'block pb-4'}>Perceraian</span>
                             <Link
                                 className={'rounded bg-kemenag text-white py-2 px-4'}
-                                href={route('desa.create', 'Perceraian')}
+                                href={route('desa.create', 'PERCERAIAN')}
                             >
                                 Layanan
                             </Link>
@@ -251,7 +251,7 @@ export default function Buat() {
                             <span className={'block pb-4'}>Kematian</span>
                             <Link
                                 className={'rounded bg-kemenag text-white py-2 px-4'}
-                                href={route('desa.create', 'Kematian')}
+                                href={route('desa.create', 'KEMATIAN')}
                             >
                                 Layanan
                             </Link>
@@ -274,7 +274,7 @@ export default function Buat() {
                                     align={'left'}
                                 >
                                     <Dropdown.Link
-                                        href={route('desa.create', 'Pengaduan-Data-Kependudukan')}
+                                        href={route('desa.create', 'PENGADUAN')}
                                     >
                                         Pengaduan Data Kependudukan (NIK)
                                     </Dropdown.Link>

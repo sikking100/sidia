@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/inertia-react'
 import moment from 'moment'
 import route from 'ziggy-js'
 import { useIsMobile } from '@/Functions/functions';
-import { Navbar, NavbarCollapse, NavbarLink, NavbarToggle } from 'flowbite-react';
+import { Navbar, NavbarBrand, NavbarCollapse, NavbarLink, NavbarToggle } from 'flowbite-react';
 import { BiBall } from 'react-icons/bi';
 import { GiSoccerBall } from 'react-icons/gi';
 
@@ -21,10 +21,16 @@ export default function Guest({ children, title = 'Selamat Datang' }: React.Prop
 
   const isMobile = useIsMobile()
 
+  const pTitle = isMobile ? 'px-2' : ''
+
   return (
-    <div className="min-w-full items-top min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center sm:pt-0 py-6 px-10">
+    <div className="min-w-full items-top min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center sm:pt-0 sm:py-6 sm:px-10">
       {
         isMobile ? <Navbar fluid rounded className='mb-6'>
+          <NavbarBrand as={Link} href="https://flowbite-react.com">
+            <img src="../../../assets/logo.png" className="mr-3 h-6 sm:h-9" alt="Flowbite React Logo" />
+            <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">SI - DiA</span>
+          </NavbarBrand>
           <NavbarToggle />
           <NavbarCollapse>
             <NavbarLink onClick={onClick} as={Link} href="#">
@@ -34,8 +40,8 @@ export default function Guest({ children, title = 'Selamat Datang' }: React.Prop
               SIDIA
             </NavbarLink>
             <NavbarLink href={route('check')}>PERMOHONAN</NavbarLink>
-            <NavbarLink href={route('login')}>ADMIN</NavbarLink>
-            <NavbarLink href={route('desa.index')}>JEMPUT BOLA</NavbarLink>
+            <NavbarLink href={route('login', { role: 'superadmin' })}>ADMIN</NavbarLink>
+            <NavbarLink href={route('login', { role: 'desa' })}>JEMPUT BOLA</NavbarLink>
           </NavbarCollapse>
         </Navbar> : <div className={'flex py-6 items-center'}>
 
@@ -68,7 +74,7 @@ export default function Guest({ children, title = 'Selamat Datang' }: React.Prop
             </div>
           </Link>
 
-          <Link href={route('login')}>
+          <Link href={route('login', { role: 'superadmin' })}>
 
             <div className={'inline-flex mr-2 rounded-full bg-kemenag py-2 px-4'}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="white" className="w-6 h-6">
@@ -78,7 +84,7 @@ export default function Guest({ children, title = 'Selamat Datang' }: React.Prop
             </div>
           </Link>
 
-          <Link href={route('desa.index')}>
+          <Link href={route('login', { role: 'desa' })}>
             <div className={'inline-flex mr-2 rounded-full bg-kemenag py-2 px-4'}>
               <GiSoccerBall color='white' className='h-6 w-6' />
               <span className={'pl-2 text-white'}>JEMPUT BOLA</span>
@@ -89,13 +95,13 @@ export default function Guest({ children, title = 'Selamat Datang' }: React.Prop
         </div>
       }
       <div className={'w-full flex justify-between pb-6'}>
-        <img src={'../../assets/banner.png'} />
+        <img src={'../../assets/banner.webp'} />
       </div>
-      <div className={'w-full flex justify-between pb-6'}>
+      <div className={`w-full flex justify-between pb-6 ${pTitle}`}>
         <h5>{title}</h5>
         <p>{moment(Date.now()).format('dddd, DD MMMM yyyy')}</p>
       </div>
-      {children}
+      {isMobile ? <div className='px-2'>{children}</div> : children}
     </div>
   );
 }

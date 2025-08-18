@@ -25,4 +25,9 @@ class Ward extends Model
     {
         return $this->hasMany(Hamlet::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

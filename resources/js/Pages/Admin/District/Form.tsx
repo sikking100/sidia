@@ -26,7 +26,7 @@ export default function DistrictForm({ district }: Props) {
     }
   }
   return (
-    <form className="w-full px-6" onSubmit={onSubmit}>
+    <form className="p-6 bg-white shadow-md rounded-md w-full px-6" onSubmit={onSubmit}>
       <BackButton
         route={'district'}
       />

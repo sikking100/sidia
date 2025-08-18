@@ -19,9 +19,12 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use mervick\aesEverywhere\AES256;
+
+use function App\Support\kirimEmail;
 
 class ApplicationController extends Controller
 {
@@ -31,6 +34,79 @@ class ApplicationController extends Controller
     public function __construct()
     {
         $this->up = new MyUploadFile();
+    }
+
+    public function dashboard()
+    {
+        $user = auth()->user();
+        $byStatus = DB::table('applications')
+            ->select('status', DB::raw('COUNT(*) as total'))
+            ->when($user->role == 'desa', function ($query) {
+                $user = auth()->user();
+                return $query->where('ward', $user->ddesa->name);
+            })
+            ->groupBy('status')
+            ->get();
+
+        $byCategory = DB::table('applications')
+            ->select('category', DB::raw('COUNT(*) as total'))
+            ->when($user->role == 'desa', function ($query) {
+                $user = auth()->user();
+                return $query->where('ward', $user->ddesa->name);
+            })
+            ->groupBy('category')
+            ->get();
+        $districts = District::with('wards.hamlets')->get();
+
+        $hamlets = [];
+
+        if ($user->role == 'desa') {
+            $hamlets = $user->ddesa->hamlets;
+        }
+
+
+        return Inertia::render('Dashboard', [
+            'status' => $byStatus,
+            'category' => $byCategory,
+            'districts' => $districts,
+            'role' => $user->role,
+            'hamlets' => $hamlets,
+        ]);
+    }
+
+    public function scopeFilterByRole($query, $request, $role)
+    {
+        if ($role == 'desa') {
+            if ($request->dusun != null && $request->dusun != '') {
+                $query->where('hamlet_id', $request->dusun);
+            } else if ($request->tahun != null && $request->tahun != 0) {
+                $query->whereYear('created_at', $request->tahun);
+            }
+        } else {
+            if ($request->kecamatan != null && $request->kecamatan != '') {
+                $query->where('district', $request->kecamatan);
+            } else if ($request->desa != null && $request->desa != '') {
+                $query->where('ward', $request->desa);
+            } else if ($request->dusun != null && $request->dusun != '') {
+                $query->where('hamlet_id', $request->dusun);
+            } else if ($request->tahun != null && $request->tahun != 0) {
+                $query->whereYear('created_at', $request->tahun);
+            }
+        }
+
+        return $query;
+    }
+
+    public function dashboard_statistic(Request $request)
+    {
+        $byCategory = DB::table('applications')
+            ->select('category', DB::raw('COUNT(*) as total'))
+            ->filterByRole($request, auth()->user()->role)
+            ->groupBy('category')
+            ->get();
+        return response()->json([
+            'summary' => $byCategory,
+        ]);
     }
 
     public function downloadFile(Request $request)
@@ -63,6 +139,27 @@ class ApplicationController extends Controller
         $files->name = 'Hasil-' . $request->id;
         $files->place = $nameExt;
         $applicant->filess()->save($files);
+        // kirim email ke desa apabila desa yang buat
+        $checkCategory = stripos($applicant->category, 'KTP') || stripos($applicant->category, 'KIA');
+        if ($applicant->hamlet_id != null && $applicant->hamlet_id != '') {
+            $hamlet = Hamlet::find($applicant->hamlet_id);
+            $subject = 'Permohonan disetujui' . $checkCategory == true ? '' : ' dan berkas siap didownload';
+            $content = 'Permohonan ' . $applicant->category . ' dengan NIK : ' . $applicant->id_card_number . ' telah disetujui oleh Dukcapil' . $checkCategory == true ? '.' : ' dan berkas siap didownload.';
+            kirimEmail(
+                $hamlet->ward->user->email,
+                $subject,
+                $content,
+            );
+        }
+
+        $subject = 'Permohonan disetujui' . $checkCategory == true ? '' : ' dan berkas siap didownload';
+        $content = 'Permohonan ' . $applicant->category . ' dengan NIK : ' . $applicant->id_card_number . ' telah disetujui oleh Dukcapil' . $checkCategory == true ? '.' : ' dan berkas siap didownload. Kunjungi website dan cek data Anda berdasarkan NIK dan unduh berkas.';
+        // kirim email ke pemohon
+        kirimEmail(
+            $hamlet->ward->user->email,
+            $subject,
+            $content,
+        );
         session()->flash('message', 'Berkas berhasil diupload');
         return redirect()->route('application.index');
     }
@@ -94,17 +191,15 @@ class ApplicationController extends Controller
     public function index()
     {
 
-        $districts = District::all();
-        $wards = Ward::all();
-        $hamlets = Hamlet::all();
+        $districts = District::with('wards.hamlets')->get();
 
         $application = Application::with('filess')->orderBy('created_at', 'desc')->paginate(10, ['*'], 'page', 1);
 
         return Inertia::render('Admin/Pemohon/Index', [
             'data' => $application->items(),
             'districts' => $districts,
-            'wards' => $wards,
-            'hamlets' => $hamlets,
+            // 'wards' => $wards,
+            // 'hamlets' => $hamlets,
             'meta' => [
                 'current_page' => $application->currentPage(),
                 'last_page' => $application->lastPage(),
@@ -282,6 +377,21 @@ class ApplicationController extends Controller
                     }
                 }
                 $res = $applicant->save();
+
+                // email ke pemohon
+                kirimEmail(
+                    $applicant->email,
+                    'Permohonan telah diregister',
+                    'Permohonan ' . $applicant->category . ' telah diregister. Mohon cek email dan website secara berkala untuk mengetahui status permohonan.'
+                );
+
+                // email ke dukcapil
+                kirimEmail(
+                    'disdukcapilkabmorut@gmail.com',
+                    'Permohonan baru',
+                    'Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.'
+                );
+
                 LOG::info('simpan data', [
                     'result' => $res,
                     'data' => $applicant
@@ -346,8 +456,9 @@ class ApplicationController extends Controller
                 'result' => $data,
                 'applicant' => $applicant,
             ]);
-
             $applicant->save();
+
+
 
             return response()->json(['message' => 'Sukses'], 200);
         } catch (\Throwable $th) {
@@ -467,7 +578,22 @@ class ApplicationController extends Controller
         $application->status_description = $request->status_description;
         $application->save();
 
-
+        if ($request->status == 'REVISED' || $request->status == 'DEFFICIENT') {
+            if ($application->hamlet_id != null || $application->hamlet_id != '') {
+                $hamlet = Hamlet::find($application->hamlet_id);
+                // kirim ke desa
+                kirimEmail(
+                    $hamlet->ward->user->email,
+                    'Permohonan ditolak',
+                    'Permohonan ' . $application->category . 'dengan NIK : ' . $application->id_card_number . ' telah ditolak. Alasan penolakan : ' . $application->status_description,
+                );
+            }
+            kirimEmail(
+                $application->email,
+                'Permohonan ditolak',
+                'Permohonan ' . $application->category . ' telah ditolak. Alasan penolakan : ' . $application->status_description,
+            );
+        }
 
         session()->flash('message', 'Sukses mengubah status');
         return redirect()->route('application.index');

@@ -93,7 +93,7 @@ export default function PersyaratanIndex(props: Props) {
         content={error !== '' ? error : menu !== null ? 'Yakin ingin menghapus data?' : f.message}
         title={error !== '' ? 'Error' : menu !== null ? 'Peringatan' : null}
       />
-      <div>
+      <div className='p-6 bg-white shadow-md rounded-md'>
         <p className='header'>Kategori dan Persyaratan</p>
         <div className={'flex justify-between mt-6'}>
           <select id="view"
