@@ -1,0 +1,53 @@
+.application {
+    justify-items: center;
+    padding: 15px;
+
+    .status {
+        display: flex;
+        align-items: center;
+       
+    }
+
+    .content {
+        padding-left: 25px;
+        padding-right: 25px;
+        min-width: 100%;
+    }
+
+    .sub-header {
+        margin-top: 30px;
+        justify-self: left;
+        display: flex;
+        align-items: center;
+
+        span {
+            margin-left: 5px;
+            font-size: 20px;
+        }
+    }
+
+    .row {
+        margin-bottom: 5px;
+    }
+
+    .title {
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+
+        span {
+            margin-left: 5px;
+        }
+    }
+
+    .subtitle {
+        @include max-screen($break-medium) {
+            margin-left: 20px;
+	    }
+    }
+
+    .table {
+        padding-left: 15px;
+        padding-right: 15px; 
+    }
+}
