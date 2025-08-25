@@ -37,8 +37,8 @@ class DistrictController extends Controller
     {
         $district = District::make($request->all());
         $district->save();
-        session()->flash('message', 'Berhasil menambah kecamatan');
-        return redirect()->route('district.index');
+
+        return redirect()->route('district.index')->with('message', 'Berhasil menambah kecamatan');
     }
 
     public function show(District $district, Request $request)
@@ -63,9 +63,9 @@ class DistrictController extends Controller
     {
         $district->name = $request->name;
         $district->save();
-        session()->flash('message', 'Berhasil mengubah kecamatan');
 
-        return redirect()->route('district.index');
+
+        return redirect()->route('district.index')->with('message', 'Berhasil mengubah kecamatan');
     }
 
     public function destroy(District $district)

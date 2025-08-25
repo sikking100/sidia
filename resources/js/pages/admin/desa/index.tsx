@@ -20,7 +20,7 @@ interface Props extends PageProps {
 }
 
 export default function KecamatanIndex({ district, wards, flash }: Props) {
-    const modalFlash = useCustomModal()
+    const { open, isOpen, close } = useCustomModal()
     const modalHapus = useCustomModal()
     const id = React.useRef(-1)
     const isMobile = useIsMobile()
@@ -35,9 +35,9 @@ export default function KecamatanIndex({ district, wards, flash }: Props) {
     React.useEffect(() => {
 
         if (flash?.message !== null && flash?.message !== undefined && flash?.message !== '') {
-            modalFlash.open()
+            open()
         }
-    }, [flash, modalFlash])
+    }, [flash, open])
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -92,11 +92,11 @@ export default function KecamatanIndex({ district, wards, flash }: Props) {
         <Admin>
             {/* Modal Flash */}
             <CustomModal
-                show={modalFlash.isOpen}
-                onHide={modalFlash.close}
+                show={isOpen}
+                onHide={close}
                 title="Pemberitahuan"
                 footer={
-                    <Button className="btn btn-sm btn-outline-primary" onClick={modalFlash.close}><GiCancel className="mr-2" /> Tutup</Button>
+                    <Button className="btn btn-sm btn-outline-primary" onClick={close}><GiCancel className="mr-2" /> Tutup</Button>
                 }
             >
                 {flash?.message}
@@ -140,7 +140,6 @@ export default function KecamatanIndex({ district, wards, flash }: Props) {
                                     <h2>Data Kel-Des</h2>
                                     <a href={route('ward.create', district.id)}><GrAddCircle size={20} className="ml-1 text-success" style={{ alignSelf: 'center' }} /></a>
                                 </div>
-
                             </div>
                             <div className="body pb-0">
                                 <div className="form-row">

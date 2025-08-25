@@ -348,10 +348,7 @@ const MenuAdmin = ({ url }: { url: string }) => {
             </li>
             <li className={url.toLowerCase().includes('/menu') ? 'active' : ''} id="dashboradContainer">
                 <a
-                    href="#!"
-                    onClick={(e) => {
-                        e.preventDefault();
-                    }}
+                    href={route('menu.index')}
                 >
                     <i className="icon-list"></i> <span>Persyaratan</span>
                 </a>

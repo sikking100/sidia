@@ -3,33 +3,35 @@ import PageHeader from "@/components/page-header";
 import { useIsMobile } from "@/hooks/use-mobile";
 import useCustomModal from "@/hooks/use-modal";
 import Admin from "@/layouts/admin";
-import { District, FlashProps, Paginator } from "@/types";
+import { FlashProps, Menu, Paginator } from "@/types";
 import { Link, useForm } from "@inertiajs/react";
 import axios from "axios";
 import { PageProps } from "node_modules/@inertiajs/core/types/types";
 import React from "react";
 import { Button, FormControl } from "react-bootstrap";
 import { GiCancel } from "react-icons/gi";
-import { GrAddCircle, GrNext, GrPrevious } from "react-icons/gr";
+import { GrNext, GrPrevious } from "react-icons/gr";
 import { HiEye, HiPencil, HiRefresh, HiSearch, HiTrash } from "react-icons/hi";
 
 interface Props extends PageProps {
-    districts: Paginator<District>
     flash: FlashProps
+    menus: Paginator<Menu>
+
 }
 
-export default function KecamatanIndex({ districts, flash }: Props) {
-    const { open, isOpen, close } = useCustomModal()
-    const modalHapus = useCustomModal()
-    const id = React.useRef(-1)
+export default function KategoriIndex({ menus, flash }: Props) {
+
+    const { data, setData, get, processing } = useForm(
+        {
+            search: '',
+            per_page: menus.per_page,
+        }
+    )
     const isMobile = useIsMobile()
+    const modalHapus = useCustomModal()
+    const { open, isOpen, close } = useCustomModal()
 
-    const INITIAL = {
-        search: '',
-        per_page: 10
-    }
-
-    const { data, setData, get, processing } = useForm(INITIAL)
+    const id = React.useRef(-1)
 
     React.useEffect(() => {
 
@@ -38,20 +40,22 @@ export default function KecamatanIndex({ districts, flash }: Props) {
         }
     }, [flash, open])
 
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        get(route('district.index'), {
+        get(route('menu.index'), {
             preserveState: true, replace: true,
 
         });
-    };
+    }
+
 
     const Nav = () => (
         <nav>
             <ul className="pagination justify-content-center">
 
                 {
-                    districts.links.map((link, i) => {
+                    menus.links.map((link, i) => {
                         let content;
 
                         if (link.label === 'pagination.previous') {
@@ -89,52 +93,54 @@ export default function KecamatanIndex({ districts, flash }: Props) {
 
     return (
         <Admin>
-            {/* Modal Flash */}
-            <CustomModal
-                show={isOpen}
-                onHide={close}
-                title="Pemberitahuan"
-                footer={
-                    <Button className="btn btn-sm btn-outline-primary" onClick={close}><GiCancel className="mr-2" /> Tutup</Button>
-                }
-            >
-                {flash?.message}
-            </CustomModal>
-
-            {/* Modal Hapus */}
-            <CustomModal
-                show={modalHapus.isOpen}
-                onHide={modalHapus.close}
-                title="Peringatan"
-                size="sm"
-                footer={
-                    <div className="d-flex">
-                        <Button className="btn btn-sm btn-outline-primary mr-2" onClick={modalHapus.close}><GiCancel className="mr-2" /> Batal</Button>
-                        <Button className="btn btn-sm btn-danger" onClick={async () => {
-                            await axios.delete(route('district.destroy', id.current))
-                            get(route('district.index'), {
-                                replace: true,
-                                preserveState: false,
-                            })
-                        }}><HiTrash className="mr-2" /> Hapus</Button>
-                    </div>
-                }
-            >
-                <h5>Anda yakin ingin menghapus data ini?</h5>
-            </CustomModal>
-
             <div className="container-fluid">
+                {/* Modal Flash */}
+                <CustomModal
+                    show={isOpen}
+                    onHide={close}
+                    title="Pemberitahuan"
+                    footer={
+                        <Button className="btn btn-sm btn-outline-primary" onClick={close}><GiCancel className="mr-2" /> Tutup</Button>
+                    }
+                >
+                    {flash?.message}
+                </CustomModal>
+
+                {/* Modal Hapus */}
+                <CustomModal
+                    show={modalHapus.isOpen}
+                    onHide={modalHapus.close}
+                    title="Peringatan"
+                    size="sm"
+                    footer={
+                        <div className="d-flex">
+                            <Button className="btn btn-sm btn-outline-primary mr-2" onClick={modalHapus.close}><GiCancel className="mr-2" /> Batal</Button>
+                            <Button className="btn btn-sm btn-danger" onClick={async () => {
+                                await axios.delete(route('menu.destroy', id.current))
+                                get(route('menu.index'), {
+                                    replace: true,
+                                    preserveState: false,
+                                    onSuccess: () => {
+                                        modalHapus.close()
+                                    }
+                                })
+                            }}><HiTrash className="mr-2" /> Hapus</Button>
+                        </div>
+                    }
+                >
+                    <h5>Anda yakin ingin menghapus data ini?</h5>
+                </CustomModal>
                 <PageHeader
-                    HeaderText="Kecamatan"
-                    Breadcrumb={[{ name: 'Kecamatan' }]}
+                    HeaderText="Kategori"
+                    Breadcrumb={[{ name: 'Kategori' }]}
                 />
                 <div className="row clearfix">
-                    <div className="col-xs-12 col-lg-12 col-md-12">
-                        <div className="card planned_task">
+                    <div className="col-md-12 col-lg-12">
+                        <div className="card planned-task">
                             <div className="header">
                                 <div className="d-flex">
-                                    <h2>Data Kecamatan</h2>
-                                    <a href={route('district.create')}><GrAddCircle size={20} className="ml-1 text-success" style={{ alignSelf: 'center' }} /></a>
+                                    <h2>Data Kategori</h2>
+                                    {/* <a href={route('menu.create')}><GrAddCircle size={20} className="ml-1 text-success" style={{ alignSelf: 'center' }} /></a> */}
                                 </div>
 
                             </div>
@@ -148,9 +154,6 @@ export default function KecamatanIndex({ districts, flash }: Props) {
                                             onChange={(e) => {
                                                 e.preventDefault();
                                                 setData('per_page', Number.parseInt(e.target.value))
-                                                // Inertia.get(route('application.index', { 'per_page': e.target.value }))
-                                                // search(null, Number.parseInt(e.target.value))
-
                                             }}
                                         >
                                             <option value={10} id='10'>10</option>
@@ -165,7 +168,7 @@ export default function KecamatanIndex({ districts, flash }: Props) {
                                     <div className="col">
                                         <FormControl
                                             id="search"
-                                            placeholder="Nama Kecamatan"
+                                            placeholder="Nama Kategori"
                                             value={data.search}
                                             onChange={(e) => { setData('search', e.target.value) }}
                                         />
@@ -188,7 +191,7 @@ export default function KecamatanIndex({ districts, flash }: Props) {
                                                         search: '',
                                                         per_page: 10,
                                                     })
-                                                    get(route('district.index'), {
+                                                    get(route('menu.index'), {
                                                         replace: true,
                                                         preserveState: false,
                                                     });
@@ -203,9 +206,9 @@ export default function KecamatanIndex({ districts, flash }: Props) {
                                 </div>
 
                             </div>
-                            <div className="body table-responsive pt-0">
+                            <div className="body table-responsive">
                                 {
-                                    districts.data.length == 0 ? <p>Tidak ada data</p>
+                                    menus.data.length == 0 ? <p>Tidak ada data</p>
                                         :
                                         <table className='table table-bordered'>
                                             <thead>
@@ -216,29 +219,29 @@ export default function KecamatanIndex({ districts, flash }: Props) {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {districts.data.map((v, i) => {
+                                                {menus.data.map((v, i) => {
                                                     return (
                                                         <tr key={i}>
-                                                            <th>{((districts.current_page - 1) * (districts.per_page)) + i + 1}</th>
+                                                            <th>{((menus.current_page - 1) * (menus.per_page)) + i + 1}</th>
                                                             <td>{v.name}</td>
                                                             <td>
 
                                                                 <div className="d-flex">
                                                                     <Button
                                                                         className="btn btn-sm btn-primary mr-2"
-                                                                        href={route('district.show', v.id)}
+                                                                        href={route('menu.show', v.id)}
                                                                     >
                                                                         <HiEye className="mr-2 h-5 w-5" />
                                                                         Detail
                                                                     </Button>
                                                                     <Button
                                                                         className="btn btn-sm btn-info mr-2"
-                                                                        href={route('district.edit', v.id)}
+                                                                        href={route('menu.edit', v.id)}
                                                                     >
                                                                         <HiPencil className="mr-2 h-5 w-5" />
                                                                         Edit
                                                                     </Button>
-                                                                    <Button
+                                                                    {/* <Button
                                                                         onClick={() => {
                                                                             id.current = v.id
                                                                             modalHapus.open()
@@ -247,7 +250,7 @@ export default function KecamatanIndex({ districts, flash }: Props) {
                                                                     >
                                                                         <HiTrash className="mr-2 h-5 w-5" />
                                                                         Hapus
-                                                                    </Button>
+                                                                    </Button> */}
 
                                                                 </div>
                                                             </td>

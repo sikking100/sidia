@@ -159,6 +159,8 @@ export interface Requirement {
   link?: string
   menu_id: number
   name: string
+  menu?: Menu
+  require: number
 }
 
 export interface Menu {

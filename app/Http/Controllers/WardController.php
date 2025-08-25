@@ -57,8 +57,8 @@ class WardController extends Controller
         $ward = Ward::make($request->all());
         $ward->user_id = $user->id;
         $ward->save();
-        session()->flash('message', 'Berhasil menambah desa / kelurahan');
-        return redirect()->route('district.show', $request->district_id);
+
+        return redirect()->route('district.show', $request->district_id)->with('message', 'Berhasil menambah desa / kelurahan');
     }
 
     public function edit(Ward $ward)
@@ -71,8 +71,7 @@ class WardController extends Controller
     {
         $ward->name = $request->name;
         $ward->save();
-        session()->flash('message', 'Berhasil mengubah desa / kelurahan');
-        return redirect()->route('district.show', $ward->district_id);
+        return redirect()->route('district.show', $ward->district_id)->with('message', 'Berhasil mengubah desa / kelurahan');
     }
 
     public function destroy(Ward $ward)
@@ -83,10 +82,7 @@ class WardController extends Controller
         $user->delete();
         session()->flash('message', 'Berhasil menghapus kelurahan / desa');
         // return redirect()->route('district.index');
-        return response()->json([
-            'message' => 'Berhasil menghapus kelurahan / desa',
-            'status' => 'success'
-        ]);
+        return response()->json(200);
         // session()->flash('message', 'Berhasil menghapus desa / kelurahan');
         // return redirect()->route('district.show', $ward->district_id);
         //     return back()->with('success', 'Kelurahan / Desa berhasil dihapus');

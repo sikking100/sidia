@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Menu;
 use App\Models\Requirement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+use Inertia\Inertia;
 
 class RequirementController extends Controller
 {
@@ -18,9 +21,10 @@ class RequirementController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create($id)
     {
-        //
+        $menu = Menu::find($id);
+        return Inertia::render('admin/persyaratan/create', compact('menu'));
     }
 
     /**
@@ -28,7 +32,9 @@ class RequirementController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $requirement = Requirement::create($request->all());
+        $requirement->save();
+        return redirect()->route('menu.show', $request->menu_id)->with('message', 'Data berhasil disimpan.');
     }
 
     /**
@@ -44,7 +50,11 @@ class RequirementController extends Controller
      */
     public function edit(Requirement $requirement)
     {
-        //
+        $menu = $requirement->menu;
+        return Inertia::render('admin/persyaratan/edit', [
+            'requirement' => $requirement,
+            'menu' => $menu
+        ]);
     }
 
     /**
@@ -52,7 +62,8 @@ class RequirementController extends Controller
      */
     public function update(Request $request, Requirement $requirement)
     {
-        //
+        $requirement->update($request->all());
+        return redirect()->route('menu.show', $request->menu_id)->with('message', 'Data berhasil diubah');
     }
 
     /**
@@ -60,6 +71,8 @@ class RequirementController extends Controller
      */
     public function destroy(Requirement $requirement)
     {
-        //
+        $requirement->delete();
+        session()->flash('message', 'Data berhasil hapus');
+        return redirect()->route('menu.show', $requirement->menu_id);
     }
 }

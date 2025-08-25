@@ -31,14 +31,61 @@ class ApplicationController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
-        $byStatus = DB::table('applications')
+        $categories = DB::table('applications')
+            ->select('category')
+            ->distinct()
+            ->pluck('category')
+            ->toArray();
+        $query = DB::table('applications')
             ->select('status', DB::raw('COUNT(*) as total'))
-            ->when($user->role == 'desa', function ($query) {
-                $user = Auth::user();
-                return $query->where('ward', $user->ddesa->name);
-            })
-            ->groupBy('status')
-            ->get();
+            ->groupBy('status');
+
+        $aliasMap = [];
+
+        foreach ($categories as $category) {
+            $alias = str_replace([' ', '-', '/'], '_', strtolower($category)); // alias aman untuk kolom
+            $aliasMap[$alias] = $category;
+            $query->addSelect(DB::raw("SUM(CASE WHEN category = '$category' THEN 1 ELSE 0 END) as `$alias`"));
+        }
+        $byStatus = $query->get();
+
+        $formatted = $byStatus->map(function ($item) use ($aliasMap) {
+            $categoryData = [];
+
+            foreach ($aliasMap as $alias => $originalName) {
+                $categoryData[] = [
+                    'name' => $originalName,
+                    'total' => (int) ($item->$alias ?? 0),
+                ];
+            }
+
+            return [
+                'status' => $item->status,
+                'total' => (int) $item->total,
+                'category' => $categoryData,
+            ];
+        });
+        // $byStatus = DB::table('applications')
+        //     ->select('status', DB::raw('COUNT(*) as total'))
+        //     ->when($user->role == 'desa', function ($query) {
+        //         $user = Auth::user();
+        //         return $query->where('ward', $user->ddesa->name);
+        //     })
+        //     ->groupBy('category')
+        //     ->get();
+
+        // $byStatus = DB::table('applications')
+        //     ->select(
+        //         'category',
+        //         DB::raw("SUM(CASE WHEN status = 'PENDING' THEN 1 ELSE 0 END) AS pending"),
+        //         DB::raw("SUM(CASE WHEN status = 'VERIFIED' THEN 1 ELSE 0 END) AS verified"),
+        //         DB::raw("SUM(CASE WHEN status = 'DEFFICIENT' THEN 1 ELSE 0 END) AS defficient"),
+        //         DB::raw("SUM(CASE WHEN status = 'CANCEL' THEN 1 ELSE 0 END) AS cancel"),
+        //         DB::raw("SUM(CASE WHEN status = 'REVISED' THEN 1 ELSE 0 END) AS revised"),
+        //         DB::raw("COUNT(*) as total")
+        //     )
+        //     ->groupBy('category')
+        //     ->get();
 
         $byCategory = DB::table('applications')
             ->select('category', DB::raw('COUNT(*) as total'))
@@ -59,7 +106,7 @@ class ApplicationController extends Controller
 
 
         return Inertia::render('dashboard', [
-            'status' => $byStatus,
+            'status' => $formatted,
             'category' => $byCategory,
             'districts' => $districts,
             'role' => $user->role,

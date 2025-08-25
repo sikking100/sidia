@@ -96,6 +96,13 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/open-file', [ApplicationController::class, 'openFile'])->name('file.open');
 
     Route::put('/files/{id}', [FileController::class, 'update'])->name('files.update');
+
+    // requirement
+    Route::get('/requirement/{id}', [RequirementController::class, 'create'])->name('requirement.create');
+    Route::post('/requirement', [RequirementController::class, 'store'])->name('requirement.store');
+    Route::get('/requirement/{requirement}/edit', [RequirementController::class, 'edit'])->name('requirement.edit');
+    Route::put('/requirement/{requirement}', [RequirementController::class, 'update'])->name('requirement.update');
+    Route::delete('/requirement/{requirement}', [RequirementController::class, 'destroy'])->name('requirement.destroy');
 });
 
 require __DIR__ . '/settings.php';

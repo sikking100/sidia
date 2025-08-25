@@ -12,11 +12,17 @@ import { HiRefresh, HiSearch } from 'react-icons/hi';
 import { Bar, BarChart, CartesianGrid, LabelList, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import useCustomModal from '@/hooks/use-modal';
 import CustomModal from '@/components/custom-modal';
+import * as echarts from "echarts"
+import { getStatus } from '@/hooks/functions';
 
 
 interface StatusSummary {
-    status: string;
-    total: number;
+    status: string
+    total: number
+    category: {
+        name: string
+        total: number
+    }[]
 }
 
 interface CategorySummary {
@@ -34,6 +40,9 @@ interface Props extends PageProps {
 
 export default function Dashboard(props: Props) {
     const { user } = usePage().props.auth as { user: User }
+    const pr = usePage()
+    console.log(pr);
+
 
     const isMobile = useIsMobile()
     const [kecamatan, setKecamatan] = React.useState<District | null>()
@@ -44,6 +53,9 @@ export default function Dashboard(props: Props) {
     const [summary, setSummary] = React.useState<CategorySummary[]>(props.category)
     const modalError = useCustomModal()
 
+    const color = ['#fac091', '#a092b0', '#92cddc', '#95b3d7', '#f79647'];
+    const itemColor = ['#f79647', '#604a7b', '#4aacc5', '#4f81bc', '#f79647'];
+
 
     React.useEffect(() => {
         const fetchTahun = async () => {
@@ -51,6 +63,9 @@ export default function Dashboard(props: Props) {
             setYears(response.data);
         }
         fetchTahun()
+        props.status.forEach((_, i) => {
+            chartPlace({ index: i })
+        });
     }, [])
 
 
@@ -80,6 +95,66 @@ export default function Dashboard(props: Props) {
         setSummary(response.data.summary)
     }
 
+    const chartPlace = ({ index }: { index: number }) => {
+        const chartDom = document.getElementById("main" + index);
+        const myChart = echarts.init(chartDom);
+        const option = {
+            tooltip: {
+                trigger: "axis",
+                // formatter: function (value) {
+                //     return value[0].data;
+                // },
+            },
+            grid: {
+                left: 0,
+                bottom: 0,
+                top: 5,
+                right: 0,
+            },
+            xAxis: [
+                {
+                    type: "category",
+                    boundaryGap: false,
+                    axisLine: {
+                        show: false,
+                    },
+                    animation: {
+                        duration: 300,
+                        easing: "cubicOut",
+                    },
+                    data: props.status[index].category.map(e => e.name),
+                },
+            ],
+            yAxis: [
+                {
+                    type: "value",
+                    splitLine: { show: false },
+                    axisLine: {
+                        show: false,
+                    },
+                    axisLabel: {
+                        show: false,
+                    },
+                    data: [0, 2, 4, 6, 8, 10],
+                },
+            ],
+            series: [
+                {
+                    type: "line",
+                    data: props.status[index].category.map(e => e.total),
+                    areaStyle: {
+                        color: itemColor[index],
+                    },
+                    itemStyle: {
+                        color: color[index],
+                    },
+                    symbolSize: 1,
+                },
+            ],
+        }
+        myChart.setOption(option)
+    }
+
     return (
         <Admin>
             <div className='container-fluid'>
@@ -99,17 +174,32 @@ export default function Dashboard(props: Props) {
                     }
                 </CustomModal>
                 <div className="row clearfix">
-                    <div className="col">
-                        <div className="card overflowhidden number-chart pending">
+                    {props.status.map((e, i) => (
+                        <div className="col">
+                            <div className="card number-chart">
+                                <div className="body">
+                                    <div className="number">
+                                        <h6>{getStatus(e.status)}</h6>
+                                        <span>{e.total}</span>
+                                    </div>
+                                </div>
+                                <div
+                                    id={"main" + i}
+                                    className="sparkline"
+                                    style={{ width: "100%", height: 55 }}
+                                ></div>
+                            </div>
+                            {/* <div className="card overflowhidden number-chart pending">
                             <div className="body">
                                 <div className="number">
                                     <h6>Pending</h6>
                                     <span>{props.status.find(e => e.status === 'PENDING')?.total ?? 0}</span>
                                 </div>
                             </div>
+                        </div> */}
                         </div>
-                    </div>
-                    <div className="col">
+                    ))}
+                    {/* <div className="col">
                         <div className="card overflowhidden number-chart revisi">
                             <div className="body">
                                 <div className="number">
@@ -148,7 +238,7 @@ export default function Dashboard(props: Props) {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <div className="row clearfix">
                     <div className="col-lg-12 col-md-12">

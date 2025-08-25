@@ -56,8 +56,8 @@ class UserController extends Controller
         $user->password = bcrypt(generateStrongPassword(6));
         $user->phone = $request->phone;
         $user->save();
-        session()->flash('message', 'Data berhasil disimpan');
-        return redirect()->route('user.index');
+
+        return redirect()->route('user.index')->with('message', 'Data berhasil disimpan');
     }
 
     /**
@@ -85,8 +85,8 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->phone = $request->phone;
         $user->save();
-        session()->flash('message', 'Data berhasil diubah');
-        return redirect()->route('user.index');
+
+        return redirect()->route('user.index')->with('message', 'Data berhasil diubah');
     }
 
     public function updates(Request $request, $id)
@@ -97,11 +97,10 @@ class UserController extends Controller
         $user->phone = $request->phone;
         $user->password = bcrypt($request->password);
         $user->save();
-        session()->flash('message', 'Data berhasil diubah');
         if ($user->role == 'desa') {
-            return redirect()->route('dashboard');
+            return redirect()->route('dashboard')->with('message', 'Data berhasil diubah');
         }
-        return redirect()->route('user.index');
+        return redirect()->route('user.index')->with('message', 'Data berhasil diubah');
     }
 
     /**
