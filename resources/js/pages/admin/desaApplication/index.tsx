@@ -332,6 +332,21 @@ export default function DusunIndex({ hamlets, flash, desaApps, ward }: Props) {
                                                             <td>
 
                                                                 <div className="d-flex">
+                                                                    {
+                                                                        v.status == 'COMPLETED' && (v.filess !== null && v.filess !== undefined && v.filess!.length !== 0 && v.filess!.filter((e) => e.name.includes('Hasil')).length !== 0) ?
+                                                                            // <Link
+                                                                            //   className={'inline-block bg-green-600 px-4 py-2 text-white rounded-md font-semibold'}
+                                                                            //   type={'a'}
+                                                                            //   target="_blank"
+                                                                            //   rel="noopener noreferrer"
+                                                                            //   href={route('file.download', { 'place': a.filess!.filter((e) => e.name.includes('Hasil'))[0].place })}
+                                                                            // >
+                                                                            //   Download Hasil
+
+                                                                            // </Link>
+                                                                            <a className={'btn btn-sm btn-outline-success'} href={`/download-file?place=${v.filess!.filter((a) => a.name.includes('Hasil'))[0].place}`} target="_blank" rel="noopener noreferrer">Download Hasil</a>
+                                                                            : <div></div>
+                                                                    }
                                                                     <Button
                                                                         className="btn btn-sm btn-primary mr-2"
                                                                         href={route('desa.show', v.id)}

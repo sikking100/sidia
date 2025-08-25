@@ -52,18 +52,16 @@ export default function Detail({ application, flash }: Props) {
         return
     }, [])
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
-            const file = e.target.files[0]
-            setFile(file)
-            setContent(file.name)
-        }
-    };
+    // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     if (e.target.files && e.target.files.length > 0) {
+    //         const file = e.target.files[0]
+    //         setFile(file)
+    //         setContent(file.name)
+    //     }
+    // };
 
     return (
-
         <Guest title={`Detail Pemohon ${application.id_card_number}`}>
-
             <CustomModal
                 show={errorModal.isOpen}
                 onHide={errorModal.close}
@@ -92,8 +90,9 @@ export default function Detail({ application, flash }: Props) {
                     </div>
                 }
             >
+
                 {getFileType(selectedFile) === 'pdf' ? (
-                    <iframe
+                    < iframe
                         src={`../../storage/${selectedFile?.place}`}
                         width="100%"
                         height="600px"
@@ -129,11 +128,11 @@ export default function Detail({ application, flash }: Props) {
                             <Image src={`../../storage/images/${application.images}`} roundedCircle style={{ width: '20vh' }} />
                         </div>
                         <div className="status">
-                            {application.status === 'COMPLETED' && <MdVerified className='mr-1' size={'30'} />}
+                            {(application.status === 'COMPLETED' || application.status === 'COMPLETED_FILE') && <MdVerified className='text-success mr-1' size={'30'} />}
                             {application.status === 'DEFFICIENT' || application.status === 'REVISED' && <MdClose className='mr-1' size={'30'} />}
                             {application.status === 'PENDING' && <MdPending className='mr-1' size={'30'} color="orange" />}
                             <div>
-                                <h3 className={`${application.status === 'COMPLETED' ? 'text-danger' : application.status === 'CANCEL' ? 'text-success' : 'text-warning'} mt-2`}>
+                                <h3 className={`${(application.status === 'COMPLETED' || application.status === 'COMPLETED_FILE') ? 'text-success' : application.status === 'CANCEL' ? 'text-success' : 'text-warning'} mt-2`}>
                                     {getStatus(application.status ?? '')}
                                 </h3>
                             </div>
@@ -331,7 +330,7 @@ export default function Detail({ application, flash }: Props) {
                                 </thead>
                                 <tbody>
                                     {
-                                        application.filess && application.filess.map((e, i) => (
+                                        application.filess && application.filess.filter(e => e.name.includes('Hasil') == false).map((e, i) => (
                                             <tr key={i}>
                                                 <td>{i + 1}</td>
                                                 <td>{e.name}</td>
@@ -359,9 +358,45 @@ export default function Detail({ application, flash }: Props) {
                         </div>
                         <div className="sub-header">
                             <BiFile size={25} />
-                            <span>Komentar : </span>
+                            <span>Berkas Hasil : </span>
                         </div>
-
+                        <div className="table">
+                            <Table striped bordered hover size="sm">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nama</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {
+                                        application.filess && application.filess.filter(e => e.name.includes('Hasil') == true).map((e, i) => (
+                                            <tr key={i}>
+                                                <td>{i + 1}</td>
+                                                <td>{e.name}</td>
+                                                <td>
+                                                    {
+                                                        checkFile(e.name, e.id, application.filess) !== undefined ?
+                                                            <Button
+                                                                className='btn btn-sm btn-info'
+                                                                onClick={(ee) => {
+                                                                    ee.preventDefault()
+                                                                    return handleView(checkFile(e.name, e.id, application.filess)!)
+                                                                }}
+                                                            >
+                                                                <HiEye className='mr-2' />
+                                                                Lihat
+                                                            </Button>
+                                                            : <p className='text-red-400'>Tidak diupload</p>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        ))
+                                    }
+                                </tbody>
+                            </Table>
+                        </div>
                     </div>
                 </Card>
             </Container>
@@ -424,7 +459,7 @@ export default function Detail({ application, flash }: Props) {
                                     </div>
                                     <div className="chat-message clearfix">
                                         <div className="input-group mb-0">
-                                            <div className="input-group-prepend">
+                                            {/* <div className="input-group-prepend">
                                                 <span className="input-group-text" style={{ height: "35px" }}>
                                                     <button
                                                         className="text-link"
@@ -440,7 +475,7 @@ export default function Detail({ application, flash }: Props) {
                                                     />
                                                 </span>
 
-                                            </div>
+                                            </div> */}
                                             <input
                                                 value={content}
                                                 className="form-control"

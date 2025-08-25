@@ -72,7 +72,7 @@ export default function PermohonanDetail({ application, flash }: Props) {
                 status: "VERIFIED",
                 status_description: "Berkas sudah diverifikasi"
             })
-            window.location.reload()
+            // window.location.reload()
         } catch (error) {
             setError(`${error}`)
             errorModal.open()
@@ -138,7 +138,6 @@ export default function PermohonanDetail({ application, flash }: Props) {
     const tolakModal = useCustomModal()
     const errorModal = useCustomModal()
     const lihatModal = useCustomModal()
-    const revisiModal = useCustomModal()
 
     React.useEffect(() => {
         if (flash?.message !== undefined && flash?.message !== null && flash?.message !== '') {
@@ -171,39 +170,6 @@ export default function PermohonanDetail({ application, flash }: Props) {
 
     return (
         <Admin>
-
-            {/* Modal revisi */}
-            <CustomModal
-                show={revisiModal.isOpen}
-                onHide={revisiModal.close}
-                title="Revisi Berkas"
-                size="lg"
-            >
-                <form onSubmit={handleSubmit}>
-                    <Form.Group>
-                        <Form.Label>
-                            Sertakan alasan
-                        </Form.Label>
-
-                        <FormControl
-                            onChange={(e) => { setData('status_description', e.target.value) }}
-                            onClick={() => setData('status', '2')}
-                            as={'textarea'}
-                            rows={5}
-                        />
-                    </Form.Group>
-                    <div className="d-flex">
-                        <Button type="reset" onClick={revisiModal.close} className="btn btn-sm btn-outline-primary mr-2">
-                            <GiCancel className="mr-1" />
-                            Batal</Button>
-                        <Button type="submit" className="btn btn-sm btn-danger">
-                            <BiRevision className="mr-1 h-4 w-4" />
-                            Revisi
-                        </Button>
-                    </div>
-                </form>
-            </CustomModal>
-
             {/* modal lihat file */}
             <CustomModal
                 show={lihatModal.isOpen}
@@ -223,7 +189,15 @@ export default function PermohonanDetail({ application, flash }: Props) {
                         </Button>
                         {
                             (selectedFile?.status == 0 || selectedFile?.status == 2) &&
-                            <Button className={"btn btn-sm btn-outline-warning mr-2"} onClick={revisiModal.open}>
+                            <Button className={"btn btn-sm btn-outline-warning mr-2"} onClick={async e => {
+                                e.preventDefault()
+                                await axios.put(route('files.update', application.id), {
+                                    'status': '2',
+                                    'status_description': 'Berkas ditolak'
+
+                                })
+                                window.location.reload()
+                            }}>
                                 <BiRevision className='mr-1 h-4 w-4' />
                                 Revisi
                             </Button>
@@ -327,11 +301,11 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                         <Image src={`../../storage/images/${application.images}`} roundedCircle style={{ width: '20vh' }} />
                                     </div>
                                     <div className="status">
-                                        {application.status === 'COMPLETED' && <MdVerified className='text-success mr-1' size={'30'} />}
+                                        {(application.status === 'COMPLETED' || application.status === 'COMPLETED_FILE') && <MdVerified className='text-success mr-1' size={'30'} />}
                                         {application.status === 'DEFFICIENT' || application.status === 'REVISED' && <MdClose className='mr-1' size={'30'} />}
                                         {application.status === 'PENDING' && <MdPending className='mr-1' size={'30'} color="orange" />}
                                         <div>
-                                            <h3 className={`${application.status === 'COMPLETED' ? 'text-success' : application.status === 'CANCEL' ? 'text-success' : 'text-warning'} mt-2`}>
+                                            <h3 className={`${(application.status === 'COMPLETED' || application.status === 'COMPLETED_FILE') ? 'text-success' : application.status === 'CANCEL' ? 'text-success' : 'text-warning'} mt-2`}>
                                                 {getStatus(application.status ?? '')}
                                             </h3>
                                         </div>
@@ -358,8 +332,7 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                                     onClick={async () => {
                                                         try {
                                                             await axios.put(route('status', application.id), {
-                                                                status: 'COMPLETED',
-                                                                status_description: 'SELESAI'
+                                                                status: 'COMPLETED'
                                                             })
                                                             window.location.reload()
                                                         } catch (error) {
@@ -378,7 +351,15 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                             <div className="col-xs-2">
                                                 <Button
                                                     className="btn btn-sm btn-secondary"
-                                                    onClick={revisiModal.open}
+                                                    onClick={async e => {
+                                                        e.preventDefault()
+                                                        await axios.put(route('status', application.id), {
+                                                            'status': 'DEFFICIENT',
+                                                            'status_description': 'Revisi Berkas'
+
+                                                        })
+                                                        window.location.reload()
+                                                    }}
                                                 >
                                                     <BiRevision className="mr-2 h-4 w-4" />
                                                     {application.status === 'REVISED' ? 'Revisi Ulang' : 'Revisi Berkas'}
@@ -687,7 +668,14 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                                         <div className="col-xs-2">
                                                             <Button
                                                                 className="btn btn-sm btn-secondary"
-                                                                onClick={revisiModal.open}
+                                                                onClick={async e => {
+                                                                    e.preventDefault()
+                                                                    await axios.put(route('status', application.id), {
+                                                                        'status': 'DEFFICIENT',
+                                                                        'status_description': 'Revisi Berkas'
+                                                                    })
+                                                                    // window.location.reload()
+                                                                }}
                                                             >
                                                                 <BiRevision className="mr-2 h-4 w-4" />
                                                                 {application.status === 'REVISED' ? 'Revisi Ulang' : 'Revisi Berkas'}
@@ -795,7 +783,6 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                                         }
                                                         if (application.ward !== null && application.ward !== undefined && application.ward !== '') {
                                                             formData.append('ward', application.ward)
-                                                            formData.append('id', String(application.id))
                                                         }
                                                         formData.append('content', content)
                                                         formData.append('user_id', String(user.id))

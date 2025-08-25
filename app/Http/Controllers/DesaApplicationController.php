@@ -176,14 +176,14 @@ class DesaApplicationController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $desaApplication = Application::find($request->id);
-        $files = $desaApplication->filess;
-        $menu = Menu::firstWhere('name', $desaApplication->category);
+        $application = Application::find($request->id);
+        $files = $application->filess;
+        $menu = Menu::firstWhere('name', $application->category);
         $requirements = $menu->requirements;
 
         if ($request->hasFile('images')) {
-            $this->upload->deleteImages('images', $desaApplication);
-            $this->upload->uploadImages($request, 'images', $desaApplication);
+            $this->upload->deleteImages('images', $application);
+            $this->upload->uploadImages($request, 'images', $application);
         }
 
         if ($request->filessss != null) {
@@ -208,15 +208,16 @@ class DesaApplicationController extends Controller
                 $desaFile->comment = 'sudah direvisi';
                 LOG::info('desafile name = ' . $desaFile->name);
                 LOG::info('desafile place = ' . $desaFile->place);
-                $desaApplication->filess()->save($desaFile);
+                $application->filess()->save($desaFile);
             }
         }
-        $desaApplication->status = 'REVISED';
-        $desaApplication->save();
+        $application->status = 'REVISED';
+        $application->status_description = 'Permohonan sudah direvisi';
+        $application->save();
 
-        $hamlet = Hamlet::find($desaApplication->hamlet_id);
+        $hamlet = Hamlet::find($application->hamlet_id);
 
-        return Inertia::render('admin/desaApplication/show', compact('desaApplication', 'files', 'requirements', 'menu', 'hamlet'));
+        return Inertia::render('admin/desaApplication/show', compact('application', 'files', 'requirements', 'menu', 'hamlet'));
     }
 
     /**

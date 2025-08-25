@@ -446,13 +446,14 @@ class ApplicationController extends Controller
 
         if ($request->status == 'REVISED' || $request->status == 'DEFFICIENT') {
             if ($application->hamlet != null || $application->hamlet != '') {
-                $hamlet = Hamlet::find($application->hamlet);
+                $hamlet = Hamlet::where('name', $application->hamlet)->first();
+                return response()->json($hamlet);
                 // kirim ke desa
-                kirimEmail(
-                    $hamlet->ward->user->email,
-                    'Permohonan ditolak',
-                    'Permohonan ' . $application->category . 'dengan NIK : ' . $application->id_card_number . ' telah ditolak. Alasan penolakan : ' . $application->status_description,
-                );
+                // kirimEmail(
+                //     $hamlet->ward->user->email,
+                //     'Permohonan ditolak',
+                //     'Permohonan ' . $application->category . 'dengan NIK : ' . $application->id_card_number . ' telah ditolak. Alasan penolakan : ' . $application->status_description,
+                // );
                 // Mail::to($hamlet->ward->user->email)->queue(
                 //     new SimpleMail('Permohonan ' . $application->category  . 'dengan NIK : ' . $application->id_card_number . ' telah ditolak. Alasan penolakan : ' . $application->status_description, 'Permohonan ditolak', false)
                 // );

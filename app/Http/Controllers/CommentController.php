@@ -23,18 +23,25 @@ class CommentController extends Controller
         if ($request->has('file')) {
             // cek apakah desa atau bukan
             if ($request->has('ward')) {
-                $applicant = Application::find($request->id);
+                $applicant = Application::find($request->application_id);
                 $nameExt = time() . '.' . $request->file->extension();
                 $request->file->storeAs($request->category, $nameExt, 'public');
                 $files = new File;
-                $files->name = 'Hasil-' . $request->id;
-                $files->place = $nameExt;
+                $files->name = 'Hasil-' . $request->application_id;
+                $files->place = $request->category . '/' . $nameExt;
+                $applicant->status = 'COMPLETED_FILE';
+                $applicant->status_description = 'Berkas sudah diupload';
+                $applicant->save();
                 $applicant->filess()->save($files);
                 $comment->content = 'Berkas berhasil diupload';
             } else {
                 $file = $request->file;
                 Mail::to($request->guest_email)->send(new SendAttachmentMail($file, $request->category));
                 $comment->content = 'Berkas terkirim ke email ' . $request->guest_mail;
+                $applicant = Application::find($request->application_id);
+                $applicant->status = 'COMPLETED';
+                $applicant->status = 'Berkas sudah terkirim ke email';
+                $applicant->save();
             }
         }
         if ($request->has('user_id')) {
