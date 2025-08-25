@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Dropdown, Nav } from "react-bootstrap";
 import { Link, usePage } from "@inertiajs/react";
 import { User } from "@/types";
+import LOGO from "../../../assets/images/logoduk.png"
 
 
 export default function AdminNav() {
@@ -37,10 +38,10 @@ export default function AdminNav() {
                     </div>
 
                     <div className="navbar-brand">
-                        <a href="dashboard">
+                        <a href={route('dashboard')}>
                             <img
-                                src="../assets/logo.png"
-                                alt="Lucid Logo"
+                                src={LOGO}
+                                alt="LOGO"
                                 className="img-responsive logo mr-2"
                                 style={{ height: 35, width: 25 }}
                             />
@@ -51,9 +52,9 @@ export default function AdminNav() {
                     <div id="navbar-menu">
                         <ul className="nav navbar-nav">
                             <li>
-                                <a href="#" className="icon-menu">
+                                <Link href={route('logout')} method="post" className="icon-menu text-link">
                                     <i className="icon-power"></i>
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </div>
@@ -82,7 +83,7 @@ export default function AdminNav() {
                             <Dropdown.Menu
                                 as="ul"
                                 className="dropdown-menu-right account">
-                                <li><Link href={route('guest.create', 'KTP-Pemula')}><i className="icon-power"></i>Logout</Link></li>
+                                <li><Link className="text-link" href={route('logout')} method="post"><i className="icon-power"></i> Logout</Link></li>
                             </Dropdown.Menu>
                         </Dropdown>
                         <hr />
@@ -288,32 +289,23 @@ const MenuDesa = ({ url }: { url: string }) => {
         <>
             <li className={url.toLowerCase().includes('/buat') ? 'active' : ''} id="dashboradContainer">
                 <a
-                    href="#!"
-                    onClick={(e) => {
-                        e.preventDefault();
-                    }}
+                    href={route('buat')}
                 >
-                    <i className="icon-home"></i> <span>Buat Permohonan</span>
+                    <i className="icon-user-follow"></i> <span>Buat Permohonan</span>
                 </a>
             </li>
             <li className={url.toLowerCase().includes('/desa') ? 'active' : ''} id="dashboradContainer">
                 <a
-                    href="#!"
-                    onClick={(e) => {
-                        e.preventDefault();
-                    }}
+                    href={route('desa.index')}
                 >
-                    <i className="icon-home"></i> <span>Daftar Permohonan</span>
+                    <i className="icon-notebook"></i> <span>Daftar Permohonan</span>
                 </a>
             </li>
             <li className={url.toLowerCase().includes('/hamlet') ? 'active' : ''} id="dashboradContainer">
                 <a
-                    href="#!"
-                    onClick={(e) => {
-                        e.preventDefault();
-                    }}
+                    href={route('hamlet.index')}
                 >
-                    <i className="icon-home"></i> <span>Dusun</span>
+                    <i className="icon-map"></i> <span>Dusun</span>
                 </a>
             </li>
         </>

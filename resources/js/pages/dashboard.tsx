@@ -40,10 +40,6 @@ interface Props extends PageProps {
 
 export default function Dashboard(props: Props) {
     const { user } = usePage().props.auth as { user: User }
-    const pr = usePage()
-    console.log(pr);
-
-
     const isMobile = useIsMobile()
     const [kecamatan, setKecamatan] = React.useState<District | null>()
     const [desa, setDesa] = React.useState<Ward | null>()
@@ -59,7 +55,10 @@ export default function Dashboard(props: Props) {
 
     React.useEffect(() => {
         const fetchTahun = async () => {
-            const response = await axios.get('/years')
+            const url = user.role === 'desa' ? '/desa-years' : '/years'
+            const response = await axios.get(url)
+            console.log(response.data);
+
             setYears(response.data);
         }
         fetchTahun()
@@ -87,10 +86,10 @@ export default function Dashboard(props: Props) {
         const response = await axios.get(route('dashboard.statistic', {
             kecamatan: kecamatan?.name,
             desa: desa?.name,
-            dusun: dusun?.id,
+            hamlet_id: dusun?.id,
             tahun: tahun
         }))
-        console.log(response);
+        console.log(response.data)
 
         setSummary(response.data.summary)
     }
@@ -175,7 +174,7 @@ export default function Dashboard(props: Props) {
                 </CustomModal>
                 <div className="row clearfix">
                     {props.status.map((e, i) => (
-                        <div className="col">
+                        <div className="col" key={i}>
                             <div className="card number-chart">
                                 <div className="body">
                                     <div className="number">
@@ -281,13 +280,17 @@ export default function Dashboard(props: Props) {
                                             }
                                         </select>
                                     </div>}
-                                    {user.role !== 'desa' && <div className="col mb-3">
+                                    <div className="col mb-3">
 
                                         <select className="custom-select" id="inputGroupSelect01"
                                             value={dusun?.id}
                                             onChange={(e) => {
                                                 e.preventDefault();
-                                                setDusun(desa?.hamlets.findLast(ee => ee.id == Number.parseInt(e.target.value)));
+                                                if (user.role === 'desa') {
+                                                    setDusun(props.hamlets.findLast(ee => ee.id == Number.parseInt(e.target.value)));
+                                                } else {
+                                                    setDusun(desa?.hamlets.findLast(ee => ee.id == Number.parseInt(e.target.value)));
+                                                }
 
                                             }}
                                         >
@@ -300,10 +303,12 @@ export default function Dashboard(props: Props) {
                                                 ))
                                             }
                                         </select>
-                                    </div>}
+                                    </div>
                                     <div className="col mb-3">
 
-                                        <select className="custom-select" id="inputGroupSelect01">
+                                        <select className="custom-select" id="inputGroupSelect01"
+                                            onChange={e => setTahun(Number.parseInt(e.target.value))}
+                                        >
                                             <option value={-1}>Tahun</option>
                                             {years?.map((e) => (
                                                 <option key={e} value={e}>{e}</option>

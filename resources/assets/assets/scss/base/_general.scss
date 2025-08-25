@@ -5,6 +5,13 @@ body {
 	font-size: $font-size;
 	color: $font-color;
 
+    .text-link {
+        background: transparent;
+        padding: 0;
+        border: none;
+        cursor: pointer;
+    }
+
     &:before,
     &:after{
         height: 5px;

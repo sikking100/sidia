@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use mervick\aesEverywhere\AES256;
 
+use function App\Support\kirimEmail;
+
 class ApplicationController extends Controller
 {
     private $up;
@@ -32,11 +34,24 @@ class ApplicationController extends Controller
     {
         $user = Auth::user();
         $categories = DB::table('applications')
+            ->when($user->role == 'desa', function ($query) {
+                $user = Auth::user();
+                $query->where('ward', $user->ddesa->name);
+                $query->whereNotNull('hamlet');
+                return $query->where('hamlet', '');
+            })
             ->select('category')
             ->distinct()
             ->pluck('category')
             ->toArray();
+
         $query = DB::table('applications')
+            ->when($user->role == 'desa', function ($query) {
+                $user = Auth::user();
+                $query->where('ward', $user->ddesa->name);
+                $query->whereNotNull('hamlet');
+                return $query->where('hamlet', '');
+            })
             ->select('status', DB::raw('COUNT(*) as total'))
             ->groupBy('status');
 
@@ -91,7 +106,9 @@ class ApplicationController extends Controller
             ->select('category', DB::raw('COUNT(*) as total'))
             ->when($user->role == 'desa', function ($query) {
                 $user = Auth::user();
-                return $query->where('ward', $user->ddesa->name);
+                $query->where('ward', $user->ddesa->name);
+                $query->whereNotNull('hamlet');
+                return $query->where('hamlet', '');
             })
             ->groupBy('category')
             ->get();
@@ -146,7 +163,7 @@ class ApplicationController extends Controller
                 'kecamatan' => $request->kecamatan,
                 'desa' => $request->desa,
                 'tahun' => $request->tahun,
-                'hamlet_id' => $request->hamlet_id,
+                'hamlet' => $request->hamlet,
                 'status' => $request->status,
             ],
         ]);
@@ -154,6 +171,7 @@ class ApplicationController extends Controller
 
     public function get_years()
     {
+
         $years = Application::selectRaw('DISTINCT YEAR(created_at) as year')->groupBy('year')->orderBy('year')->pluck('year');
         return response()->json($years);
     }
@@ -253,24 +271,24 @@ class ApplicationController extends Controller
                 $res = $applicant->save();
 
                 // email ke pemohon
-                // kirimEmail(
-                //     $applicant->email,
-                //     'Permohonan telah diregister',
-                //     'Permohonan ' . $applicant->category . ' telah diregister. Mohon cek email dan website secara berkala untuk mengetahui status permohonan.'
-                // );
-                Mail::to($applicant->email)->queue(
-                    new SimpleMail('Permohonan ' . $applicant->category  . ' telah diregister. Mohon cek email dan website secara berkala untuk mengetahui status permohonan.', 'Permohonan telah diregister', false)
+                kirimEmail(
+                    $applicant->email,
+                    'Permohonan telah diregister',
+                    'Permohonan ' . $applicant->category . ' telah diregister. Mohon cek email dan website secara berkala untuk mengetahui status permohonan.'
                 );
+                // Mail::to($applicant->email)->queue(
+                //     new SimpleMail('Permohonan ' . $applicant->category  . ' telah diregister. Mohon cek email dan website secara berkala untuk mengetahui status permohonan.', 'Permohonan telah diregister', false)
+                // );
 
                 // email ke dukcapil
-                // kirimEmail(
-                //     'disdukcapilkabmorut@gmail.com',
-                //     'Permohonan baru',
-                //     'Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.'
-                // );
-                Mail::to(config('custom.email_dukcapil'))->queue(
-                    new SimpleMail('Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.', 'Permohonan baru', false)
+                kirimEmail(
+                    config('custom.email_dukcapil'),
+                    'Permohonan baru',
+                    'Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.'
                 );
+                // Mail::to(config('custom.email_dukcapil'))->queue(
+                //     new SimpleMail('Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.', 'Permohonan baru', false)
+                // );
 
                 LOG::info('simpan data', [
                     'result' => $res,
@@ -427,23 +445,23 @@ class ApplicationController extends Controller
         $application->save();
 
         if ($request->status == 'REVISED' || $request->status == 'DEFFICIENT') {
-            if ($application->hamlet_id != null || $application->hamlet_id != '') {
-                $hamlet = Hamlet::find($application->hamlet_id);
+            if ($application->hamlet != null || $application->hamlet != '') {
+                $hamlet = Hamlet::find($application->hamlet);
                 // kirim ke desa
-                // kirimEmail(
-                //     $hamlet->ward->user->email,
-                //     'Permohonan ditolak',
-                //     'Permohonan ' . $application->category . 'dengan NIK : ' . $application->id_card_number . ' telah ditolak. Alasan penolakan : ' . $application->status_description,
-                // );
-                Mail::to($hamlet->ward->user->email)->queue(
-                    new SimpleMail('Permohonan ' . $application->category  . 'dengan NIK : ' . $application->id_card_number . ' telah ditolak. Alasan penolakan : ' . $application->status_description, 'Permohonan ditolak', false)
+                kirimEmail(
+                    $hamlet->ward->user->email,
+                    'Permohonan ditolak',
+                    'Permohonan ' . $application->category . 'dengan NIK : ' . $application->id_card_number . ' telah ditolak. Alasan penolakan : ' . $application->status_description,
                 );
+                // Mail::to($hamlet->ward->user->email)->queue(
+                //     new SimpleMail('Permohonan ' . $application->category  . 'dengan NIK : ' . $application->id_card_number . ' telah ditolak. Alasan penolakan : ' . $application->status_description, 'Permohonan ditolak', false)
+                // );
             }
-            // kirimEmail(
-            //     $application->email,
-            //     'Permohonan ditolak',
-            //     'Permohonan ' . $application->category . ' telah ditolak. Alasan penolakan : ' . $application->status_description,
-            // );
+            kirimEmail(
+                $application->email,
+                'Permohonan ditolak',
+                'Permohonan ' . $application->category . ' telah ditolak. Alasan penolakan : ' . $application->status_description,
+            );
             Mail::to($application->email)->queue(
                 new SimpleMail('Permohonan ' . $application->category . ' telah ditolak. Alasan penolakan : ' . $application->status_description, 'Permohonan ditolak', false)
             );

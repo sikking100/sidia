@@ -339,7 +339,7 @@ export default function GuestCreate({ category, menu, application, districts }: 
                                 </Col>
 
                             </Row>
-                            <Row>
+                            {category == 'PENGADUAN' && <Row>
                                 <Col className="mb-3">
                                     <InputGroup>
                                         <InputGroup.Prepend className="sm">
@@ -355,7 +355,7 @@ export default function GuestCreate({ category, menu, application, districts }: 
                                         </Form.Control>
                                     </InputGroup>
                                 </Col>
-                            </Row>
+                            </Row>}
                             <Row>
                                 <Col sm={8} className="mb-3">
                                     <Form.Control required as="textarea" rows={12} placeholder="Jelaskan alasan permohonan" isInvalid={errors.description != null}

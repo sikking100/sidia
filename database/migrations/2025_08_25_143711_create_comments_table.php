@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('files', function (Blueprint $table) {
+        Schema::create('comments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('application_id')->constrained()->onDelete('cascade');
-            $table->text('name');
-            $table->text('place')->nullable();
-            $table->enum('status', [0, 1, 2])->default(0)->comment('0 = pending, 1 = approved, 2 = rejected');
-            $table->text('comment')->nullable();
+            $table->foreignId('user_id')->constrained()->nullable();
+            $table->string('guest_name', 255)->nullable();
+            $table->string('guest_email', 255)->nullable();
+            $table->text('content');
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('files');
+        Schema::dropIfExists('comments');
     }
 };

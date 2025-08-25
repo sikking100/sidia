@@ -101,7 +101,6 @@ class GuestController extends Controller
                 $files->place = $request->category . '/' . $nameExt;
                 $files->status = '0';
                 $files->comment = '-';
-                $files->requirement_id = 1;
                 $applicant->filess()->save($files);
             }
         }

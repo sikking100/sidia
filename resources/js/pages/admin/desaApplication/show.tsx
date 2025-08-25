@@ -1,27 +1,24 @@
+import CustomModal from "@/components/custom-modal";
 import PageHeader from "@/components/page-header";
-import { checkFile, defImage, getFileType, getStatus, } from "@/hooks/functions";
+import { checkFile, defImage, getFileType, getStatus } from "@/hooks/functions";
+import useCustomModal from "@/hooks/use-modal";
 import Admin from "@/layouts/admin";
-import { Applicant, CustomComment, Filess, FlashProps, Hamlet, User } from "@/types";
+import { Applicant, CustomComment, Filess, FlashProps, User } from "@/types";
+import { Link, usePage } from "@inertiajs/react";
+import axios from "axios";
 import { PageProps } from "node_modules/@inertiajs/core/types/types";
 import React from "react";
-import { Button, Col, Form, FormControl, Image, Row, Table } from "react-bootstrap";
-import { BiFace, BiFile, BiHome, BiIdCard, BiMap, BiMapAlt, BiPhone, BiPrinter, BiRevision, BiSolidDownload, BiText, BiTime, BiUserCircle } from "react-icons/bi";
-import { GiCancel, GiTick } from "react-icons/gi";
-import { GoVerified } from "react-icons/go";
+import { Button, Col, Image, Row, Table } from "react-bootstrap";
+import { BiFace, BiFile, BiHome, BiIdCard, BiMap, BiMapAlt, BiPhone, BiRevision, BiSolidDownload, BiText, BiTime, BiUserCircle } from "react-icons/bi";
+import { GiCancel } from "react-icons/gi";
 import { HiEye } from "react-icons/hi";
 import { MdClose, MdOutlineEmail, MdPending, MdVerified } from "react-icons/md";
 import TimeAgo from "react-timeago";
 import { makeIntlFormatter } from "react-timeago/defaultFormatter";
-import { Link, useForm, usePage } from "@inertiajs/react";
-import useCustomModal from "@/hooks/use-modal";
-import CustomModal from "@/components/custom-modal";
-import axios from "axios";
 
 interface Props extends PageProps {
     flash: FlashProps
     application: Applicant
-    hamlet?: Hamlet
-
 }
 
 
@@ -31,91 +28,15 @@ interface FileTicket {
     FileName: string
 }
 
-interface FormUpdateStatus {
-    status: string
-    status_description: string
-}
 
-export default function PermohonanDetail({ application, flash }: Props) {
+export default function DesaApplicationShow({ application, flash }: Props) {
     const [selectedFile, setSelectedFile] = React.useState<Filess | null>(null);
     const [file, setFile] = React.useState<File | null>(null);
-
-    const [error, setError] = React.useState<string>('');
     const [comments, setComment] = React.useState<CustomComment[]>([])
     const [content, setContent] = React.useState('')
     const { user } = usePage().props.auth as { user: User }
 
 
-    const { setData, put } = useForm<FormUpdateStatus>({
-        status: '',
-        status_description: ''
-    })
-
-    function onClick() {
-        window.open(route('application.edit', application.id))
-    }
-
-    function onTolak() {
-        setData('status', 'CANCEL')
-        tolakModal.open()
-    }
-
-    const onVerified = async () => {
-        const check = application.filess.filter(e => e.status != 1)
-        if (check.length > 0) {
-            setError('Berkas belum diverifikasi, silahkan verifikasi semua berkas terlebih dahulu')
-            errorModal.open()
-            return
-        }
-        try {
-            await axios.put(route('status', application.id), {
-                status: "VERIFIED",
-                status_description: "Berkas sudah diverifikasi"
-            })
-            window.location.reload()
-        } catch (error) {
-            setError(`${error}`)
-            errorModal.open()
-        }
-        return
-    }
-
-    const onVerifiedBerkas = async () => {
-        try {
-            await axios.put(route('files.update', selectedFile?.id), {
-                status: '1',
-                status_description: 'Berkas terverifikasi'
-            })
-            window.location.reload()
-        } catch (error) {
-            setError(`${error}`)
-            errorModal.open()
-        }
-        return
-    }
-
-
-
-
-    function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
-        if (selectedFile !== null && selectedFile !== undefined) {
-            put(route('files.update', selectedFile?.id), {
-                onError: (e) => {
-                    errorModal.open()
-                    setError(e.message)
-                }
-            })
-        } else {
-            put(route('status', application.id), {
-                onError: (e) => {
-                    errorModal.open()
-                    setError(e.message)
-                }
-            })
-        }
-        return
-    }
 
     function handleClick(name: string) {
         window.open(route('photo', name))
@@ -135,19 +56,15 @@ export default function PermohonanDetail({ application, flash }: Props) {
 
 
 
-    const tolakModal = useCustomModal()
-    const errorModal = useCustomModal()
+    const { open, isOpen, close } = useCustomModal()
     const lihatModal = useCustomModal()
-    const revisiModal = useCustomModal()
 
     React.useEffect(() => {
         if (flash?.message !== undefined && flash?.message !== null && flash?.message !== '') {
-            errorModal.open()
+            open()
         }
 
-    }, [flash?.message, errorModal])
-
-
+    }, [flash?.message, open])
 
     React.useEffect(() => {
         const fetchComment = async () => {
@@ -165,45 +82,8 @@ export default function PermohonanDetail({ application, flash }: Props) {
             setContent(file.name)
         }
     };
-
-
-
-
     return (
         <Admin>
-
-            {/* Modal revisi */}
-            <CustomModal
-                show={revisiModal.isOpen}
-                onHide={revisiModal.close}
-                title="Revisi Berkas"
-                size="lg"
-            >
-                <form onSubmit={handleSubmit}>
-                    <Form.Group>
-                        <Form.Label>
-                            Sertakan alasan
-                        </Form.Label>
-
-                        <FormControl
-                            onChange={(e) => { setData('status_description', e.target.value) }}
-                            onClick={() => setData('status', '2')}
-                            as={'textarea'}
-                            rows={5}
-                        />
-                    </Form.Group>
-                    <div className="d-flex">
-                        <Button type="reset" onClick={revisiModal.close} className="btn btn-sm btn-outline-primary mr-2">
-                            <GiCancel className="mr-1" />
-                            Batal</Button>
-                        <Button type="submit" className="btn btn-sm btn-danger">
-                            <BiRevision className="mr-1 h-4 w-4" />
-                            Revisi
-                        </Button>
-                    </div>
-                </form>
-            </CustomModal>
-
             {/* modal lihat file */}
             <CustomModal
                 show={lihatModal.isOpen}
@@ -221,20 +101,6 @@ export default function PermohonanDetail({ application, flash }: Props) {
                             <BiSolidDownload className='mr-1 h-4 w-4' />
                             Download
                         </Button>
-                        {
-                            (selectedFile?.status == 0 || selectedFile?.status == 2) &&
-                            <Button className={"btn btn-sm btn-outline-warning mr-2"} onClick={revisiModal.open}>
-                                <BiRevision className='mr-1 h-4 w-4' />
-                                Revisi
-                            </Button>
-                        }
-                        {
-                            selectedFile?.status == 0 &&
-                            <Button className={"btn btn-sm btn-outline-success"} onClick={onVerifiedBerkas}>
-                                <GoVerified className='mr-1 h-4 w-4' />
-                                Verifikasi
-                            </Button>
-                        }
                     </div>
                 }
             >
@@ -260,54 +126,18 @@ export default function PermohonanDetail({ application, flash }: Props) {
 
             {/* kalau ada error */}
             <CustomModal
-                show={errorModal.isOpen}
-                onHide={errorModal.close}
+                show={isOpen}
+                onHide={close}
                 title="Kesalahan"
                 size="sm"
                 footer={
-                    <Button type="reset" onClick={errorModal.close} className="btn btn-sm btn-outline-primary mr-2">
+                    <Button type="reset" onClick={close} className="btn btn-sm btn-outline-primary mr-2">
                         <GiCancel className="mr-1" />
                         Tutup
                     </Button>
                 }
             >
-                {flash?.message ?? error}
-            </CustomModal>
-
-
-            {/* modal tolak */}
-            <CustomModal
-                show={tolakModal.isOpen}
-                onHide={tolakModal.close}
-                title="Peringatan"
-                size="lg"
-            >
-                <div>
-                    <h6>
-                        Anda Yakin ingin menolak?
-                    </h6>
-                    <form onSubmit={handleSubmit}>
-                        <Form.Group>
-                            <Form.Label>
-                                Sertakan alasan
-                            </Form.Label>
-
-                            <FormControl
-                                onChange={e => setData('status_description', e.target.value)}
-                                as={'textarea'}
-                                rows={5}
-                            />
-                        </Form.Group>
-                        <div className="d-flex">
-                            <Button type="reset" onClick={tolakModal.close} className="btn btn-sm btn-outline-primary mr-2">
-                                <GiCancel className="mr-1" />
-                                Batal</Button>
-                            <Button type="submit" className="btn btn-sm btn-danger">
-                                <BiRevision className="mr-1 h-4 w-4" />
-                                Tolak</Button>
-                        </div>
-                    </form>
-                </div>
+                {flash?.message}
             </CustomModal>
 
 
@@ -341,70 +171,14 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                     </div>
 
                                     <div className='form-row mt-3'>
-                                        {(application.status == 'VERIFIED' || application.status == 'COMPLETED') &&
-                                            <div className="col-xs-2">
-                                                <Button
-                                                    onClick={onClick}
-                                                    className="btn btn-sm btn-outline-primary"
-                                                >
-                                                    <BiPrinter className="mr-2 h-4 w-4" />
-                                                    Print PDF
-                                                </Button>
-                                            </div>
-                                        }
-                                        {(application.status == 'VERIFIED') &&
-                                            <div className="col">
-                                                <Button
-                                                    onClick={async () => {
-                                                        try {
-                                                            await axios.put(route('status', application.id), {
-                                                                status: 'COMPLETED',
-                                                                status_description: 'SELESAI'
-                                                            })
-                                                            window.location.reload()
-                                                        } catch (error) {
-                                                            setError(`${error}`)
-                                                            errorModal.open()
-                                                        }
-                                                    }}
-                                                    className="btn btn-sm btn-success"
-                                                >
-                                                    <GiTick className="mr-2 h-4 w-4" />
-                                                    Selesai
-                                                </Button>
-                                            </div>
-                                        }
-                                        {(application.status == 'PENDING' || application.status == 'REVISED') &&
+                                        {application.status === 'DEFFICIENT' &&
                                             <div className="col-xs-2">
                                                 <Button
                                                     className="btn btn-sm btn-secondary"
-                                                    onClick={revisiModal.open}
+                                                    href={route('desa.edit', application.id)}
                                                 >
                                                     <BiRevision className="mr-2 h-4 w-4" />
-                                                    {application.status === 'REVISED' ? 'Revisi Ulang' : 'Revisi Berkas'}
-                                                </Button>
-                                            </div>
-                                        }
-                                        {(application.status == 'PENDING' || application.status == 'REVISED') &&
-                                            <div className="col">
-                                                <Button
-                                                    onClick={onVerified}
-                                                    className="btn btn-sm btn-primary"
-                                                >
-                                                    <GoVerified className="mr-2 h-4 w-4" />
-                                                    Verifikasi
-                                                </Button>
-                                            </div>
-                                        }
-                                        {(application.status == 'PENDING') &&
-                                            <div className="col">
-                                                <Button
-                                                    color={'red'}
-                                                    onClick={() => onTolak()}
-                                                    className="btn btn-sm btn-danger"
-                                                >
-                                                    <BiRevision className="mr-2 h-4 w-4" />
-                                                    Tolak
+                                                    Revisi Berkas
                                                 </Button>
                                             </div>
                                         }
@@ -638,7 +412,6 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -661,62 +434,7 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                             </div>
                                             <div className="col-lg-6 hidden-sm text-right">
                                                 <div className="row">
-                                                    {(application.status == 'VERIFIED') &&
-                                                        <div className="col">
-                                                            <Button
-                                                                onClick={async () => {
-                                                                    try {
-                                                                        await axios.put(route('status', application.id), {
-                                                                            status: 'COMPLETED',
-                                                                            status_description: 'SELESAI'
-                                                                        })
-                                                                        window.location.reload()
-                                                                    } catch (error) {
-                                                                        setError(`${error}`)
-                                                                        errorModal.open()
-                                                                    }
-                                                                }}
-                                                                className="btn btn-sm btn-success"
-                                                            >
-                                                                <GiTick className="mr-2 h-4 w-4" />
-                                                                Selesai
-                                                            </Button>
-                                                        </div>
-                                                    }
-                                                    {(application.status == 'PENDING' || application.status == 'REVISED') &&
-                                                        <div className="col-xs-2">
-                                                            <Button
-                                                                className="btn btn-sm btn-secondary"
-                                                                onClick={revisiModal.open}
-                                                            >
-                                                                <BiRevision className="mr-2 h-4 w-4" />
-                                                                {application.status === 'REVISED' ? 'Revisi Ulang' : 'Revisi Berkas'}
-                                                            </Button>
-                                                        </div>
-                                                    }
-                                                    {(application.status == 'PENDING' || application.status == 'REVISED') &&
-                                                        <div className="col">
-                                                            <Button
-                                                                onClick={onVerified}
-                                                                className="btn btn-sm btn-primary"
-                                                            >
-                                                                <GoVerified className="mr-2 h-4 w-4" />
-                                                                Verifikasi
-                                                            </Button>
-                                                        </div>
-                                                    }
-                                                    {(application.status == 'PENDING') &&
-                                                        <div className="col">
-                                                            <Button
-                                                                color={'red'}
-                                                                onClick={() => onTolak()}
-                                                                className="btn btn-sm btn-danger"
-                                                            >
-                                                                <BiRevision className="mr-2 h-4 w-4" />
-                                                                Tolak
-                                                            </Button>
-                                                        </div>
-                                                    }
+
                                                 </div>
                                             </div>
                                         </div>
@@ -724,22 +442,22 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                     <div className="chat-history">
                                         <ul className="m-b-0">
                                             {/* <li className="clearfix">
-                                                <div className="message-data text-right">
-                                                    <span className="message-data-time">PEMOHON 10:10 AM, Today</span>
-                                                </div>
-                                                <div className="message other-message float-right">
-                                                    {" "}
-                                                    Hi Aiden, how are you? How is the project coming along?{" "}
-                                                </div>
-                                            </li>
-                                            <li className="clearfix">
-                                                <div className="message-data">
-                                                    <span className="message-data-time">OPERATOR 10:12 AM, Today</span>
-                                                </div>
-                                                <div className="message my-message">
-                                                    Are we meeting today?
-                                                </div>
-                                            </li> */}
+                                                            <div className="message-data text-right">
+                                                                <span className="message-data-time">PEMOHON 10:10 AM, Today</span>
+                                                            </div>
+                                                            <div className="message other-message float-right">
+                                                                {" "}
+                                                                Hi Aiden, how are you? How is the project coming along?{" "}
+                                                            </div>
+                                                        </li>
+                                                        <li className="clearfix">
+                                                            <div className="message-data">
+                                                                <span className="message-data-time">OPERATOR 10:12 AM, Today</span>
+                                                            </div>
+                                                            <div className="message my-message">
+                                                                Are we meeting today?
+                                                            </div>
+                                                        </li> */}
                                             {comments.map((e, i) => {
                                                 const dateCreated = Date.parse(e.created_at ?? '')
                                                 const dateCreate = Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(dateCreated)
@@ -798,9 +516,9 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                                             formData.append('id', String(application.id))
                                                         }
                                                         formData.append('content', content)
-                                                        formData.append('user_id', String(user.id))
                                                         formData.append('application_id', String(application?.id))
-                                                        formData.append('guest_email', String(application?.email))
+                                                        formData.append('guest_email', String(user.email))
+                                                        formData.append('guest_name', String(user.name))
                                                         formData.append('category', String(application?.category))
 
                                                         try {
@@ -813,8 +531,9 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                                                 ...comments,
                                                                 {
                                                                     content: response.data.content,
-                                                                    user_id: user.id,
-                                                                    created_at: response.data.created_at
+                                                                    created_at: response.data.created_at,
+                                                                    guest_name: user.name,
+                                                                    guest_email: user.email
                                                                 }
                                                             ])
                                                             console.log('Upload sukses:', response.data);

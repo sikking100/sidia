@@ -3,7 +3,7 @@ import PageHeader from "@/components/page-header";
 import { useIsMobile } from "@/hooks/use-mobile";
 import useCustomModal from "@/hooks/use-modal";
 import Admin from "@/layouts/admin";
-import { FlashProps, Paginator, User } from "@/types";
+import { FlashProps, Hamlet, Paginator, Ward } from "@/types";
 import { Link, useForm } from "@inertiajs/react";
 import axios from "axios";
 import { PageProps } from "node_modules/@inertiajs/core/types/types";
@@ -11,28 +11,25 @@ import React from "react";
 import { Button, FormControl } from "react-bootstrap";
 import { GiCancel } from "react-icons/gi";
 import { GrAddCircle, GrNext, GrPrevious } from "react-icons/gr";
-import { HiPencil, HiRefresh, HiSearch } from "react-icons/hi";
-import { RiAiGenerate } from "react-icons/ri";
+import { HiEye, HiPencil, HiRefresh, HiSearch, HiTrash } from "react-icons/hi";
 
 interface Props extends PageProps {
-    users: Paginator<User>
+    hamlets: Paginator<Hamlet>
     flash: FlashProps
+    ward: Ward
 }
 
-export default function PenggunaIndex({ users, flash }: Props) {
+
+export default function DusunIndex({ hamlets, flash, ward }: Props) {
     const { open, isOpen, close } = useCustomModal()
-    const modalPass = useCustomModal()
+    const modalHapus = useCustomModal()
+    const id = React.useRef(-1)
     const isMobile = useIsMobile()
-    const [newPass, setNewPass] = React.useState('')
-    const [error, setError] = React.useState('')
-    const [loading, setLoading] = React.useState(false);
-    const [index, setIndex] = React.useState(-1)
 
     const INITIAL = {
         search: '',
         per_page: 10
     }
-
     const { data, setData, get, processing } = useForm(INITIAL)
 
     React.useEffect(() => {
@@ -42,28 +39,11 @@ export default function PenggunaIndex({ users, flash }: Props) {
         }
     }, [flash, open])
 
-    const handleRegeneratePassword = async ({ email, index }: { email: string, index: number }) => {
-        try {
-            setIndex(index)
-            setLoading(true)
-            await axios.post(route('pass.reset'), {
-                'email': email
-            });
-            setNewPass(`Password baru telah dikirim ke Email : ${email}.`)
-            modalPass.open()
-            return;
-        } catch (error) {
-            setError(`${error}`);
-            open()
-        } finally {
-            setLoading(false)
-        }
-    }
-
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        get(route('user.index'), {
+        get(route('hamlet.index'), {
             preserveState: true, replace: true,
+
         });
     };
 
@@ -72,7 +52,7 @@ export default function PenggunaIndex({ users, flash }: Props) {
             <ul className="pagination justify-content-center">
 
                 {
-                    users.links.map((link, i) => {
+                    hamlets.data !== undefined && hamlets.links.map((link, i) => {
                         let content;
 
                         if (link.label === 'pagination.previous') {
@@ -119,34 +99,43 @@ export default function PenggunaIndex({ users, flash }: Props) {
                     <Button className="btn btn-sm btn-outline-primary" onClick={close}><GiCancel className="mr-2" /> Tutup</Button>
                 }
             >
-                {flash?.message ?? error}
+                {flash?.message}
             </CustomModal>
 
-            {/* Modal Pass */}
+            {/* Modal Hapus */}
             <CustomModal
-                show={modalPass.isOpen}
-                onHide={modalPass.close}
-                title="Reset Password"
+                show={modalHapus.isOpen}
+                onHide={modalHapus.close}
+                title="Peringatan"
+                size="sm"
                 footer={
-                    <Button className="btn btn-sm btn-outline-primary" onClick={modalPass.close}><GiCancel className="mr-2" /> Tutup</Button>
+                    <div className="d-flex">
+                        <Button className="btn btn-sm btn-outline-primary mr-2" onClick={modalHapus.close}><GiCancel className="mr-2" /> Batal</Button>
+                        <Button className="btn btn-sm btn-danger" onClick={async () => {
+                            await axios.delete(route('hamlet.destroy', id.current))
+                            get(route('hamlet.index'), {
+                                replace: true,
+                                preserveState: false,
+                            })
+                        }}><HiTrash className="mr-2" /> Hapus</Button>
+                    </div>
                 }
             >
-                <h5>{newPass}</h5>
+                <h5>Anda yakin ingin menghapus data ini?</h5>
             </CustomModal>
-
 
             <div className="container-fluid">
                 <PageHeader
-                    HeaderText="Pengguna"
-                    Breadcrumb={[{ name: 'Pengguna' }]}
+                    HeaderText="Dusun"
+                    Breadcrumb={[{ name: 'Dusun' }]}
                 />
                 <div className="row clearfix">
                     <div className="col-xs-12 col-lg-12 col-md-12">
                         <div className="card planned_task">
                             <div className="header">
                                 <div className="d-flex">
-                                    <h2>Data Pengguna</h2>
-                                    <a href={route('user.create')}><GrAddCircle size={20} className="ml-1 text-success" style={{ alignSelf: 'center' }} /></a>
+                                    <h2>Data Dusun di Kelurahan / Desa {ward.name}</h2>
+                                    <a href={route('hamlet.create')}><GrAddCircle size={20} className="ml-1 text-success" style={{ alignSelf: 'center' }} /></a>
                                 </div>
 
                             </div>
@@ -177,7 +166,7 @@ export default function PenggunaIndex({ users, flash }: Props) {
                                     <div className="col">
                                         <FormControl
                                             id="search"
-                                            placeholder="Nama atau nomor telepon"
+                                            placeholder="Nama Dusun"
                                             value={data.search}
                                             onChange={(e) => { setData('search', e.target.value) }}
                                         />
@@ -200,7 +189,7 @@ export default function PenggunaIndex({ users, flash }: Props) {
                                                         search: '',
                                                         per_page: 10,
                                                     })
-                                                    get(route('user.index'), {
+                                                    get(route('district.index'), {
                                                         replace: true,
                                                         preserveState: false,
                                                     });
@@ -215,70 +204,66 @@ export default function PenggunaIndex({ users, flash }: Props) {
                                 </div>
 
                             </div>
-                            <div className="body table-responsive pt-0">
-                                {
-                                    users.data.length == 0 ? <p>Tidak ada data</p>
-                                        :
+                            {
+                                hamlets.data === undefined || hamlets.data?.length === 0 ? <div className="body clearfix pt-3">
+                                    <p>Tidak ada data</p>
+                                </div>
+                                    :
+                                    <div className="body table-responsive pt-0">
+
                                         <table className='table table-bordered'>
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
-                                                    <th>Kel / Des</th>
                                                     <th>Nama</th>
-                                                    <th>Telp</th>
-                                                    <th>Email</th>
                                                     <th>Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {users.data.map((v, i) => {
+                                                {hamlets.data !== undefined && hamlets.data.map((v, i) => {
                                                     return (
                                                         <tr key={i}>
-                                                            <th>{((users.current_page - 1) * (users.per_page)) + i + 1}</th>
-                                                            <td>{v.ddesa?.name}</td>
+                                                            <th>{((hamlets.current_page - 1) * (hamlets.per_page)) + i + 1}</th>
                                                             <td>{v.name}</td>
-                                                            <td>{v.phone}</td>
-                                                            <td>{v.email}</td>
                                                             <td>
 
-                                                                <div className="d-flex flex-column">
+                                                                <div className="d-flex">
                                                                     <Button
-                                                                        className="btn btn-sm btn-info mb-2"
-                                                                        href={route('user.edit', v.id)}
+                                                                        className="btn btn-sm btn-primary mr-2"
+                                                                        href={route('district.show', v.id)}
+                                                                    >
+                                                                        <HiEye className="mr-2 h-5 w-5" />
+                                                                        Detail
+                                                                    </Button>
+                                                                    <Button
+                                                                        className="btn btn-sm btn-info mr-2"
+                                                                        href={route('district.edit', v.id)}
                                                                     >
                                                                         <HiPencil className="mr-2 h-5 w-5" />
                                                                         Edit
                                                                     </Button>
                                                                     <Button
-                                                                        onClick={() => handleRegeneratePassword({ email: v.email, index: i })}
-                                                                        disabled={loading}
+                                                                        onClick={() => {
+                                                                            id.current = v.id
+                                                                            modalHapus.open()
+                                                                        }}
                                                                         className="btn btn-sm btn-danger"
                                                                     >
-                                                                        {loading && index === i ? (
-                                                                            <>
-                                                                                <HiRefresh className="mr-2 h-5 w-5 animate-spin" />
-                                                                                Processing...
-                                                                            </>
-                                                                        ) : (
-                                                                            <>
-                                                                                <RiAiGenerate className='mr-2' />
-                                                                                Reset Pass
-                                                                            </>
-                                                                        )}
+                                                                        <HiTrash className="mr-2 h-5 w-5" />
+                                                                        Hapus
                                                                     </Button>
+
                                                                 </div>
-
-
-
                                                             </td>
                                                         </tr>
                                                     )
                                                 })}
                                             </tbody>
                                         </table>
-                                }
-                                <Nav />
-                            </div>
+                                        <Nav />
+                                    </div>
+                            }
+
                         </div>
                     </div>
                 </div>

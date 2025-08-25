@@ -126,8 +126,15 @@
 				margin: 10px 0; 
 			}
 
+			button{
+				padding: 10px;
+				font-size: 14px;
+				color: $grey-500;
+				border: none;
+			}
+
 			a{
-				@extend .displayblock;
+				// @extend .displayblock;
 				padding: 10px;
 				font-size: 14px;
 				color: $grey-500;

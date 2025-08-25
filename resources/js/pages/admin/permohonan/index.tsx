@@ -26,7 +26,7 @@ interface Props extends PageProps {
 interface SearchParam {
     kecamatan: string
     desa: string
-    hamlet_id: number
+    hamlet: string
     status: string
     search: string
     tahun: number
@@ -42,7 +42,7 @@ export default function PermohonanIndex(props: Props) {
     const INITIAL = {
         search: '',
         kecamatan: '',
-        hamlet_id: -1,
+        hamlet: '',
         per_page: 10,
         status: '',
         tahun: -1,
@@ -55,7 +55,7 @@ export default function PermohonanIndex(props: Props) {
     const isMobile = useIsMobile()
     const { data, setData, get, reset, processing } = useForm<SearchParam>(INITIAL)
 
-    const modalFlash = useCustomModal()
+    const { open, isOpen, close } = useCustomModal()
     const modalHapus = useCustomModal()
 
 
@@ -74,9 +74,9 @@ export default function PermohonanIndex(props: Props) {
 
     React.useEffect(() => {
         if (props.flash?.message !== undefined && props.flash?.message !== null && props.flash?.message !== '') {
-            modalFlash.open()
+            open()
         }
-    }, [props.flash?.message, modalFlash])
+    }, [props.flash?.message, open])
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -154,13 +154,13 @@ export default function PermohonanIndex(props: Props) {
 
             {/* modal error */}
             <CustomModal
-                show={modalFlash.isOpen}
-                onHide={modalFlash.close}
+                show={isOpen}
+                onHide={close}
                 title="Pemberitahuan"
                 size="sm"
                 footer={
                     <div>
-                        <Button className="btn btn-sm btn-outline-primary" onClick={modalFlash.close}><GiCancel className="mr-2" /> Tutup</Button>
+                        <Button className="btn btn-sm btn-outline-primary" onClick={close}><GiCancel className="mr-2" /> Tutup</Button>
 
                     </div>
                 }
@@ -217,17 +217,17 @@ export default function PermohonanIndex(props: Props) {
                                     </div>
                                     <div className="col">
                                         <select className="custom-select" id="desa"
-                                            value={data.hamlet_id}
+                                            value={data.hamlet}
                                             onChange={(e) => {
                                                 e.preventDefault();
-                                                setData('hamlet_id', Number.parseInt(e.target.value))
+                                                setData('hamlet', e.target.value)
 
                                             }}
                                         >
                                             <option key={-1} value={-1}>Dusun</option>
                                             {
                                                 districts?.find(e => e.name == data.kecamatan)?.wards?.find(e => e.name == data.desa)?.hamlets?.map((item) => (
-                                                    <option key={item.id} value={item.id}>{item.name}</option>
+                                                    <option key={item.id} value={item.name}>{item.name}</option>
                                                 ))
                                             }
                                         </select>

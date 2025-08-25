@@ -44,9 +44,9 @@ class Application extends Model
         return $this->belongsTo(Hamlet::class);
     }
 
-    public function supports()
+    public function comments()
     {
-        return $this->hasMany(SupportFile::class);
+        return $this->hasMany(Comment::class);
     }
 
     public function scopeFilterByRole($query, $request, $role)
@@ -59,10 +59,10 @@ class Application extends Model
                 $query->where('ward', $request->desa);
             }
         }
-        if ($request->hamlet_id != null && $request->hamlet_id != -1) {
-            $query->where('hamlet_id', $request->hamlet_id);
+        if ($request->hamlet != null && $request->hamlet != '') {
+            $query->where('hamlet', $request->hamlet);
         }
-        if ($request->tahun != null && $request->tahun != -1) {
+        if ($request->tahun != null && $request->tahun != 0) {
             $query->whereYear('created_at', $request->tahun);
         }
         if ($request->search != null && $request->search != '') {

@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('id_card_number', 20);
             $table->string('family_card_number', 20);
             $table->string('family_head_name', 255);
-            $table->bigInteger('id_category')->nullable();
             $table->string('category', 255);
             $table->string('name', 255);
             $table->string('phone', 20);
@@ -26,15 +25,13 @@ return new class extends Migration
             $table->string('religion', 255);
             $table->string('district', 255);
             $table->string('ward', 255);
+            $table->string('hamlet', 255);
             $table->text('images');
             $table->text('description')->nullable();
             $table->text('problems')->nullable();
             $table->enum('status', ['PENDING', 'DEFFICIENT', 'REVISED', 'VERIFIED', 'COMPLETED', 'CANCEL'])->default('PENDING');
             $table->text('status_description')->nullable();
             $table->text('files')->nullable();
-            $table->bigInteger('ward_id')->nullable();
-            $table->bigInteger('district_id')->nullable();
-            $table->bigInteger('hamlet_id')->nullable();
             $table->timestamps();
         });
     }

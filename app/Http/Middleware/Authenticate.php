@@ -15,7 +15,6 @@ class Authenticate extends Middleware
             // arahkan langsung ke /login/superadmin
             return route('login', ['role' => 'superadmin']);
         }
-
         return null;
     }
 }

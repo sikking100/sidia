@@ -73,7 +73,7 @@ export interface Applicant {
   images: string | File | undefined
   status?: string
   status_description?: string | null
-  created_at?: string | null
+  created_at: string | null
   files?: string | null
   ticket?: string | null
   upload?: string | null
@@ -85,6 +85,14 @@ export interface Applicant {
 
 }
 
+export interface CustomComment {
+    user_id?: number
+    guest_name?: string
+    guest_email?: string
+    content: string
+    created_at: string
+}
+
 export interface DesaApplication {
   id?: number
   ticket?: string | null
@@ -94,6 +102,7 @@ export interface DesaApplication {
   category: string
   district: string
   ward: string
+  hamlet: string
   name: string
   phone: string
   email: string
@@ -118,7 +127,7 @@ export interface Meta {
 }
 
 export interface DesaApplicationPost {
-  hamlet_id: number
+  hamlet: string
   id_card_number: string
   family_card_number: string
   family_head_name: string
@@ -131,8 +140,7 @@ export interface DesaApplicationPost {
   images: string | File | undefined
   description: string
   problem?: string
-  filessss: FilesForm[] | undefined
-  pendukung: Pendukung[]
+  filessss: FilesForm[]
 }
 
 export interface District {
@@ -181,12 +189,10 @@ export interface FilesForm {
   name: string
   filenya: File
   place: string
-  requirement_id?: number
 }
 
 export interface Filess {
   id: number
-  requirement_id?: number | null
   name: string
   place: string
   status?: number

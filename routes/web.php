@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DesaApplicationController;
 use App\Http\Controllers\DistrictController;
 use App\Http\Controllers\FileController;
@@ -21,7 +22,6 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [ApplicationController::class, 'dashboard'])->name('dashboard');
-    Route::get('years', [ApplicationController::class, 'get_years'])->name('years');
     Route::get('dashboard-statistic', [ApplicationController::class, 'dashboard_statistic'])->name('dashboard.statistic');
     Route::get('districts-list', [DistrictController::class, 'get_districts']);
 });
@@ -38,6 +38,8 @@ Route::controller(GuestController::class)->group(function () {
 
 
 Route::post('pass-reset', [UserController::class, 'kirim_pass'])->name('pass.reset');
+Route::get('/comment/{id}', [CommentController::class, 'get']);
+Route::post('/comment', [CommentController::class, 'store']);
 
 Route::middleware(['auth', 'role:desa'])->group(function () {
     // desa

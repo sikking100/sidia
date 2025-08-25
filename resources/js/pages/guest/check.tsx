@@ -105,8 +105,7 @@ export default function Check() {
                                                             <td>{v.id_card_number}</td>
                                                             <td>{v.name}</td>
                                                             <td>
-                                                                {v.status == 'COMPLETED' && (v.filess !== null && v.filess!.length !== 0 && v.filess!.filter((ee) => ee.name.includes('Hasil')).length !== 0) &&
-                                                                    <a className={'btn btn-outline-success btn-sm mr-2'} href={`/download-file?place=`} target="_blank" rel="noopener noreferrer"><i className="fa fa-download pe-2"> <span>Download Hasil</span></i></a>}
+                                                                {v.status !== 'COMPLETED-FILE' && <span></span>}
                                                                 <a type="button" className="btn btn-outline-primary btn-sm" href={route('detail', v.id)}>
                                                                     <i className="fa fa-info-circle pe-2"> <span>Detail</span></i>
                                                                 </a>
