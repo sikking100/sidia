@@ -46,7 +46,7 @@ export default function AdminNav() {
                                 style={{ height: 35, width: 25 }}
                             />
                         </a>
-                        <span>SI-DiA</span>
+                        <span>SI-DiA 2.0</span>
 
                     </div>
                     <div id="navbar-menu">

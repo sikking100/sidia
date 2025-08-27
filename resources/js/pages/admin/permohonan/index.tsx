@@ -314,7 +314,7 @@ export default function PermohonanIndex(props: Props) {
                                                     </th>
                                                     <td>
                                                         <p>{formattedDate}</p>
-                                                        <TimeAgo date={d.created_at ?? '1997-02-07'} formatter={intlFormatter} />
+                                                        <TimeAgo date={d.created_at ?? 1692230400000} formatter={intlFormatter} />
                                                     </td>
                                                     <td className="whitespace-nowrap font-bold text-gray-900 dark:text-white">
                                                         <p>{getStatus(d.status ?? '')} </p>

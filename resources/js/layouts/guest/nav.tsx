@@ -33,7 +33,7 @@ export function GuestNavbar() {
                                 style={{ height: 25, width: 25 }}
                                 className="img-responsive logo pr-2"
                             />
-                            <div className="align-self-center">SI-DiA</div>
+                            <div className="align-self-center">SI-DiA 2.0</div>
                         </a>
                     </div>
 

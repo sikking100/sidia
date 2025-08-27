@@ -61,7 +61,7 @@ class PageHeader extends React.Component<Props, State> {
                         </h2>
                         <ul className="breadcrumb">
                             <li className="breadcrumb-item">
-                                <a href={role != null && role === 'bpjs' ? '#' : 'dashboard'}>
+                                <a href={role != null && role === 'bpjs' ? '#' : route('dashboard')}>
                                     <i className="icon-home"></i>
                                 </a>
                             </li>
