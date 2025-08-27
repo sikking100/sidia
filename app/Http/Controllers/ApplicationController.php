@@ -462,11 +462,11 @@ class ApplicationController extends Controller
                 $hamlet = Hamlet::where('name', $application->hamlet)->first();
                 return response()->json($hamlet);
                 // kirim ke desa
-                // kirimEmail(
-                //     $hamlet->ward->user->email,
-                //     'Permohonan ditolak',
-                //     'Permohonan ' . $application->category . 'dengan NIK : ' . $application->id_card_number . ' telah ditolak. Alasan penolakan : ' . $application->status_description,
-                // );
+                kirimEmail(
+                    $hamlet->ward->user->email,
+                    'Permohonan ditolak',
+                    'Permohonan ' . $application->category . 'dengan NIK : ' . $application->id_card_number . ' telah ditolak. Alasan penolakan : ' . $application->status_description,
+                );
                 // Mail::to($hamlet->ward->user->email)->queue(
                 //     new SimpleMail('Permohonan ' . $application->category  . 'dengan NIK : ' . $application->id_card_number . ' telah ditolak. Alasan penolakan : ' . $application->status_description, 'Permohonan ditolak', false)
                 // );
@@ -476,9 +476,9 @@ class ApplicationController extends Controller
                 'Permohonan ditolak',
                 'Permohonan ' . $application->category . ' telah ditolak. Alasan penolakan : ' . $application->status_description,
             );
-            Mail::to($application->email)->queue(
-                new SimpleMail('Permohonan ' . $application->category . ' telah ditolak. Alasan penolakan : ' . $application->status_description, 'Permohonan ditolak', false)
-            );
+            // Mail::to($application->email)->queue(
+            //     new SimpleMail('Permohonan ' . $application->category . ' telah ditolak. Alasan penolakan : ' . $application->status_description, 'Permohonan ditolak', false)
+            // );
         }
 
         session()->flash('message', 'Sukses mengubah status');

@@ -376,7 +376,7 @@ export default function DesaApplicationBuat() {
                                     </Col>
                                     <Col xs={12} md={4} lg={4} xl={3} sm={3}>
                                         <div className='card'>
-                                            <Image src='../../assets/5.webp' rounded className='img-fluid' />
+                                            <Image src='../../assets/14.png' rounded className='img-fluid' />
                                             <div>
                                                 <div className="header">
                                                     <a href={route('desa.create', 'Klaim-JKM')}>

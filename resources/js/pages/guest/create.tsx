@@ -1,7 +1,7 @@
 import { checkFile, defImage, permasalahan, Subtitle } from "@/hooks/functions";
 import Guest from "@/layouts/guest";
 import { Applicant, District, FilesForm, Menu } from "@/types";
-import { useForm } from "@inertiajs/react";
+import { router, useForm } from "@inertiajs/react";
 import React from "react";
 import { Button, Card, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { GoNumber, GoPerson } from 'react-icons/go'
@@ -20,7 +20,7 @@ interface Props {
 }
 
 export default function GuestCreate({ category, menu, application, districts }: Props) {
-    const { data, setData, post, put, errors } = useForm<Applicant>(
+    const { data, setData, post, errors } = useForm<Applicant>(
         {
             id: application?.id ?? 0,
             family_card_number: application?.family_card_number ?? '',
@@ -94,8 +94,8 @@ export default function GuestCreate({ category, menu, application, districts }: 
         formData.append('problem', data.problem ?? '');
         if (application !== null) {
             formData.append('_method', 'put');
-            formData.append('id', String(data.id));
-            put(route('form.update',), {
+            formData.append('id', String(application.id));
+            router.post(route('form.update', application.id), {
                 forceFormData: true,
             })
         } else {

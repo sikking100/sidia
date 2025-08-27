@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreApplicationRequest;
-use App\Mail\SimpleMail;
 use App\Models\Application;
 use App\Models\District;
 use App\Models\File as ModelsFile;
@@ -13,7 +12,6 @@ use App\Support\MyUploadFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -64,21 +62,24 @@ class GuestController extends Controller
 
     public function formAction(StoreApplicationRequest $request)
     {
+        // dd(config('custom.email_dukcapil'));
+        // dd($request->email);
         $applicant = Application::make($request->all());
-        $applicant->ward_id = $request->ward_id;
-        $applicant->district_id = $request->district_id;
-        $applicant->hamlet_id = 0;
         $this->upload->uploadImages($request, 'images', $applicant);
         $applicant->status_description = "Mohon cek secara berkala, sementara permohonan Anda sedang diverifikasi";
         $applicant->save();
         // email ke pemohon
-        Mail::to($request->email)->queue(
-            new SimpleMail('Permohonan ' . $request->cateogry . ' telah diregister. Mohon cek email dan website secara berkala untuk mengetahui status permohonan', 'Permohonan telah diregister', false)
+        kirimEmail(
+            $request->email,
+            'Permohonan telah diregister',
+            'Permohonan ' . $applicant->category . ' telah diregister. Mohon cek email dan website secara berkala untuk mengetahui status permohonan.'
         );
 
         // email ke dukcapil
-        Mail::to(config('custom.email_dukcapil'))->queue(
-            new SimpleMail('Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.', 'Permohonan baru', false)
+        kirimEmail(
+            config('custom.email_dukcapil'),
+            'Permohonan Baru',
+            'Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.'
         );
 
         if ($request->filessss != null) {

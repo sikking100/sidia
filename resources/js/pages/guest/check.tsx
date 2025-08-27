@@ -1,15 +1,24 @@
+import CustomModal from "@/components/custom-modal";
 import { getStatus } from "@/hooks/functions";
 import { useIsMobile } from "@/hooks/use-mobile";
+import useCustomModal from "@/hooks/use-modal";
 import Guest from "@/layouts/guest";
 import { Applicant } from "@/types";
+import { usePage } from "@inertiajs/react";
 import axios from "axios";
-import { useState } from "react";
-import { Col, Container, Row } from "react-bootstrap";
+import React, { useState } from "react";
+import { Button, Col, Container, Row } from "react-bootstrap";
+import { GiCancel } from "react-icons/gi";
 
 export default function Check() {
     const [applications, setApplications] = useState<Applicant[]>([])
     const [query, setQuery] = useState('')
     const isMobile = useIsMobile()
+    const { message } = usePage().props.flash as { message: string }
+    const { open, isOpen, close } = useCustomModal()
+
+
+
 
     const handleButton = async () => {
         const response = await axios.get(route('search', {
@@ -22,9 +31,30 @@ export default function Check() {
         }
     }
 
+    React.useEffect(() => {
+        if (message !== undefined && message !== null && message !== '') {
+            open()
+        }
+    }, [message, open])
+
     return (
 
         <Guest title="Cek Permohonan">
+            {/* modal error */}
+            <CustomModal
+                show={isOpen}
+                onHide={close}
+                title="Pemberitahuan"
+                size="sm"
+                footer={
+                    <div>
+                        <Button className="btn btn-sm btn-outline-primary" onClick={close}><GiCancel className="mr-2" /> Tutup</Button>
+
+                    </div>
+                }
+            >
+                <h5>{message}</h5>
+            </CustomModal>
             <Container fluid className="mt-2">
                 <Row className="justify-content-center">
                     <Col sm={4} xs={12} className="">
