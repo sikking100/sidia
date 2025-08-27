@@ -129,7 +129,7 @@ export default function Login({ role }: LoginProps) {
                                             <div className="bottom">
                                                 <span className="helper-text m-b-10">
                                                     <i className="fa fa-lock"></i>{" "}
-                                                    <a href={`forgotpassword`}
+                                                    <a href={route('password.request', role)}
                                                     >
                                                         Lupa password?
                                                     </a>

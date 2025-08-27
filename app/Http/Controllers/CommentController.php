@@ -19,6 +19,7 @@ class CommentController extends Controller
 
     public function store(Request $request)
     {
+        // return response()->json($request->all());
         $comment = Comment::make($request->all());
         if ($request->has('file')) {
             // cek apakah desa atau bukan

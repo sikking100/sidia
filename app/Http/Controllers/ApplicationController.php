@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use mervick\aesEverywhere\AES256;
 
@@ -28,6 +29,18 @@ class ApplicationController extends Controller
     public function __construct()
     {
         $this->up = new MyUploadFile();
+    }
+
+    public function downloadFile(Request $request)
+    {
+        $filename = $request->place;
+
+        // dd($filename);
+        if (!Storage::disk('public')->exists($filename)) {
+            abort(404);
+        }
+        // return response()->download(storage_path('app/public/' . $filename));
+        return response()->download(Storage::disk('public')->path($filename));
     }
 
     public function dashboard()

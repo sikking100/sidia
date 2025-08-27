@@ -89,6 +89,28 @@ class DesaApplicationController extends Controller
         $applicant->district = $user->ddesa->district->name;
         $this->upload->uploadImages($request, 'images', $applicant);
         $applicant->save();
+
+        foreach ($request->filessss as $key => $file) {
+            $nameExt = $key . '-' . time() . '.' . $file['filenya']->extension();
+            $file['filenya']->storeAs($request->category, $nameExt, 'public');
+            $desaFile = new File();
+            $desaFile->name = $file['name'];
+            $desaFile->place = $request->category . '/' . $nameExt;
+            $desaFile->status = '0';
+            $applicant->filess()->save($desaFile);
+        }
+
+        if ($request->pendukung != null) {
+            foreach ($request->pendukung as $key => $file) {
+                $nameExt =  $key . '-' . time() . '.' . $file['filenya']->extension();
+                $file['filenya']->storeAs('pendukung', $nameExt, 'public');
+                $desaFile = new SupportFile();
+                $desaFile->name = $file['name'];
+                $desaFile->place = 'pendukung' . '/' . $nameExt;
+                $applicant->supports()->save($desaFile);
+            }
+        }
+
         // email ke pemohon
         kirimEmail(
             $request->email,
@@ -103,15 +125,6 @@ class DesaApplicationController extends Controller
             'Permohonan baru',
             'Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.'
         );
-        foreach ($request->filessss as $key => $file) {
-            $nameExt = $key . '-' . time() . '.' . $file['filenya']->extension();
-            $file['filenya']->storeAs($request->category, $nameExt, 'public');
-            $desaFile = new File();
-            $desaFile->name = $file['name'];
-            $desaFile->place = $request->category . '/' . $nameExt;
-            $desaFile->status = '0';
-            $applicant->filess()->save($desaFile);
-        }
 
         // $desaApplication = DesaApplication::make($request->all());
         // $this->upload->uploadImages($request, 'images', $desaApplication);
@@ -201,14 +214,14 @@ class DesaApplicationController extends Controller
 
                 $nameExt = $key . '-' . time() . '.' . $file['filenya']->extension();
                 $file['filenya']->storeAs($request->category, $nameExt, 'public');
-                $desaFile = new File();
+                $desaFile = File::find($file['id']);
                 $desaFile->name = $file['name'];
                 $desaFile->place = $request->category . '/' . $nameExt;
                 $desaFile->status = '0';
                 $desaFile->comment = 'sudah direvisi';
                 LOG::info('desafile name = ' . $desaFile->name);
                 LOG::info('desafile place = ' . $desaFile->place);
-                $application->filess()->save($desaFile);
+                $application->filess()->update($desaFile);
             }
         }
         $application->status = 'REVISED';

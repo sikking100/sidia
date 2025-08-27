@@ -1,11 +1,11 @@
-import { checkFile, defImage, getFileType, getStatus } from "@/hooks/functions";
+import { checkFile, getFileType, getStatus } from "@/hooks/functions";
 import Guest from "@/layouts/guest";
 import { Applicant, CustomComment, Filess, FlashProps, User } from "@/types";
 import { PageProps } from "@inertiajs/core";
 import React, { useState } from "react";
 import { Button, Card, Col, Container, Image, Row, Table } from "react-bootstrap";
 import { IoIosArrowDropleftCircle } from 'react-icons/io'
-import { MdClose, MdOutlineEmail, MdPending, MdVerified, } from "react-icons/md";
+import { MdCreate, MdOutlineEmail, MdPending, MdVerified, } from "react-icons/md";
 import { BiFace, BiFile, BiHome, BiIdCard, BiMap, BiMapAlt, BiPhone, BiRevision, BiSolidDownload, BiText, BiTime, BiUserCircle } from "react-icons/bi";
 import { makeIntlFormatter } from 'react-timeago/defaultFormatter'
 import TimeAgo from 'react-timeago'
@@ -35,6 +35,8 @@ export default function Detail({ application, flash }: Props) {
     const [comments, setComment] = React.useState<CustomComment[]>([])
     const [content, setContent] = React.useState('')
     const { user } = usePage().props.auth as { user: User }
+    const listRef = React.useRef<HTMLDivElement | null>(null)
+
 
     const handleView = (file: Filess) => {
         console.log('e');
@@ -51,6 +53,12 @@ export default function Detail({ application, flash }: Props) {
         fetchComment()
         return
     }, [])
+
+    React.useEffect(() => {
+        if (listRef.current) {
+            listRef.current.scrollTop = listRef.current.scrollHeight;
+        }
+    }, [comments])
 
     // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     //     if (e.target.files && e.target.files.length > 0) {
@@ -129,7 +137,7 @@ export default function Detail({ application, flash }: Props) {
                         </div>
                         <div className="status">
                             {(application.status === 'COMPLETED' || application.status === 'COMPLETED_FILE') && <MdVerified className='text-success mr-1' size={'30'} />}
-                            {application.status === 'DEFFICIENT' || application.status === 'REVISED' && <MdClose className='mr-1' size={'30'} />}
+                            {application.status === 'DEFFICIENT' || application.status === 'REVISED' && <MdCreate className='mr-1' color="orange" size={'30'} />}
                             {application.status === 'PENDING' && <MdPending className='mr-1' size={'30'} color="orange" />}
                             <div>
                                 <h3 className={`${(application.status === 'COMPLETED' || application.status === 'COMPLETED_FILE') ? 'text-success' : application.status === 'CANCEL' ? 'text-success' : 'text-warning'} mt-2`}>
@@ -410,7 +418,7 @@ export default function Detail({ application, flash }: Props) {
                                         <div className="row">
                                             <div className="col-lg-6">
                                                 <Link href="#" data-target="#view_info" data-toggle="modal">
-                                                    <img alt="avatar" src={defImage} />
+                                                    <img alt="avatar" src={`../../storage/images/${application.images}`} />
                                                 </Link>
                                                 <div className="chat-about">
                                                     <h6 className="m-b-0">Pemohon : {application.name}</h6>
@@ -419,25 +427,8 @@ export default function Detail({ application, flash }: Props) {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="chat-history">
+                                    <div className="chat-history" ref={listRef}>
                                         <ul className="m-b-0">
-                                            {/* <li className="clearfix">
-                                                            <div className="message-data text-right">
-                                                                <span className="message-data-time">PEMOHON 10:10 AM, Today</span>
-                                                            </div>
-                                                            <div className="message other-message float-right">
-                                                                {" "}
-                                                                Hi Aiden, how are you? How is the project coming along?{" "}
-                                                            </div>
-                                                        </li>
-                                                        <li className="clearfix">
-                                                            <div className="message-data">
-                                                                <span className="message-data-time">OPERATOR 10:12 AM, Today</span>
-                                                            </div>
-                                                            <div className="message my-message">
-                                                                Are we meeting today?
-                                                            </div>
-                                                        </li> */}
                                             {comments.map((e, i) => {
                                                 const dateCreated = Date.parse(e.created_at ?? '')
                                                 const dateCreate = Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(dateCreated)
@@ -446,10 +437,12 @@ export default function Detail({ application, flash }: Props) {
                                                 });
                                                 return (
                                                     <li className="clearfix" key={i}>
-                                                        <div className={`message-data ${e.user_id !== null ? "" : "text-right"}`}>
-                                                            <span className="message-data-time">{e.user_id !== null ? 'OPERATOR' : 'PEMOHON'} {dateCreate} <TimeAgo date={e.created_at} formatter={intlFormatter} /></span>
+                                                        <div className={`message-data ${e.guest_email !== null ? "" : "text-right"}`}>
+                                                            <span className="message-data-time">{e.guest_email === null ? 'OPERATOR' : 'PEMOHON'} {dateCreate} <TimeAgo date={e.created_at} formatter={intlFormatter} /></span>
+                                                            {e.guest_email === null && <img alt="avatar" src={`../../storage/images/${application.images}`} />}
+
                                                         </div>
-                                                        <div className={`message ${e.user_id !== null ? "my-message" : "other-message float-right"}`}>
+                                                        <div className={`message ${e.guest_email !== null ? "my-message" : "other-message float-right"}`}>
                                                             {e.content}
                                                         </div>
                                                     </li>
@@ -459,23 +452,6 @@ export default function Detail({ application, flash }: Props) {
                                     </div>
                                     <div className="chat-message clearfix">
                                         <div className="input-group mb-0">
-                                            {/* <div className="input-group-prepend">
-                                                <span className="input-group-text" style={{ height: "35px" }}>
-                                                    <button
-                                                        className="text-link"
-                                                        onClick={() => document.getElementById('file-input')?.click()}
-                                                    >
-                                                        <i className="icon-paper-clip"></i>
-                                                    </button>
-                                                    <input
-                                                        id="file-input"
-                                                        type="file"
-                                                        style={{ display: 'none' }}
-                                                        onChange={handleFileChange}
-                                                    />
-                                                </span>
-
-                                            </div> */}
                                             <input
                                                 value={content}
                                                 className="form-control"
@@ -512,6 +488,7 @@ export default function Detail({ application, flash }: Props) {
                                                                 {
                                                                     content: response.data.content,
                                                                     guest_email: application?.email,
+                                                                    user_id: null,
                                                                     guest_name: application?.name,
                                                                     created_at: response.data.created_at
                                                                 }
@@ -523,7 +500,9 @@ export default function Detail({ application, flash }: Props) {
 
                                                         setContent('');
                                                         setFile(null);
-                                                        (document.getElementById('file-input') as HTMLInputElement).value = '';
+                                                        if (file !== null) {
+                                                            (document.getElementById('file-input') as HTMLInputElement).value = ''
+                                                        }
                                                     }} className="text-link">
                                                         <i className="icon-paper-plane"></i>
                                                     </button>

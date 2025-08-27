@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\BpjsController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DesaApplicationController;
 use App\Http\Controllers\DistrictController;
@@ -41,6 +42,14 @@ Route::post('pass-reset', [UserController::class, 'kirim_pass'])->name('pass.res
 Route::get('/comment/{id}', [CommentController::class, 'get']);
 Route::post('/comment', [CommentController::class, 'store']);
 
+Route::middleware(['auth', 'role:bpjs'])->group(function () {
+    Route::get('/bpjs', [BpjsController::class, 'index'])->name('bpjs.index');
+    Route::get('/bpjs/{id}/show', [BpjsController::class, 'show'])->name('bpjs.show');
+    Route::put('/bpjs/{id}', [BpjsController::class, 'update'])->name('bpjs.update');
+    Route::put('/bpjs/{id}/file', [FileController::class, 'update'])->name('bpjs.file');
+    Route::get('/bpjs-years', [BpjsController::class, 'years']);
+});
+
 Route::middleware(['auth', 'role:desa'])->group(function () {
     // desa
     Route::get('/desa', [DesaApplicationController::class, 'index'])->name('desa.index');
@@ -57,6 +66,8 @@ Route::middleware(['auth', 'role:desa'])->group(function () {
     Route::get('/hamlet-paging', [HamletController::class, 'pagination']);
     Route::get('/user/{user}', [UserController::class, 'show'])->name('user.show');
     Route::put('/user/{id}/update', [UserController::class, 'updates'])->name('user.updates');
+    Route::get('/download-file-wajib', [ApplicationController::class, 'downloadFile']);
+
     // end desa
 });
 

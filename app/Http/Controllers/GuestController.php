@@ -223,10 +223,10 @@ class GuestController extends Controller
         $filename = $request->place;
 
         // dd($filename);
-        if (!Storage::exists('public/' . $filename)) {
+        if (!Storage::disk('public')->exists($filename)) {
             abort(404);
         }
         // return response()->download(storage_path('app/public/' . $filename));
-        return Storage::download('public/' . $filename);
+        return response()->download(Storage::disk('public')->path($filename));
     }
 }

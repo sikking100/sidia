@@ -1,5 +1,5 @@
 import PageHeader from "@/components/page-header";
-import { checkFile, defImage, getFileType, getStatus, } from "@/hooks/functions";
+import { checkFile, getFileType, getStatus, } from "@/hooks/functions";
 import Admin from "@/layouts/admin";
 import { Applicant, CustomComment, Filess, FlashProps, Hamlet, User } from "@/types";
 import { PageProps } from "node_modules/@inertiajs/core/types/types";
@@ -9,7 +9,7 @@ import { BiFace, BiFile, BiHome, BiIdCard, BiMap, BiMapAlt, BiPhone, BiPrinter, 
 import { GiCancel, GiTick } from "react-icons/gi";
 import { GoVerified } from "react-icons/go";
 import { HiEye } from "react-icons/hi";
-import { MdClose, MdOutlineEmail, MdPending, MdVerified } from "react-icons/md";
+import { MdCreate, MdOutlineEmail, MdPending, MdVerified } from "react-icons/md";
 import TimeAgo from "react-timeago";
 import { makeIntlFormatter } from "react-timeago/defaultFormatter";
 import { Link, useForm, usePage } from "@inertiajs/react";
@@ -44,7 +44,15 @@ export default function PermohonanDetail({ application, flash }: Props) {
     const [comments, setComment] = React.useState<CustomComment[]>([])
     const [content, setContent] = React.useState('')
     const { user } = usePage().props.auth as { user: User }
-
+    const dateCreated = Date.parse(application.created_at ?? '')
+    const dateCreate = Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(dateCreated)
+    const intlFormatter = makeIntlFormatter({
+        locale: "id-ID", // string
+    });
+    const tolakModal = useCustomModal()
+    const errorModal = useCustomModal()
+    const lihatModal = useCustomModal()
+    const listRef = React.useRef<HTMLDivElement | null>(null)
 
     const { setData, put } = useForm<FormUpdateStatus>({
         status: '',
@@ -127,24 +135,14 @@ export default function PermohonanDetail({ application, flash }: Props) {
         lihatModal.open()
     };
 
-    const dateCreated = Date.parse(application.created_at ?? '')
-    const dateCreate = Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(dateCreated)
-    const intlFormatter = makeIntlFormatter({
-        locale: "id-ID", // string
-    });
 
-
-
-    const tolakModal = useCustomModal()
-    const errorModal = useCustomModal()
-    const lihatModal = useCustomModal()
 
     React.useEffect(() => {
         if (flash?.message !== undefined && flash?.message !== null && flash?.message !== '') {
             errorModal.open()
         }
 
-    }, [flash?.message, errorModal])
+    }, [flash?.message])
 
 
 
@@ -156,6 +154,12 @@ export default function PermohonanDetail({ application, flash }: Props) {
         fetchComment()
         return
     }, [])
+
+    React.useEffect(() => {
+        if (listRef.current) {
+            listRef.current.scrollTop = listRef.current.scrollHeight;
+        }
+    }, [comments])
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -302,7 +306,7 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                     </div>
                                     <div className="status">
                                         {(application.status === 'COMPLETED' || application.status === 'COMPLETED_FILE') && <MdVerified className='text-success mr-1' size={'30'} />}
-                                        {application.status === 'DEFFICIENT' || application.status === 'REVISED' && <MdClose className='mr-1' size={'30'} />}
+                                        {application.status === 'DEFFICIENT' || application.status === 'REVISED' && <MdCreate className='mr-1' color="orange" size={'30'} />}
                                         {application.status === 'PENDING' && <MdPending className='mr-1' size={'30'} color="orange" />}
                                         <div>
                                             <h3 className={`${(application.status === 'COMPLETED' || application.status === 'COMPLETED_FILE') ? 'text-success' : application.status === 'CANCEL' ? 'text-success' : 'text-warning'} mt-2`}>
@@ -633,7 +637,7 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                         <div className="row">
                                             <div className="col-lg-6">
                                                 <Link href="#" data-target="#view_info" data-toggle="modal">
-                                                    <img alt="avatar" src={defImage} />
+                                                    <img alt="avatar" src={`../../storage/images/${application.images}`} />
                                                 </Link>
                                                 <div className="chat-about">
                                                     <h6 className="m-b-0">Pemohon : {application.name}</h6>
@@ -738,6 +742,7 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                                     <li className="clearfix" key={i}>
                                                         <div className={`message-data ${e.user_id !== null ? "" : "text-right"}`}>
                                                             <span className="message-data-time">{e.user_id !== null ? 'OPERATOR' : 'PEMOHON'} {dateCreate} <TimeAgo date={e.created_at} formatter={intlFormatter} /></span>
+                                                            {e.user_id !== null && <img alt="avatar" src={`../../storage/images/${application.images}`} />}
                                                         </div>
                                                         <div className={`message ${e.user_id !== null ? "my-message" : "other-message float-right"}`}>
                                                             {e.content}
@@ -808,10 +813,11 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                                         } catch (error) {
                                                             console.error('Upload gagal:', error);
                                                         }
-
                                                         setContent('');
                                                         setFile(null);
-                                                        (document.getElementById('file-input') as HTMLInputElement).value = '';
+                                                        if (file != null) {
+                                                            (document.getElementById('file-input') as HTMLInputElement).value = ''
+                                                        }
                                                     }} className="text-link">
                                                         <i className="icon-paper-plane"></i>
                                                     </button>

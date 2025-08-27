@@ -1,5 +1,6 @@
 import React from "react";
 interface Props {
+    role?: string
     HeaderText: string
     Breadcrumb: {
         name: string
@@ -34,7 +35,7 @@ class PageHeader extends React.Component<Props, State> {
     };
 
     render() {
-        const { HeaderText, Breadcrumb } = this.props;
+        const { HeaderText, Breadcrumb, role } = this.props;
         return (
             <div className="block-header">
                 <div className="row">
@@ -60,7 +61,7 @@ class PageHeader extends React.Component<Props, State> {
                         </h2>
                         <ul className="breadcrumb">
                             <li className="breadcrumb-item">
-                                <a href="dashboard">
+                                <a href={role != null && role === 'bpjs' ? '#' : 'dashboard'}>
                                     <i className="icon-home"></i>
                                 </a>
                             </li>

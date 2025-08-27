@@ -1,37 +1,40 @@
-import CustomModal from "@/components/custom-modal";
-import PageHeader from "@/components/page-header";
-import { checkFile, getFileType, getStatus } from "@/hooks/functions";
-import useCustomModal from "@/hooks/use-modal";
-import Admin from "@/layouts/admin";
-import { Applicant, CustomComment, Filess, FlashProps, User } from "@/types";
-import { Link, usePage } from "@inertiajs/react";
-import axios from "axios";
 import { PageProps } from "node_modules/@inertiajs/core/types/types";
+import { BPJSNav } from ".";
+import { Applicant, CustomComment, Filess, FlashProps, User } from "@/types";
 import React from "react";
-import { Button, Col, Image, Row, Table } from "react-bootstrap";
-import { BiFace, BiFile, BiHome, BiIdCard, BiMap, BiMapAlt, BiPhone, BiRevision, BiSolidDownload, BiText, BiTime, BiUserCircle } from "react-icons/bi";
-import { GiCancel } from "react-icons/gi";
-import { HiEye } from "react-icons/hi";
+import { Link, useForm, usePage } from "@inertiajs/react";
+import axios from "axios";
+import { makeIntlFormatter } from "react-timeago/defaultFormatter";
+import useCustomModal from "@/hooks/use-modal";
+import CustomModal from "@/components/custom-modal";
+import { Button, Col, Form, FormControl, Image, Row, Table } from "react-bootstrap";
+import { GiCancel, GiTick } from "react-icons/gi";
+import { BiFace, BiFile, BiHome, BiIdCard, BiMap, BiMapAlt, BiPhone, BiPrinter, BiRevision, BiSolidDownload, BiText, BiTime, BiUserCircle } from "react-icons/bi";
+import { GoVerified } from "react-icons/go";
+import { checkFile, getFileType, getStatus, getStatusBerkas } from "@/hooks/functions";
+import PageHeader from "@/components/page-header";
 import { MdCreate, MdOutlineEmail, MdPending, MdVerified } from "react-icons/md";
 import TimeAgo from "react-timeago";
-import { makeIntlFormatter } from "react-timeago/defaultFormatter";
+import { HiEye } from "react-icons/hi";
+
 
 interface Props extends PageProps {
     flash: FlashProps
     application: Applicant
+
 }
 
 
-interface FileTicket {
-    TypeName: string
-    FilePath: string
-    FileName: string
+interface FormUpdateStatus {
+    status: string
+    status_description: string
 }
 
-
-export default function DesaApplicationShow({ application, flash }: Props) {
+export default function BPJSShow({ application, flash }: Props) {
     const [selectedFile, setSelectedFile] = React.useState<Filess | null>(null);
     const [file, setFile] = React.useState<File | null>(null);
+
+    const [error, setError] = React.useState<string>('');
     const [comments, setComment] = React.useState<CustomComment[]>([])
     const [content, setContent] = React.useState('')
     const { user } = usePage().props.auth as { user: User }
@@ -39,9 +42,76 @@ export default function DesaApplicationShow({ application, flash }: Props) {
 
 
 
+    const { setData, put } = useForm<FormUpdateStatus>({
+        status: '',
+        status_description: ''
+    })
 
-    function handleClick(name: string) {
-        window.open(route('photo', name))
+    function onClick() {
+        window.open(route('application.edit', application.id))
+    }
+
+    function onTolak() {
+        setData('status', 'CANCEL')
+        tolakModal.open()
+    }
+
+    const onVerified = async () => {
+        const check = application.filess.filter(e => e.status != 1)
+        if (check.length > 0) {
+            setError('Berkas belum diverifikasi, silahkan verifikasi semua berkas terlebih dahulu')
+            errorModal.open()
+            return
+        }
+        try {
+            await axios.put(route('bpjs.update', application.id), {
+                status: "VERIFIED",
+                status_description: "Berkas sudah diverifikasi"
+            })
+            // window.location.reload()
+        } catch (error) {
+            setError(`${error}`)
+            errorModal.open()
+        }
+        return
+    }
+
+    const onVerifiedBerkas = async () => {
+        try {
+            await axios.put(route('bpjs.file', selectedFile?.id), {
+                status: '1',
+                status_description: 'Berkas terverifikasi'
+            })
+            window.location.reload()
+        } catch (error) {
+            setError(`${error}`)
+            errorModal.open()
+        }
+        return
+    }
+
+
+
+
+
+    function handleSubmit(e: React.FormEvent) {
+        e.preventDefault()
+        if (selectedFile !== null && selectedFile !== undefined) {
+            put(route('bpjs.file', selectedFile?.id), {
+                onError: (e) => {
+                    errorModal.open()
+                    setError(e.message)
+                }
+            })
+        } else {
+            put(route('bpjs.update', application.id), {
+                onError: (e) => {
+                    errorModal.open()
+                    setError(e.message)
+                }
+            })
+        }
+        return
     }
 
     const handleView = (file: Filess) => {
@@ -58,15 +128,18 @@ export default function DesaApplicationShow({ application, flash }: Props) {
 
 
 
-    const { open, isOpen, close } = useCustomModal()
+    const tolakModal = useCustomModal()
+    const errorModal = useCustomModal()
     const lihatModal = useCustomModal()
 
     React.useEffect(() => {
         if (flash?.message !== undefined && flash?.message !== null && flash?.message !== '') {
-            open()
+            errorModal.open()
         }
 
-    }, [flash?.message, open])
+    }, [flash?.message])
+
+
 
     React.useEffect(() => {
         const fetchComment = async () => {
@@ -83,20 +156,21 @@ export default function DesaApplicationShow({ application, flash }: Props) {
         }
     }, [comments])
 
-    // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     if (e.target.files && e.target.files.length > 0) {
-    //         const file = e.target.files[0]
-    //         setFile(file)
-    //         setContent(file.name)
-    //     }
-    // };
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0]
+            setFile(file)
+            setContent(file.name)
+        }
+    }
+
     return (
-        <Admin>
-            {/* modal lihat file */}
+        <div id="wrapper">
+            <BPJSNav />
             <CustomModal
                 show={lihatModal.isOpen}
                 onHide={lihatModal.close}
-                title="Detail Berkas"
+                title={`Status Berkas - ${getStatusBerkas(selectedFile?.status ?? 0)}`}
                 size="xl"
                 scrollable={true}
                 footer={
@@ -109,6 +183,27 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                             <BiSolidDownload className='mr-1 h-4 w-4' />
                             Download
                         </Button>
+                        {
+                            application.supports && selectedFile?.status == 0 &&
+                            <Button className={"btn btn-sm btn-outline-warning mr-2"} onClick={async e => {
+                                e.preventDefault()
+                                await axios.put(route('bpjs.file', selectedFile.id), {
+                                    'status': '2',
+                                    'status_description': 'Berkas ditolak'
+                                })
+                                window.location.reload()
+                            }}>
+                                <BiRevision className='mr-1 h-4 w-4' />
+                                Revisi
+                            </Button>
+                        }
+                        {
+                            selectedFile?.status == 0 &&
+                            <Button className={"btn btn-sm btn-outline-success"} onClick={onVerifiedBerkas}>
+                                <GoVerified className='mr-1 h-4 w-4' />
+                                Verifikasi
+                            </Button>
+                        }
                     </div>
                 }
             >
@@ -134,25 +229,62 @@ export default function DesaApplicationShow({ application, flash }: Props) {
 
             {/* kalau ada error */}
             <CustomModal
-                show={isOpen}
-                onHide={close}
+                show={errorModal.isOpen}
+                onHide={errorModal.close}
                 title="Kesalahan"
                 size="sm"
                 footer={
-                    <Button type="reset" onClick={close} className="btn btn-sm btn-outline-primary mr-2">
+                    <Button type="reset" onClick={errorModal.close} className="btn btn-sm btn-outline-primary mr-2">
                         <GiCancel className="mr-1" />
                         Tutup
                     </Button>
                 }
             >
-                {flash?.message}
+                {flash?.message ?? error}
             </CustomModal>
 
 
-            <div className="container-fluid">
+            {/* modal tolak */}
+            <CustomModal
+                show={tolakModal.isOpen}
+                onHide={tolakModal.close}
+                title="Peringatan"
+                size="lg"
+            >
+                <div>
+                    <h6>
+                        Anda Yakin ingin menolak?
+                    </h6>
+                    <form onSubmit={handleSubmit}>
+                        <Form.Group>
+                            <Form.Label>
+                                Sertakan alasan
+                            </Form.Label>
+
+                            <FormControl
+                                onChange={e => setData('status_description', e.target.value)}
+                                as={'textarea'}
+                                rows={5}
+                            />
+                        </Form.Group>
+                        <div className="d-flex">
+                            <Button type="reset" onClick={tolakModal.close} className="btn btn-sm btn-outline-primary mr-2">
+                                <GiCancel className="mr-1" />
+                                Batal</Button>
+                            <Button type="submit" className="btn btn-sm btn-danger">
+                                <BiRevision className="mr-1 h-4 w-4" />
+                                Tolak</Button>
+                        </div>
+                    </form>
+                </div>
+            </CustomModal>
+
+
+            <div className="container-fluid mt-5">
                 <PageHeader
+                    role={user.role}
                     HeaderText={`Permohonan NIK ${application.id_card_number}`}
-                    Breadcrumb={[{ name: "Permohonan", navigate: 'application.index' }, { name: "Detail" }]}
+                    Breadcrumb={[{ name: "Permohonan", navigate: 'bpjs.index' }, { name: "Detail" }]}
                 />
 
                 <div className="row clearfix">
@@ -179,14 +311,77 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                     </div>
 
                                     <div className='form-row mt-3'>
-                                        {application.status === 'DEFFICIENT' &&
+                                        {(application.status == 'VERIFIED' || application.status == 'COMPLETED') &&
+                                            <div className="col-xs-2">
+                                                <Button
+                                                    onClick={onClick}
+                                                    className="btn btn-sm btn-outline-primary"
+                                                >
+                                                    <BiPrinter className="mr-2 h-4 w-4" />
+                                                    Print PDF
+                                                </Button>
+                                            </div>
+                                        }
+                                        {(application.status == 'VERIFIED') &&
+                                            <div className="col">
+                                                <Button
+                                                    onClick={async () => {
+                                                        try {
+                                                            await axios.put(route('bpjs.update', application.id), {
+                                                                status: 'COMPLETED'
+                                                            })
+                                                            window.location.reload()
+                                                        } catch (error) {
+                                                            setError(`${error}`)
+                                                            errorModal.open()
+                                                        }
+                                                    }}
+                                                    className="btn btn-sm btn-success"
+                                                >
+                                                    <GiTick className="mr-2 h-4 w-4" />
+                                                    Selesai
+                                                </Button>
+                                            </div>
+                                        }
+                                        {(application.status == 'PENDING' || application.status == 'REVISED') &&
                                             <div className="col-xs-2">
                                                 <Button
                                                     className="btn btn-sm btn-secondary"
-                                                    href={route('desa.edit', application.id)}
+                                                    onClick={async e => {
+                                                        e.preventDefault()
+                                                        await axios.put(route('bpjs.update', application.id), {
+                                                            'status': 'DEFFICIENT',
+                                                            'status_description': 'Revisi Berkas'
+
+                                                        })
+                                                        window.location.reload()
+                                                    }}
                                                 >
                                                     <BiRevision className="mr-2 h-4 w-4" />
-                                                    Revisi Berkas
+                                                    {application.status === 'REVISED' ? 'Revisi Ulang' : 'Revisi Berkas'}
+                                                </Button>
+                                            </div>
+                                        }
+                                        {(application.status == 'PENDING' || application.status == 'REVISED') &&
+                                            <div className="col">
+                                                <Button
+                                                    onClick={onVerified}
+                                                    className="btn btn-sm btn-primary"
+                                                >
+                                                    <GoVerified className="mr-2 h-4 w-4" />
+                                                    Verifikasi
+                                                </Button>
+                                            </div>
+                                        }
+                                        {(application.status == 'PENDING') &&
+                                            <div className="col">
+                                                <Button
+                                                    color={'red'}
+                                                    onClick={() => onTolak()}
+                                                    className="btn btn-sm btn-danger"
+                                                >
+                                                    <BiRevision className="mr-2 h-4 w-4" />
+                                                    Tolak
                                                 </Button>
                                             </div>
                                         }
@@ -370,71 +565,7 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                             </thead>
                                             <tbody>
                                                 {
-                                                    application.ticket !== null && application.ticket !== '' && application.ticket !== '-' ?
-                                                        application.files !== null && application.files !== '' ? (JSON.parse(application.files!) as Array<FileTicket>).map((v, k) => {
-                                                            return (
-                                                                <tr key={k}>
-                                                                    <td>{k + 1}</td>
-                                                                    <td>{v.TypeName}</td>
-                                                                    <td>{ }</td>
-                                                                    <td>
-                                                                        <Button
-                                                                            className='btn btn-info'
-                                                                            onClick={() => handleClick(v.FileName)}
-                                                                        >
-                                                                            <HiEye className='mr-2' />
-                                                                            Lihat
-                                                                        </Button>
-                                                                    </td>
-                                                                </tr>
-                                                            )
-                                                        }) : <tr>
-                                                            <td colSpan={3} className='text-center'>Berkas tidak lengkap</td>
-                                                        </tr> :
-                                                        application.filess && application.filess.filter(e => e.name.includes('Hasil') == false).map((e, i) => (
-                                                            <tr key={i}>
-                                                                <td>{i + 1}</td>
-                                                                <td>{e.name}</td>
-                                                                <td>
-                                                                    {
-                                                                        checkFile(e.name, e.id, application.filess) !== undefined ?
-                                                                            <Button
-                                                                                className='btn btn-sm btn-info'
-                                                                                onClick={(ee) => {
-                                                                                    ee.preventDefault()
-                                                                                    return handleView(checkFile(e.name, e.id, application.filess)!)
-                                                                                }}
-                                                                            >
-                                                                                <HiEye className='mr-2' />
-                                                                                Lihat
-                                                                            </Button>
-                                                                            : <p className='text-red-400'>Tidak diupload</p>
-                                                                    }
-                                                                </td>
-                                                            </tr>
-                                                        ))
-                                                }
-                                            </tbody>
-                                        </Table>
-                                    </div>
-
-                                    <div className="sub-header">
-                                        <BiFile size={25} />
-                                        <span>Berkas Hasil : </span>
-                                    </div>
-                                    <div className="table">
-                                        <Table striped bordered hover size="sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>Nama</th>
-                                                    <th>Aksi</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {
-
-                                                    application.filess && application.filess.filter(e => e.name.includes('Hasil') == true).map((e, i) => (
+                                                    application.filess && application.filess.map((e, i) => (
                                                         <tr key={i}>
                                                             <td>{i + 1}</td>
                                                             <td>{e.name}</td>
@@ -460,9 +591,52 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                             </tbody>
                                         </Table>
                                     </div>
+
+                                    <div className="sub-header">
+                                        <BiFile size={25} />
+                                        <span>Lampiran Pendukung : </span>
+                                    </div>
+                                    <div className="table">
+                                        <Table striped bordered hover size="sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Nama Lampiran</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {
+                                                    application.supports && application.supports.map((e, i) => (
+                                                        <tr key={i}>
+                                                            <td>{i + 1}</td>
+                                                            <td>{e.name}</td>
+                                                            <td>
+                                                                {
+                                                                    checkFile(e.name, e.id, application.supports) !== undefined ?
+                                                                        <Button
+                                                                            className='btn btn-sm btn-info'
+                                                                            onClick={(ee) => {
+                                                                                ee.preventDefault()
+                                                                                return handleView(checkFile(e.name, e.id, application.supports)!)
+                                                                            }}
+                                                                        >
+                                                                            <HiEye className='mr-2' />
+                                                                            Lihat
+                                                                        </Button>
+                                                                        : <p className='text-red-400'>Tidak diupload</p>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                }
+                                            </tbody>
+                                        </Table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -485,7 +659,69 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                             </div>
                                             <div className="col-lg-6 hidden-sm text-right">
                                                 <div className="row">
-
+                                                    {(application.status == 'VERIFIED') &&
+                                                        <div className="col">
+                                                            <Button
+                                                                onClick={async () => {
+                                                                    try {
+                                                                        await axios.put(route('bpjs.update', application.id), {
+                                                                            status: 'COMPLETED',
+                                                                            status_description: 'SELESAI'
+                                                                        })
+                                                                        window.location.reload()
+                                                                    } catch (error) {
+                                                                        setError(`${error}`)
+                                                                        errorModal.open()
+                                                                    }
+                                                                }}
+                                                                className="btn btn-sm btn-success"
+                                                            >
+                                                                <GiTick className="mr-2 h-4 w-4" />
+                                                                Selesai
+                                                            </Button>
+                                                        </div>
+                                                    }
+                                                    {(application.status == 'PENDING' || application.status == 'REVISED') &&
+                                                        <div className="col-xs-2">
+                                                            <Button
+                                                                className="btn btn-sm btn-secondary"
+                                                                onClick={async e => {
+                                                                    e.preventDefault()
+                                                                    await axios.put(route('bpjs.update', application.id), {
+                                                                        'status': 'DEFFICIENT',
+                                                                        'status_description': 'Revisi Berkas'
+                                                                    })
+                                                                    window.location.reload()
+                                                                }}
+                                                            >
+                                                                <BiRevision className="mr-2 h-4 w-4" />
+                                                                {application.status === 'REVISED' ? 'Revisi Ulang' : 'Revisi Berkas'}
+                                                            </Button>
+                                                        </div>
+                                                    }
+                                                    {(application.status == 'PENDING' || application.status == 'REVISED') &&
+                                                        <div className="col">
+                                                            <Button
+                                                                onClick={onVerified}
+                                                                className="btn btn-sm btn-primary"
+                                                            >
+                                                                <GoVerified className="mr-2 h-4 w-4" />
+                                                                Verifikasi
+                                                            </Button>
+                                                        </div>
+                                                    }
+                                                    {(application.status == 'PENDING') &&
+                                                        <div className="col">
+                                                            <Button
+                                                                color={'red'}
+                                                                onClick={() => onTolak()}
+                                                                className="btn btn-sm btn-danger"
+                                                            >
+                                                                <BiRevision className="mr-2 h-4 w-4" />
+                                                                Tolak
+                                                            </Button>
+                                                        </div>
+                                                    }
                                                 </div>
                                             </div>
                                         </div>
@@ -498,13 +734,15 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                                 const intlFormatter = makeIntlFormatter({
                                                     locale: "id-ID", // string
                                                 });
+                                                console.log(application.images);
+
                                                 return (
                                                     <li className="clearfix" key={i}>
-                                                        <div className={`message-data ${e.guest_email !== null ? "" : "text-right"}`}>
-                                                            <span className="message-data-time">{e.guest_email === null ? 'OPERATOR' : 'PEMOHON'} {dateCreate} <TimeAgo date={e.created_at} formatter={intlFormatter} /></span>
-                                                            {e.guest_email === null && <img alt="avatar" src={`../../storage/images/${application.images}`} />}
+                                                        <div className={`message-data ${e.user_id !== null ? "" : "text-right"}`}>
+                                                            <span className="message-data-time">{e.user_id !== null ? 'OPERATOR' : 'PEMOHON'} {dateCreate} <TimeAgo date={e.created_at} formatter={intlFormatter} /></span>
+                                                            {e.user_id !== null && <img alt="avatar" src={`../../storage/images/${application.images}`} />}
                                                         </div>
-                                                        <div className={`message ${e.guest_email !== null ? "my-message" : "other-message float-right"}`}>
+                                                        <div className={`message ${e.user_id !== null ? "my-message" : "other-message float-right"}`}>
                                                             {e.content}
                                                         </div>
                                                     </li>
@@ -514,7 +752,7 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                     </div>
                                     <div className="chat-message clearfix">
                                         <div className="input-group mb-0">
-                                            {/* <div className="input-group-prepend">
+                                            <div className="input-group-prepend">
                                                 <span className="input-group-text" style={{ height: "35px" }}>
                                                     <button
                                                         className="text-link"
@@ -530,7 +768,7 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                                     />
                                                 </span>
 
-                                            </div> */}
+                                            </div>
                                             <input
                                                 value={content}
                                                 className="form-control"
@@ -548,12 +786,11 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                                         }
                                                         if (application.ward !== null && application.ward !== undefined && application.ward !== '') {
                                                             formData.append('ward', application.ward)
-                                                            formData.append('id', String(application.id))
                                                         }
                                                         formData.append('content', content)
+                                                        formData.append('user_id', String(user.id))
                                                         formData.append('application_id', String(application?.id))
-                                                        formData.append('guest_email', String(user.email))
-                                                        formData.append('guest_name', String(user.name))
+                                                        formData.append('guest_email', String(application?.email))
                                                         formData.append('category', String(application?.category))
 
                                                         try {
@@ -566,10 +803,8 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                                                 ...comments,
                                                                 {
                                                                     content: response.data.content,
-                                                                    created_at: response.data.created_at,
-                                                                    user_id: null,
-                                                                    guest_name: user.name,
-                                                                    guest_email: user.email
+                                                                    user_id: user.id,
+                                                                    created_at: response.data.created_at
                                                                 }
                                                             ])
                                                             console.log('Upload sukses:', response.data);
@@ -595,6 +830,6 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                     </div>
                 </div>
             </div>
-        </Admin >
+        </div>
     )
 }

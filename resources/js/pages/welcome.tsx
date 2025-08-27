@@ -1,6 +1,6 @@
 import Guest from '@/layouts/guest';
 import { Head, Link } from '@inertiajs/react';
-import { Col, Container, Dropdown, Image, Row } from 'react-bootstrap';
+import { Col, Container, Dropdown, Image } from 'react-bootstrap';
 
 export default function Welcome() {
 
@@ -10,11 +10,11 @@ export default function Welcome() {
             </Head>
             <Guest title='Selamat Datang'>
                 <Container fluid className='pt-2'>
-                    <Row>
-                        <Col xs={12} md={3} lg={3} xl={2} sm={2}>
+                    <div className='form-row'>
+                        <Col xs={12} md={4} lg={4} xl={3} sm={3}>
                             <div className='card'>
                                 <Image src='../../assets/2.webp' rounded className='img-fluid' />
-                                <Container>
+                                <div className=''>
                                     <div className="header">
                                         <Dropdown as="ul" className="header-dropdown">
                                             <Dropdown.Toggle
@@ -23,7 +23,7 @@ export default function Welcome() {
                                                 id="dropdown-basic"
                                                 className='d-flex align-items-center'
                                             >
-                                                <h2 className='pe-2'>KTP - el</h2>
+                                                <h2>KTP - el</h2>
                                                 <Dropdown.Menu
                                                     as="ul"
                                                     className="dropdown-menu"
@@ -37,23 +37,23 @@ export default function Welcome() {
                                                     <li>
                                                         <Link href={route('guest.create', 'KTP-Hilang')}>KTP Hilang</Link>
                                                     </li>
-                                                    <li>
+                                                    {/* <li>
                                                         <Link href={route('guest.create', 'KTP-Perubahan')}>KTP Perubahan Data</Link>
-                                                    </li>
-                                                    <li>
+                                                    </li> */}
+                                                    {/* <li>
                                                         <Link href={route('guest.create', 'KTP-Disabilitas')}>Perekamana Disabilitas</Link>
-                                                    </li>
+                                                    </li> */}
                                                 </Dropdown.Menu>
                                             </Dropdown.Toggle>
                                         </Dropdown>
                                     </div>
-                                </Container>
+                                </div>
                             </div>
                         </Col>
-                        <Col xs={12} md={3} lg={3} xl={2} sm={2}>
+                        <Col xs={12} md={4} lg={4} xl={3} sm={3}>
                             <div className='card'>
                                 <Image src='../../assets/1.webp' rounded className='img-fluid' />
-                                <Container>
+                                <div className=''>
                                     <div className="header">
                                         <Dropdown as="ul" className="header-dropdown">
                                             <Dropdown.Toggle
@@ -62,10 +62,10 @@ export default function Welcome() {
                                                 id="dropdown-basic"
                                                 className='d-flex align-items-center'
                                             >
-                                                <h2 className='pe-2'>Kartu Keluarga</h2>
+                                                <h2>Kartu Keluarga</h2>
                                                 <Dropdown.Menu
                                                     as="ul"
-                                                    className="dropdown-menu dropdown-menu-right"
+                                                    className="dropdown-menu"
                                                 >
                                                     <li>
                                                         <Link href={route('guest.create', 'KK-Baru')}>KK Baru</Link>
@@ -76,21 +76,24 @@ export default function Welcome() {
                                                     <li>
                                                         <Link href={route('guest.create', 'KK-Hilang')}>KK Hilang</Link>
                                                     </li>
-                                                    <li>
-                                                        <Link href={route('guest.create', 'KK-Perubahan-Data')}>KK Perubahan Data</Link>
-                                                    </li>
+                                                    {/* <li>
+                                                        <Link href={route('guest.create', 'KTP-Perubahan')}>KTP Perubahan Data</Link>
+                                                    </li> */}
+                                                    {/* <li>
+                                                        <Link href={route('guest.create', 'KTP-Disabilitas')}>Perekamana Disabilitas</Link>
+                                                    </li> */}
                                                 </Dropdown.Menu>
                                             </Dropdown.Toggle>
-
                                         </Dropdown>
                                     </div>
-                                </Container>
+                                </div>
+
                             </div>
                         </Col>
-                        <Col xs={12} md={3} lg={3} xl={2} sm={2}>
+                        <Col xs={12} md={4} lg={4} xl={3} sm={3}>
                             <div className='card'>
                                 <Image src='../../assets/3.webp' rounded className='img-fluid' />
-                                <Container>
+                                <div>
                                     <div className="header">
                                         <Dropdown as="ul" className="header-dropdown">
                                             <Dropdown.Toggle
@@ -99,7 +102,7 @@ export default function Welcome() {
                                                 id="dropdown-basic"
                                                 className='d-flex align-items-center'
                                             >
-                                                <h2 className='pe-2'>KIA</h2>
+                                                <h2>KIA</h2>
                                                 <Dropdown.Menu
                                                     as="ul"
                                                     className="dropdown-menu dropdown-menu-botto"
@@ -113,21 +116,21 @@ export default function Welcome() {
                                                     <li>
                                                         <Link href={route('guest.create', 'KIA-Hilang')}>KIA Hilang</Link>
                                                     </li>
-                                                    <li>
+                                                    {/* <li>
                                                         <Link href={route('guest.create', 'KIA-Perubahan-Data')}>KIA Perubahan Data</Link>
-                                                    </li>
+                                                    </li> */}
                                                 </Dropdown.Menu>
                                             </Dropdown.Toggle>
 
                                         </Dropdown>
                                     </div>
-                                </Container>
+                                </div>
                             </div>
                         </Col>
-                        <Col xs={12} md={3} lg={3} xl={2} sm={2}>
+                        <Col xs={12} md={4} lg={4} xl={3} sm={3}>
                             <div className='card'>
                                 <Image src='../../assets/8.webp' rounded className='img-fluid' />
-                                <Container>
+                                <div>
                                     <div className="header">
                                         <Dropdown as="ul" className="header-dropdown">
                                             <Dropdown.Toggle
@@ -136,7 +139,7 @@ export default function Welcome() {
                                                 id="dropdown-basic"
                                                 className='d-flex align-items-center'
                                             >
-                                                <h2 className='pe-2'>SKPWNI</h2>
+                                                <h2>SKPWNI</h2>
                                                 <Dropdown.Menu
                                                     as="ul"
                                                     className="dropdown-menu dropdown-menu-right"
@@ -150,13 +153,25 @@ export default function Welcome() {
 
                                         </Dropdown>
                                     </div>
-                                </Container>
+                                </div>
                             </div>
                         </Col>
-                        <Col xs={12} md={3} lg={3} xl={2} sm={2}>
+                        <Col xs={12} md={4} lg={4} xl={3} sm={3}>
+                            <div className='card'>
+                                <Image src='../../assets/10.png' rounded className='img-fluid' />
+                                <div>
+                                    <div className="header">
+                                        <a href={route('guest.create', 'Surat-Keterangan-Pindah-Luar-Negeri')}>
+                                            <h2>Surat Keterangan Pindah Luar Negeri</h2>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </Col>
+                        <Col xs={12} md={4} lg={4} xl={3} sm={3}>
                             <div className='card'>
                                 <Image src='../../assets/4.webp' rounded className='img-fluid' />
-                                <Container>
+                                <div>
                                     <div className="header">
                                         <Dropdown as="ul" className="header-dropdown">
                                             <Dropdown.Toggle
@@ -165,7 +180,7 @@ export default function Welcome() {
                                                 id="dropdown-basic"
                                                 className='d-flex align-items-center'
                                             >
-                                                <h2 className='pe-2'>Kelahiran</h2>
+                                                <h2>Kelahiran</h2>
                                                 <Dropdown.Menu
                                                     as="ul"
                                                     className="dropdown-menu dropdown-menu-right"
@@ -182,54 +197,121 @@ export default function Welcome() {
                                                     <li>
                                                         <Link href={route('guest.create', 'Akta-Kelahiran-Perubahan')}>Akta Lahir Perubahan Data</Link>
                                                     </li>
+                                                    <li>
+                                                        <Link href={route('guest.create', 'Akta-Kelahiran-Tidak-Tahu')}>Akta Kelahiran Bagi Anak Yang Tidak Diketahui Asal-usulnya/Keberadaan Orang Tuanya</Link>
+                                                    </li>
                                                 </Dropdown.Menu>
                                             </Dropdown.Toggle>
-
                                         </Dropdown>
                                     </div>
-                                </Container>
+                                </div>
                             </div>
                         </Col>
-                        <Col xs={12} md={3} lg={3} xl={2} sm={2}>
+
+                        <Col xs={12} md={4} lg={4} xl={3} sm={3}>
                             <div className='card'>
                                 <Image src='../../assets/5.webp' rounded className='img-fluid' />
-                                <Container>
+                                <div>
                                     <div className="header">
                                         <a href={route('guest.create', 'PERKAWINAN')}>
-                                            <h2 className='pe-2'>Perkawinan</h2>
+                                            <h2>Perkawinan</h2>
                                         </a>
                                     </div>
-                                </Container>
+                                </div>
                             </div>
                         </Col>
-                        <Col xs={12} md={3} lg={3} xl={2} sm={2}>
+                        <Col xs={12} md={4} lg={4} xl={3} sm={3}>
                             <div className='card'>
                                 <Image src='../../assets/6.webp' rounded className='img-fluid' />
-                                <Container>
+                                <div>
                                     <div className="header">
                                         <a href={route('guest.create', 'PERCERAIAN')}>
-                                            <h2 className='pe-2'>Perceraian</h2>
+                                            <h2>Perceraian</h2>
                                         </a>
                                     </div>
-                                </Container>
+                                </div>
                             </div>
                         </Col>
-                        <Col xs={12} md={3} lg={3} xl={2} sm={2}>
+                        <Col xs={12} md={4} lg={4} xl={3} sm={3}>
                             <div className='card'>
-                                <Image src='../../assets/7.webp' rounded className='img-fluid' />
-                                <Container>
+                                <Image src='../../assets/12.png' rounded className='img-fluid' />
+                                <div>
                                     <div className="header">
-                                        <a href={route('guest.create', 'KEMATIAN')}>
-                                            <h2 className='pe-2'>Kematian</h2>
-                                        </a>
+                                        <Dropdown as="ul" className="header-dropdown">
+                                            <Dropdown.Toggle
+                                                variant="success"
+                                                as="li"
+                                                id="dropdown-basic"
+                                                className='d-flex align-items-center'
+                                            >
+                                                <h2 className='text-wrap'>Akta Pengakuan, Pengesahan & Pengangkatan Anak</h2>
+                                                <Dropdown.Menu
+                                                    as="ul"
+                                                    className="dropdown-menu dropdown-menu-right"
+                                                >
+                                                    <li>
+                                                        <Link href={route('guest.create', 'Akta-Pengakuan-Anak')}>Akta Pengakuan Anak</Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link href={route('guest.create', 'Akta-Pengesahan-Anak')}>Akta Pengesahan Anak</Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link href={route('guest.create', 'Surat-Keterangan-Pengangkatan-Anak')}>Surat Keterangan Pengangkatan Anak</Link>
+                                                    </li>
+                                                </Dropdown.Menu>
+                                            </Dropdown.Toggle>
+                                        </Dropdown>
                                     </div>
-                                </Container>
+                                </div>
                             </div>
                         </Col>
-                        <Col xs={12} md={3} lg={3} xl={2} sm={2}>
+                        <Col xs={12} md={4} lg={4} xl={3} sm={3}>
+                            <div className='card'>
+                                <Image src='../../assets/11.png' rounded className='img-fluid' />
+                                <div>
+                                    <div className="header">
+                                        <a href={route('guest.create', 'Surat-Keterangan-Pelepasan-Kewarganegaraan')}>
+                                            <h2>Surat Keterangan Pelepasan Kewarganegaraan Indonesia</h2>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </Col>
+                        <Col xs={12} md={4} lg={4} xl={3} sm={3}>
+                            <div className='card'>
+                                <Image src='../../assets/13.png' rounded className='img-fluid' />
+                                <div>
+                                    <div className="header">
+                                        <Dropdown as="ul" className="header-dropdown">
+                                            <Dropdown.Toggle
+                                                variant="success"
+                                                as="li"
+                                                id="dropdown-basic"
+                                                className='d-flex align-items-center overflow-clip'
+                                            >
+                                                <h2 className='text-wrap'>Surat Keterangan Pembatalan Perkawinan / Perceraian</h2>
+                                                <Dropdown.Menu
+                                                    as="ul"
+                                                    className="dropdown-menu dropdown-menu-right"
+                                                >
+                                                    <li>
+                                                        <Link href={route('guest.create', 'Surat-Keterangan-Pembatalan-Perkawinan')}>Surat Keterangan Pembatalan Perkawinan</Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link href={route('guest.create', 'Surat-Keterangan-Pembatalan-Perceraian')}>Surat Keterangan Pembatalan Perceraian</Link>
+                                                    </li>
+                                                </Dropdown.Menu>
+                                            </Dropdown.Toggle>
+                                        </Dropdown>
+                                    </div>
+                                </div>
+                            </div>
+                        </Col>
+
+                        <Col xs={12} md={4} lg={4} xl={3} sm={3}>
                             <div className='card'>
                                 <Image src='../../assets/9.webp' rounded className='img-fluid' />
-                                <Container>
+                                <div>
                                     <div className="header">
                                         <Dropdown as="ul" className="header-dropdown">
                                             <Dropdown.Toggle
@@ -251,10 +333,40 @@ export default function Welcome() {
 
                                         </Dropdown>
                                     </div>
-                                </Container>
+                                </div>
                             </div>
                         </Col>
-                    </Row>
+                        <Col xs={12} md={4} lg={4} xl={3} sm={3}>
+                            <div className='card'>
+                                <Image src='../../assets/7.webp' rounded className='img-fluid' />
+                                <div>
+                                    <div className="header">
+                                        <Dropdown as="ul" className="header-dropdown">
+                                            <Dropdown.Toggle
+                                                variant="success"
+                                                as="li"
+                                                id="dropdown-basic"
+                                                className='d-flex align-items-center'
+                                            >
+                                                <h2>Kematian</h2>
+                                                <Dropdown.Menu
+                                                    as="ul"
+                                                    className="dropdown-menu dropdown-menu-right"
+                                                >
+                                                    <li>
+                                                        <Link href={route('guest.create', 'KEMATIAN')}>Akta Kematian</Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link href={route('guest.create', 'Surat-Keterangan-Lahir-Mati')}>Surat Keterangan Lahir Mati</Link>
+                                                    </li>
+                                                </Dropdown.Menu>
+                                            </Dropdown.Toggle>
+                                        </Dropdown>
+                                    </div>
+                                </div>
+                            </div>
+                        </Col>
+                    </div>
                 </Container>
             </Guest >
         </>

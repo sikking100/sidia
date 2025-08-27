@@ -15,7 +15,6 @@ import CustomModal from '@/components/custom-modal';
 import * as echarts from "echarts"
 import { getStatus } from '@/hooks/functions';
 
-
 interface StatusSummary {
     status: string
     total: number
@@ -51,6 +50,8 @@ export default function Dashboard(props: Props) {
 
     const color = ['#fac091', '#a092b0', '#92cddc', '#95b3d7', '#f79647'];
     const itemColor = ['#f79647', '#604a7b', '#4aacc5', '#4f81bc', '#f79647'];
+
+
 
 
     React.useEffect(() => {
@@ -155,6 +156,7 @@ export default function Dashboard(props: Props) {
     }
 
     return (
+
         <Admin>
             <div className='container-fluid'>
                 <PageHeader

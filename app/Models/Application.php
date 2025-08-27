@@ -34,6 +34,11 @@ class Application extends Model
         return $this->hasMany(File::class);
     }
 
+    public function supports()
+    {
+        return $this->hasMany(SupportFile::class);
+    }
+
     public function cat()
     {
         return $this->hasOne(Menu::class, 'name', 'category');
@@ -51,7 +56,11 @@ class Application extends Model
 
     public function scopeFilterByRole($query, $request, $role)
     {
-        if ($role == 'superadmin') {
+        if ($role == 'bpjs') {
+            $query->where('category', 'Klaim-JKM');
+        }
+
+        if ($role == 'superadmin' || $role == 'bpjs') {
             if ($request->kecamatan != null && $request->kecamatan != '') {
                 $query->where('district', $request->kecamatan);
             }
@@ -62,7 +71,7 @@ class Application extends Model
         if ($request->hamlet != null && $request->hamlet != '') {
             $query->where('hamlet', $request->hamlet);
         }
-        if ($request->tahun != null && $request->tahun != 0) {
+        if ($request->tahun != null && $request->tahun != 0 && $request->tahun != -1) {
             $query->whereYear('created_at', $request->tahun);
         }
         if ($request->search != null && $request->search != '') {

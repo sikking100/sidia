@@ -86,7 +86,7 @@ export interface Applicant {
 }
 
 export interface CustomComment {
-    user_id?: number
+    user_id?: number | null
     guest_name?: string
     guest_email?: string
     content: string
@@ -141,6 +141,7 @@ export interface DesaApplicationPost {
   description: string
   problem?: string
   filessss: FilesForm[]
+  pendukung: Pendukung[]
 }
 
 export interface District {
@@ -186,6 +187,7 @@ export type Pendukung = {
 }
 
 export interface FilesForm {
+  id?: number
   name: string
   filenya: File
   place: string

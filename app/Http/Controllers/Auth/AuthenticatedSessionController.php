@@ -30,10 +30,24 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+
         $credentials = $request->only('email', 'password');
-        if (Auth::attempt(array_merge($credentials, ['role' => $request->role]))) {
+        if ($request->role === 'superadmin') {
+            // Hanya superadmin yang boleh login
+            $canLogin = Auth::attempt(array_merge($credentials, ['role' => 'superadmin']));
+        } elseif ($request->role === 'desa') {
+            // Boleh role desa atau bpjs
+            $canLogin = Auth::attempt(array_merge($credentials, ['role' => 'desa']))
+                || Auth::attempt(array_merge($credentials, ['role' => 'bpjs']));
+        } else {
+            $canLogin = false;
+        }
+        if ($canLogin) {
             $request->authenticate();
             $request->session()->regenerate();
+            if (Auth::user()->role == 'bpjs') {
+                return redirect()->intended(route('bpjs.index', absolute: false));
+            }
             return redirect()->intended(route('dashboard', absolute: false));
         }
         return back()->withErrors(['email' => 'Email atau password salah, atau bukan akun ' . $request->role . '.']);
@@ -45,10 +59,8 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return redirect()->route('home');
     }
 }

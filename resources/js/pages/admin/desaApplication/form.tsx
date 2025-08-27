@@ -1,15 +1,16 @@
 import PageHeader from "@/components/page-header"
 import { checkFile, defImage, permasalahan } from "@/hooks/functions"
 import { DesaApplication, DesaApplicationPost, FilesForm, Hamlet, Menu } from "@/types"
-import { useForm } from "@inertiajs/react"
+import { router, useForm } from "@inertiajs/react"
 import React from "react"
 import { Button, Card, Col, Form, InputGroup, Row } from "react-bootstrap"
-import { BiFace, BiHome, BiIdCard, BiUpload, BiUser } from "react-icons/bi"
+import { BiFace, BiFile, BiHome, BiIdCard, BiUpload, BiUser } from "react-icons/bi"
 import { FaRestroom } from "react-icons/fa"
 import { GiVillage } from "react-icons/gi"
 import { GoNumber, GoPerson } from "react-icons/go"
 import { HiSave } from "react-icons/hi"
 import { MdWarning } from "react-icons/md"
+import { CgAdd, CgRemove } from "react-icons/cg"
 
 interface Props {
     hamlets: Hamlet[]
@@ -23,7 +24,7 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
     const title = application !== null && application !== undefined ? 'Ubah' : 'Simpan'
     const breadcumb = application !== null && application !== undefined ? 'Revisi' : 'Buat'
 
-    const { data, setData, post, put, errors } = useForm<DesaApplicationPost>(
+    const { data, setData, post, errors, processing } = useForm<DesaApplicationPost>(
         {
             hamlet: application?.hamlet ?? '',
             id_card_number: application?.id_card_number ?? '',
@@ -38,18 +39,57 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
             images: application?.images ?? '',
             description: application?.description ?? '',
             problem: application?.problem ?? '',
-            filessss: []
+            filessss: [],
+            pendukung: [],
         }
     )
     const [selectedFile, setSelectedFile] = React.useState<Blob | MediaSource>()
     const [preview, setPreview] = React.useState<string>()
     const fileInputRef = React.useRef<HTMLInputElement>(null);
-    const filessRef = React.useRef<FilesForm[]>([])
+    // const filessRef = React.useRef<FilesForm[]>([])
+    const [pendukung, setPendukung] = React.useState<(FilesForm | null)[]>([])
+    const fileInputs = React.useRef<Record<number, HTMLInputElement | null>>({})
+    const fileInputSupport = React.useRef<Record<number, HTMLInputElement | null>>({})
+
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         if (application !== null && application !== undefined) {
-            put(route('desa.update', application.id))
+            const formData = new FormData()
+
+            formData.append('id_card_number', data.id_card_number);
+            formData.append('family_card_number', data.family_card_number);
+            formData.append('family_head_name', data.family_head_name);
+            formData.append('name', data.name);
+            if (data.images !== null && data.images !== undefined) {
+                formData.append('images', data.images);
+            }
+            formData.append('category', category);
+            formData.append('description', data.description);
+            formData.append('email', data.email);
+
+            // Append files ke FormData
+            data.filessss?.forEach((fileObj, index) => {
+                formData.append(`filessss[${index}][name]`, fileObj.name);
+                formData.append(`filessss[${index}][id]`, String(fileObj.id));
+                formData.append(`filessss[${index}][filenya]`, fileObj.filenya);
+                formData.append(`filessss[${index}][place]`, fileObj.place);
+            });
+
+            // berkas pendukung
+            data.pendukung?.forEach((v, i) => {
+                formData.append(`pendukung[${i}][name]`, v?.name ?? '')
+                formData.append(`pendukung[${i}][filenya]`, v?.filenya ?? '')
+            })
+
+            formData.append('hamlet', data.hamlet);
+            formData.append('phone', data.phone);
+            formData.append('religion', data.religion);
+            formData.append('sex', data.sex);
+            formData.append('problem', data.problem ?? '');
+            formData.append('_method', 'put');
+            formData.append('id', String(application.id));
+            router.post(route('desa.update', application.id), formData)
         } else {
             post(route('desa.store'))
         }
@@ -353,28 +393,47 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
                                         <Card.Title><BiUpload /> Dokumen Persyaratan : </Card.Title>
                                         <Row>
                                             <Col>
-                                                {menu.requirements.map((v, k) => {
+                                                {menu.requirements.map(v => {
                                                     const checkFiles = checkFile(v.name, v.id, application?.filess ?? [])
                                                     if (checkFiles !== undefined && checkFiles.status == 1) return null
-                                                    return <Form.Row key={k} className="mb-3">
-                                                        <Form.Label column lg={2}>{checkFiles !== undefined && checkFiles.status == 2 ? 'PERLU REVISI ' : ''} {v.name}</Form.Label>
+                                                    const currentFile = data.filessss.find(f => f.name === v.name);
+                                                    return <Form.Row key={v.id} className="mb-3">
+                                                        <Form.Label key={v.id} column lg={2}>{checkFiles !== undefined && checkFiles.status == 2 ? <span className="text-danger">PERLU REVISI</span> : ''} {v.name} {v.require ? '(WAJIB)' : ''} {v.link &&
+                                                            <a className={'text-link'} style={{ color: 'blue' }} href={`/download-file-wajib?place=${v.link}`} target="_blank" rel="noopener noreferrer">Download Contoh</a>
+                                                        }</Form.Label>
                                                         <Col>
                                                             <Form.File
+                                                                key={v.id}
+                                                                ref={(ee) => { fileInputs.current[v.id] = ee }}
+                                                                required={data.filessss.find(f => f.name === v.name)?.place === '' ? v.require === 1 ? true : false : false}
                                                                 custom
-                                                                id="custom-file"
-                                                                label={data.filessss[k]?.filenya?.name ?? ''}
+                                                                id={`custom-file-${v.id}`}
+                                                                label={currentFile?.filenya.name || 'Pilih file....'}
                                                                 onChange={e => {
                                                                     const listFiles = e.target.files
                                                                     if (listFiles != null) {
+                                                                        const existing = application?.filess?.find(f => f.name === v.name);
+                                                                        const file = listFiles[0]
                                                                         if (application !== null && application !== undefined && application.filess?.filter((e) => e.name === v.name)[0] !== undefined) {
                                                                             console.log(v.name);
                                                                             console.log(application.filess?.filter((e) => e.name === v.name));
-                                                                            filessRef.current.push({ name: v.name, filenya: listFiles[0], place: application.filess?.filter((e) => e.name === v.name)[0].place ?? '' })
+                                                                            // filessRef.current.push({ name: v.name, filenya: listFiles[0], place: application.filess?.filter((e) => e.name === v.name)[0].place ?? '' })
+                                                                            const newFiles = [
+                                                                                ...data.filessss.filter(f => f.name !== v.name), // hapus lama
+                                                                                { id: v.id, name: v.name, filenya: file, place: existing?.place ?? application.filess?.filter((e) => e.name === v.name)[0].place ?? '' }
+                                                                            ];
+                                                                            setData('filessss', newFiles)
+
                                                                         } else {
-                                                                            filessRef.current.push({ name: v.name, filenya: listFiles[0], place: '' })
+                                                                            const newFiles = [
+                                                                                ...data.filessss.filter(f => f.name !== v.name), // hapus lama
+                                                                                { name: v.name, filenya: file, place: existing?.place ?? '' }
+
+                                                                            ];
+                                                                            setData('filessss', newFiles)
                                                                         }
-                                                                        console.log(filessRef.current.length);
-                                                                        setData('filessss', filessRef.current)
+                                                                        // console.log(filessRef.current.length);
+                                                                        // setData('filessss', [...filessRef.current])
 
                                                                     }
                                                                 }}
@@ -385,70 +444,82 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
                                                 })}
                                             </Col>
                                         </Row>
-                                        {/* <Card.Title className="mt-3"><BiFile /> Berkas lainnya : <CgAdd
-                                onClick={e => {
-                                    e.preventDefault()
-                                    setPendukung([...pendukung, null])
-                                    setData('pendukung', [...data.pendukung, { name: '', filenya: undefined }])
-                                }}
-                            /></Card.Title>
-                            <Row>
-                                <Col>
-                                    {pendukung.map((v, k) => {
-                                        return <Form.Row key={k}>
-                                            <Col className="mb-3">
-                                                <Form.Control
-                                                    placeholder="Masukkan Nama Berkas"
-                                                />
-                                            </Col>
+                                        <Card.Title className="mt-3"><BiFile /> Berkas lainnya : <CgAdd
+                                            onClick={e => {
+                                                e.preventDefault()
+                                                setPendukung([...pendukung, null])
+                                                setData('pendukung', [...data.pendukung, { name: '', filenya: undefined }])
+                                            }}
+                                        /></Card.Title>
+                                        <Row>
                                             <Col>
-                                                <Form.File
-                                                    custom
-                                                    id="custom-file"
-                                                    label={k + 1}
-                                                    onChange={e => {
-                                                        const listFiles = e.target.files
-                                                        if (listFiles != null) {
-                                                            // if (applicant !== null && applicant !== undefined && applicant.filess?.filter((e) => e.name === v.name)[0] !== undefined) {
-                                                            //   filessRef.current.push({ name: v.name, filenya: listFiles[0], place: applicant.filess?.filter((e) => e.name === v.name)[0].place ?? '' })
-                                                            // } else {
-                                                            // pendukungRef.current.push({ name: `${k}`, filenya: listFiles[0], place: '' })
-                                                            const updated = [...data.pendukung]
-                                                            updated[k].filenya = listFiles[0]
+                                                {pendukung.map((v, k) => {
+                                                    return <Form.Row key={k}>
+                                                        <Col className="mb-3">
+                                                            <Form.Control
+                                                                placeholder="Masukkan Nama Berkas"
+                                                                onChange={e => {
+                                                                    const updated = [...data.pendukung]
+                                                                    updated[k].name = e.target.value
+                                                                    setData('pendukung', updated)
+                                                                }}
+                                                            />
+                                                        </Col>
+                                                        <Col>
+                                                            <Form.File
+                                                                custom
+                                                                id="custom-file"
+                                                                ref={e => { fileInputSupport.current[k] = e }}
+                                                                label={data.pendukung[k]?.filenya?.name ?? ''}
+                                                                onChange={e => {
+                                                                    const listFiles = e.target.files
+                                                                    if (listFiles != null) {
+                                                                        // if (applicant !== null && applicant !== undefined && applicant.filess?.filter((e) => e.name === v.name)[0] !== undefined) {
+                                                                        //   filessRef.current.push({ name: v.name, filenya: listFiles[0], place: applicant.filess?.filter((e) => e.name === v.name)[0].place ?? '' })
+                                                                        // } else {
+                                                                        // pendukungRef.current.push({ name: `${k}`, filenya: listFiles[0], place: '' })
+                                                                        const updated = [...data.pendukung]
+                                                                        updated[k].filenya = listFiles[0]
 
-                                                            setData('pendukung', updated)
-                                                            // }
-                                                        }
-                                                    }}
-                                                    name={`${k + 1}`}
-                                                />
+                                                                        setData('pendukung', updated)
+                                                                        // }
+                                                                    }
+                                                                }}
+                                                                name={`${k + 1}`}
+                                                            />
+                                                        </Col>
+                                                        <Col xs={1}>
+                                                            <CgRemove
+                                                                size={25}
+                                                                className={'cursor-pointer'}
+                                                                color='red'
+                                                                onClick={(e) => {
+                                                                    e.preventDefault()
+                                                                    setPendukung(pendukung.filter((_, i) => i !== k))
+                                                                }}
+                                                            />
+                                                        </Col>
+                                                    </Form.Row>
+                                                })}
                                             </Col>
-                                            <Col xs={1}>
-                                                <CgRemove
-                                                    size={25}
-                                                    className={'cursor-pointer'}
-                                                    color='red'
-                                                    onClick={(e) => {
-                                                        e.preventDefault()
-                                                        setPendukung(pendukung.filter((_, i) => i !== k))
-                                                    }}
-                                                />
-                                            </Col>
-                                        </Form.Row>
-                                    })}
-                                </Col>
-                            </Row>
-                            */}
+                                        </Row>
+
                                         <Row className="justify-content-md-center">
                                             <Col md={"auto"}>
                                                 <Button
+                                                    disabled={processing}
                                                     className='mt-5'
                                                     type='submit'
                                                     size='sm'
                                                     variant="primary"
                                                 >
                                                     <HiSave className={'mr-2'} />
-                                                    {title} Permohoan
+                                                    {
+                                                        processing ? <><i className="fa fa-spinner fa-spin"></i>{" "}
+                                                            <span>Loading...</span>
+                                                        </> : ` ${title}  Permohoan`
+                                                    }
+
                                                 </Button>
                                             </Col>
                                         </Row>

@@ -41,7 +41,8 @@ export default function GuestCreate({ category, menu, application, districts }: 
             pendukung: [],
             filess: [],
             files: undefined,
-            supports: []
+            supports: [],
+            created_at: '',
         }
     )
     const [stateDistrict, setStateDistrict] = React.useState<District | null>()
@@ -412,11 +413,12 @@ export default function GuestCreate({ category, menu, application, districts }: 
                                         const checkFiles = checkFile(v.name, v.id, application?.filess ?? [])
                                         if (checkFiles !== undefined && checkFiles.status == 1) return null
                                         return <Form.Row key={k} className="mb-3">
-                                            <Form.Label column lg={2}>{checkFiles !== undefined && checkFiles.status == 2 ? 'PERLU REVISI ' : ''} {v.name}</Form.Label>
+                                            <Form.Label column lg={2}>{checkFiles !== undefined && checkFiles.status == 2 ? <span className="text-danger">PERLU REVISI</span> : ''} {v.name} {v.require ? '(WAJIB)' : ''}</Form.Label>
                                             <Col>
                                                 <Form.File
                                                     custom
                                                     id="custom-file"
+                                                    required={data.filessss.find(f => f.name === v.name)?.place === '' ? v.require === 1 ? true : false : false}
                                                     label={data.filessss[k]?.filenya.name ?? ''}
                                                     onChange={e => {
                                                         const listFiles = e.target.files
