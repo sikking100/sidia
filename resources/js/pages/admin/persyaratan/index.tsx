@@ -5,13 +5,14 @@ import useCustomModal from "@/hooks/use-modal";
 import Admin from "@/layouts/admin";
 import { FlashProps, Menu, Paginator, Requirement } from "@/types";
 import { Button, FormControl } from "react-bootstrap";
-import { GrAddCircle, GrNext, GrPrevious } from "react-icons/gr";
+import { GrAddCircle } from "react-icons/gr";
 import { PageProps } from "node_modules/@inertiajs/core/types/types";
 import axios from "axios";
 import React from "react";
 import { GiCancel } from "react-icons/gi";
-import { Link, useForm } from "@inertiajs/react";
+import { useForm } from "@inertiajs/react";
 import { HiPencil, HiRefresh, HiSearch, HiTrash } from "react-icons/hi";
+import Nav from "@/components/pagination";
 
 
 interface Props extends PageProps {
@@ -45,48 +46,6 @@ export default function PersyaratanIndex({ menu, requirements, flash }: Props) {
 
         });
     };
-
-    const Nav = () => (
-        <nav>
-            <ul className="pagination justify-content-center">
-
-                {
-                    requirements.links.map((link, i) => {
-                        let content;
-
-                        if (link.label === 'pagination.previous') {
-                            content = <GrPrevious />; // Bootstrap Icon
-                        } else if (link.label === 'pagination.next') {
-                            content = <GrNext />;
-                        } else {
-                            content = link.label; // angka halaman biasa
-                        }
-                        return (
-                            <li
-                                key={i}
-                                className={`page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}`}
-                            >
-                                {link?.url ? (
-                                    <Link
-                                        href={link.url}
-                                        className="page-link"
-                                        preserveState
-                                        preserveScroll
-                                    >{content}</Link>
-                                ) : (
-                                    <span
-                                        className="page-link"
-                                    >{content}</span>
-                                )}
-                            </li>
-                        );
-                    })
-                }
-
-            </ul>
-        </nav>
-    )
-
 
     return (
         <Admin>
@@ -159,7 +118,7 @@ export default function PersyaratanIndex({ menu, requirements, flash }: Props) {
                                         </select>
                                     </div>
                                     {isMobile ? <div className="col"></div> : <div className="col">
-                                        <Nav />
+                                        <Nav pagination={requirements.links} />
                                     </div>}
                                     <div className="col">
                                         <FormControl
@@ -249,7 +208,7 @@ export default function PersyaratanIndex({ menu, requirements, flash }: Props) {
                                             </tbody>
                                         </table>
                                 }
-                                <Nav />
+                                <Nav pagination={requirements.links} />
                             </div>
                         </div>
                     </div>

@@ -2,7 +2,6 @@ import { Link, useForm, usePage } from "@inertiajs/react";
 import LOGO from "../../../../assets/images/logoduk.png"
 import { PageProps } from "node_modules/@inertiajs/core/types/types";
 import { Applicant, District, FlashProps, Paginator, User } from "@/types";
-import { GrNext, GrPrevious } from "react-icons/gr";
 import React from "react";
 import useCustomModal from "@/hooks/use-modal";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -15,6 +14,7 @@ import PageHeader from "@/components/page-header";
 import { getStatus, statusOptions } from "@/hooks/functions";
 import { makeIntlFormatter } from "react-timeago/defaultFormatter";
 import TimeAgo from "react-timeago";
+import Nav from "@/components/pagination";
 
 
 interface Props extends PageProps {
@@ -82,47 +82,6 @@ export default function BPJSIndex(props: Props) {
 
         });
     };
-
-    const Nav = () => (
-        <nav>
-            <ul className="pagination justify-content-center">
-
-                {
-                    props.applications.links.map((link, i) => {
-                        let content;
-
-                        if (link.label === 'pagination.previous') {
-                            content = <GrPrevious />; // Bootstrap Icon
-                        } else if (link.label === 'pagination.next') {
-                            content = <GrNext />;
-                        } else {
-                            content = link.label; // angka halaman biasa
-                        }
-                        return (
-                            <li
-                                key={i}
-                                className={`page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}`}
-                            >
-                                {link?.url ? (
-                                    <Link
-                                        href={link.url}
-                                        className="page-link"
-                                        preserveState
-                                        preserveScroll
-                                    >{content}</Link>
-                                ) : (
-                                    <span
-                                        className="page-link"
-                                    >{content}</span>
-                                )}
-                            </li>
-                        );
-                    })
-                }
-
-            </ul>
-        </nav>
-    )
     return (
         <div id="wrapper">
             <BPJSNav />
@@ -289,7 +248,7 @@ export default function BPJSIndex(props: Props) {
                                         </select>
                                     </div>
                                     {isMobile || props.applications.data.length == 0 ? <div className="col"></div> : <div className="col">
-                                        <Nav />
+                                        <Nav pagination={props.applications.links} />
                                     </div>}
                                     <div className='col-xs-4'>
                                         <form onSubmit={handleSearch} className="d-flex">
@@ -428,7 +387,7 @@ export default function BPJSIndex(props: Props) {
                                 </table>}
                             </div>
                             <div className="body pt-0">
-                                {props.applications.data.length > 0 && <Nav />}
+                                {props.applications.data.length > 0 && <Nav pagination={props.applications.links} />}
                             </div>
                         </div>
                     </div>

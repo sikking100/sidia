@@ -1,17 +1,17 @@
 import CustomModal from "@/components/custom-modal";
 import PageHeader from "@/components/page-header";
+import Nav from "@/components/pagination";
 import { getStatus, statusOptions } from "@/hooks/functions";
 import { useIsMobile } from "@/hooks/use-mobile";
 import useCustomModal from "@/hooks/use-modal";
 import Admin from "@/layouts/admin";
 import { Applicant, District, FlashProps, Paginator } from "@/types"
 import { PageProps } from "@inertiajs/core";
-import { Link, useForm } from "@inertiajs/react";
+import { useForm } from "@inertiajs/react";
 import axios from "axios";
 import React from "react";
 import { Button, FormControl } from "react-bootstrap";
 import { GiCancel } from "react-icons/gi";
-import { GrNext, GrPrevious } from "react-icons/gr";
 import { HiDownload, HiEye, HiRefresh, HiSearch, HiTrash, HiUpload } from "react-icons/hi";
 import TimeAgo from "react-timeago";
 import { makeIntlFormatter } from "react-timeago/defaultFormatter";
@@ -85,48 +85,6 @@ export default function PermohonanIndex(props: Props) {
 
         });
     };
-
-    const Nav = () => (
-        <nav>
-            <ul className="pagination justify-content-center">
-
-                {
-                    props.applications.links.map((link, i) => {
-                        let content;
-
-                        if (link.label === 'pagination.previous') {
-                            content = <GrPrevious />; // Bootstrap Icon
-                        } else if (link.label === 'pagination.next') {
-                            content = <GrNext />;
-                        } else {
-                            content = link.label; // angka halaman biasa
-                        }
-                        return (
-                            <li
-                                key={i}
-                                className={`page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}`}
-                            >
-                                {link?.url ? (
-                                    <Link
-                                        href={link.url}
-                                        className="page-link"
-                                        preserveState
-                                        preserveScroll
-                                    >{content}</Link>
-                                ) : (
-                                    <span
-                                        className="page-link"
-                                    >{content}</span>
-                                )}
-                            </li>
-                        );
-                    })
-                }
-
-            </ul>
-        </nav>
-    )
-
 
     return (
         <Admin>
@@ -293,7 +251,7 @@ export default function PermohonanIndex(props: Props) {
                                         </select>
                                     </div>
                                     {isMobile ? <div className="col"></div> : <div className="col">
-                                        <Nav />
+                                        <Nav pagination={props.applications.links} />
                                     </div>}
                                     <div className='col-xs-4'>
                                         <form onSubmit={handleSearch} className="d-flex">
@@ -430,7 +388,7 @@ export default function PermohonanIndex(props: Props) {
                                 </table>
                             </div>
                             <div className="body pt-0">
-                                <Nav />
+                                <Nav pagination={props.applications.links} />
                             </div>
                         </div>
                     </div>

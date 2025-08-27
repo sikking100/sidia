@@ -1,16 +1,17 @@
 import CustomModal from "@/components/custom-modal";
 import PageHeader from "@/components/page-header";
+import Nav from "@/components/pagination";
 import { useIsMobile } from "@/hooks/use-mobile";
 import useCustomModal from "@/hooks/use-modal";
 import Admin from "@/layouts/admin";
 import { FlashProps, Hamlet, Paginator, Ward } from "@/types";
-import { Link, useForm } from "@inertiajs/react";
+import { useForm } from "@inertiajs/react";
 import axios from "axios";
 import { PageProps } from "node_modules/@inertiajs/core/types/types";
 import React from "react";
 import { Button, FormControl } from "react-bootstrap";
 import { GiCancel } from "react-icons/gi";
-import { GrAddCircle, GrNext, GrPrevious } from "react-icons/gr";
+import { GrAddCircle } from "react-icons/gr";
 import { HiEye, HiPencil, HiRefresh, HiSearch, HiTrash } from "react-icons/hi";
 
 interface Props extends PageProps {
@@ -46,47 +47,6 @@ export default function DusunIndex({ hamlets, flash, ward }: Props) {
 
         });
     };
-
-    const Nav = () => (
-        <nav>
-            <ul className="pagination justify-content-center">
-
-                {
-                    hamlets.data !== undefined && hamlets.links.map((link, i) => {
-                        let content;
-
-                        if (link.label === 'pagination.previous') {
-                            content = <GrPrevious />; // Bootstrap Icon
-                        } else if (link.label === 'pagination.next') {
-                            content = <GrNext />;
-                        } else {
-                            content = link.label; // angka halaman biasa
-                        }
-                        return (
-                            <li
-                                key={i}
-                                className={`page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}`}
-                            >
-                                {link?.url ? (
-                                    <Link
-                                        href={link.url}
-                                        className="page-link"
-                                        preserveState
-                                        preserveScroll
-                                    >{content}</Link>
-                                ) : (
-                                    <span
-                                        className="page-link"
-                                    >{content}</span>
-                                )}
-                            </li>
-                        );
-                    })
-                }
-
-            </ul>
-        </nav>
-    )
 
     return (
         <Admin>
@@ -161,7 +121,7 @@ export default function DusunIndex({ hamlets, flash, ward }: Props) {
                                         </select>
                                     </div>
                                     {isMobile ? <div className="col"></div> : <div className="col">
-                                        <Nav />
+                                        <Nav pagination={hamlets.links} />
                                     </div>}
                                     <div className="col">
                                         <FormControl
@@ -260,7 +220,7 @@ export default function DusunIndex({ hamlets, flash, ward }: Props) {
                                                 })}
                                             </tbody>
                                         </table>
-                                        <Nav />
+                                        <Nav pagination={hamlets.links} />
                                     </div>
                             }
 
