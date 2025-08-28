@@ -9,7 +9,7 @@ import CustomModal from "@/components/custom-modal";
 import { Button, FormControl } from "react-bootstrap";
 import axios from "axios";
 import { GiCancel } from "react-icons/gi";
-import { HiDownload, HiEye, HiRefresh, HiSearch, HiTrash, HiUpload } from "react-icons/hi";
+import { HiEye, HiRefresh, HiSearch, HiTrash } from "react-icons/hi";
 import PageHeader from "@/components/page-header";
 import { getStatus, statusOptions } from "@/hooks/functions";
 import { makeIntlFormatter } from "react-timeago/defaultFormatter";
@@ -330,35 +330,6 @@ export default function BPJSIndex(props: Props) {
                                                     </td>
                                                     <td>
                                                         <div className="grid">
-                                                            {d.category.includes('KTP') || d.category.includes('KIA') ? <div></div> : d.status !== 'COMPLETED' ? <div></div> : (d.filess !== null && d.filess!.length > 0 && d.filess![0].name.includes('Hasil')) ? <div>
-
-                                                                <a className="btn btn-sm btn-success col mb-2"
-                                                                    // className={'inline-block bg-blue-300 px-4 py-2 text-black rounded-md font-semibold'}
-                                                                    href={`/download-file?place=${d.filess!.filter((a) => a.name.includes('Hasil'))[0].place}`} target="_blank" rel="noopener noreferrer">
-                                                                    <Button
-                                                                        className='btn btn-sm btn-primary'
-                                                                    >
-                                                                        <HiDownload className='mr-1' />
-                                                                        Download
-                                                                    </Button>
-                                                                </a>
-                                                            </div> :
-
-                                                                <>
-                                                                    <Button
-                                                                        // color={'green'}
-                                                                        className={'btn btn-sm btn-primary col mb-1'}
-                                                                        onClick={(ev) => {
-                                                                            ev.preventDefault()
-                                                                            // setShowModal(!showModal)
-                                                                            id.current = d.id ?? 0
-                                                                        }}
-                                                                    >
-                                                                        <HiUpload className='mr-2' />
-                                                                        Upload
-                                                                    </Button>
-                                                                </>
-                                                            }
                                                             <Button
                                                                 // color={"green"}
                                                                 className='btn btn-sm btn-info col mb-1'

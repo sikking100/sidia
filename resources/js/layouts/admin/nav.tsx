@@ -84,6 +84,7 @@ export default function AdminNav() {
                                 as="ul"
                                 className="dropdown-menu-right account">
                                 <li><Link className="text-link" href={route('logout')} method="post"><i className="icon-power"></i> Logout</Link></li>
+                                {user.role !== 'superadmin' && <li><Link className="text-link" href={route('user.show', user.id)} method="get"><i className="icon-user"></i> Profil</Link></li>}
                             </Dropdown.Menu>
                         </Dropdown>
                         <hr />
@@ -279,7 +280,7 @@ export default function AdminNav() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 

@@ -12,7 +12,7 @@ import axios from "axios";
 import React from "react";
 import { Button, FormControl } from "react-bootstrap";
 import { GiCancel } from "react-icons/gi";
-import { HiDownload, HiEye, HiRefresh, HiSearch, HiTrash, HiUpload } from "react-icons/hi";
+import { HiEye, HiRefresh, HiSearch, HiTrash } from "react-icons/hi";
 import TimeAgo from "react-timeago";
 import { makeIntlFormatter } from "react-timeago/defaultFormatter";
 
@@ -331,7 +331,7 @@ export default function PermohonanIndex(props: Props) {
                                                     </td>
                                                     <td>
                                                         <div className="grid">
-                                                            {d.category.includes('KTP') || d.category.includes('KIA') ? <div></div> : d.status !== 'COMPLETED' ? <div></div> : (d.filess !== null && d.filess!.length > 0 && d.filess![0].name.includes('Hasil')) ? <div>
+                                                            {/* {d.category.includes('KTP') || d.category.includes('KIA') ? <div></div> : d.status !== 'COMPLETED' ? <div></div> : (d.filess !== null && d.filess!.length > 0 && d.filess![0].name.includes('Hasil')) ? <div>
 
                                                                 <a className="btn btn-sm btn-success col mb-2"
                                                                     // className={'inline-block bg-blue-300 px-4 py-2 text-black rounded-md font-semibold'}
@@ -359,7 +359,7 @@ export default function PermohonanIndex(props: Props) {
                                                                         Upload
                                                                     </Button>
                                                                 </>
-                                                            }
+                                                            } */}
                                                             <Button
                                                                 // color={"green"}
                                                                 className='btn btn-sm btn-info col mb-1'

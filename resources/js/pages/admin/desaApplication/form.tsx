@@ -399,7 +399,7 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
                                                     const currentFile = data.filessss.find(f => f.name === v.name);
                                                     return <Form.Row key={v.id} className="mb-3">
                                                         <Form.Label key={v.id} column lg={2}>{checkFiles !== undefined && checkFiles.status == 2 ? <span className="text-danger">PERLU REVISI</span> : ''} {v.name} {v.require ? '(WAJIB)' : ''} {v.link &&
-                                                            <a className={'text-link'} style={{ color: 'blue' }} href={`/download-file-wajib?place=${v.link}`} target="_blank" rel="noopener noreferrer">Download Contoh</a>
+                                                            <a className={'text-link'} style={{ color: 'blue' }} href={v.link.includes('http') ? v.link : `/download-file-wajib?place=${v.link}`} target="_blank" rel="noopener noreferrer">Download Contoh</a>
                                                         }</Form.Label>
                                                         <Col>
                                                             <Form.File

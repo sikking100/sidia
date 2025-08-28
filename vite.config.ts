@@ -41,13 +41,14 @@ export default () => {
             react(),
             // tailwindcss(),
             VitePWA({
-                buildBase: '/build/',
-                scope: '/',
-                base: '/',
-                registerType: 'prompt',
+                registerType: 'autoUpdate',
                 devOptions: {
-                    enabled: false
+                    enabled: true
                 },
+                includeAssets: [
+                    'favicon.ico',
+                    'robots.txt'
+                ],
                 workbox: {
                     // Add all the assets built by Vite into the public/build/assets
                     // folder to the SW cache.
@@ -56,7 +57,7 @@ export default () => {
                     // Define the root URL as the entrypoint for the offline app.
                     // vue-router can then takes over and shows the correct page
                     // if you are using it.
-                    navigateFallback: '/',
+                    navigateFallback: null,
 
                     // Stops various paths being intercepted by the service worker
                     // if they're not available offline. Telescope is a good
@@ -88,17 +89,15 @@ export default () => {
                 },
                 manifest: {
                     // Metadata
-                    name: 'Laravel Vite PWA',
-                    short_name: 'laravel-vite-pwa',
-                    description: 'A demo of Laravel with vite-plugin-pwa',
-                    theme_color: '#DE9918',
-                    background_color: '#DE9918',
+                    name: 'SI-DiA DUKCAPIL 2.0',
+                    short_name: 'SI-DiA 2.0',
+                    description: 'Sistem Informasi Digitalisasi Adminduk Dinas Kependudukan dan Pencatatan Sipil Daerah Kabupaten Morowali Utara',
+                    theme_color: '#0f65ad',
+                    background_color: '#0f65ad',
                     orientation: 'portrait',
                     display: 'standalone',
                     scope: '/',
                     start_url: '/',
-                    id: '/',
-
                     // These icons are used when installing the PWA onto a home screen
                     icons: [...manifestIcons],
                     screenshots: [

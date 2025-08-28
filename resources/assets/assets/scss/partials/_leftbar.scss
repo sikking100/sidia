@@ -112,6 +112,7 @@
 		@extend .inlineblock;
 		@extend .align-left;
 		@extend .m-t-5;
+		cursor: pointer;
 
 		.dropdown-menu{
 			transform: none !important;			
@@ -131,6 +132,11 @@
 				font-size: 14px;
 				color: $grey-500;
 				border: none;
+
+				i{
+					@extend .m-r-10;
+					font-size: 14px;
+				}
 			}
 
 			a{

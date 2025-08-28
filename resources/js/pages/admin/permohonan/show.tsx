@@ -319,7 +319,7 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                     </div>
 
                                     <div className='form-row mt-3'>
-                                        {(application.status == 'VERIFIED' || application.status == 'COMPLETED') &&
+                                        {(application.status == 'VERIFIED' || application.status == 'COMPLETED' || application.status == 'COMPLETED_FILE') &&
                                             <div className="col-xs-2">
                                                 <Button
                                                     onClick={onClick}

@@ -95,10 +95,12 @@ class UserController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
-        $user->password = bcrypt($request->password);
+        if ($request->password != null) {
+            $user->password = bcrypt($request->password);
+        }
         $user->save();
         if ($user->role == 'desa') {
-            return redirect()->route('dashboard')->with('message', 'Data berhasil diubah');
+            return back()->with('message', 'Data berhasil diubah');
         }
         return redirect()->route('user.index')->with('message', 'Data berhasil diubah');
     }
