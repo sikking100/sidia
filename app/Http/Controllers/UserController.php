@@ -144,4 +144,26 @@ class UserController extends Controller
 
         return back()->with('status', __('Silakan cek email Anda'));
     }
+
+    public function bpjs($id)
+    {
+        $user = User::find($id);
+        return Inertia::render('admin/bpjs/user', compact('user'));
+    }
+
+    public function bpjs_update(Request $request, $id)
+    {
+        $user = User::find($id);
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->phone = $request->phone;
+        if ($request->password != null) {
+            $user->password = bcrypt($request->password);
+        }
+        $user->save();
+        if ($user->role == 'bpjs') {
+            return back()->with('message', 'Data berhasil diubah');
+        }
+        return redirect()->route('user.index')->with('message', 'Data berhasil diubah');
+    }
 }

@@ -83,8 +83,8 @@ export default function AdminNav() {
                             <Dropdown.Menu
                                 as="ul"
                                 className="dropdown-menu-right account">
-                                <li><Link className="text-link" href={route('logout')} method="post"><i className="icon-power"></i> Logout</Link></li>
                                 {user.role !== 'superadmin' && <li><Link className="text-link" href={route('user.show', user.id)} method="get"><i className="icon-user"></i> Profil</Link></li>}
+                                <li><Link className="text-link" href={route('logout')} method="post"><i className="icon-power"></i> Logout</Link></li>
                             </Dropdown.Menu>
                         </Dropdown>
                         <hr />

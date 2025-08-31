@@ -48,6 +48,8 @@ Route::middleware(['auth', 'role:bpjs'])->group(function () {
     Route::put('/bpjs/{id}', [BpjsController::class, 'update'])->name('bpjs.update');
     Route::put('/bpjs/{id}/file', [FileController::class, 'update'])->name('bpjs.file');
     Route::get('/bpjs-years', [BpjsController::class, 'years']);
+    Route::get('/bpjs/{id}/user', [UserController::class, 'bpjs'])->name('bpjs.user');
+    Route::put('/bpjs/{id}/update', [UserController::class, 'bpjs_update'])->name('bpjs.updates');
 });
 
 Route::middleware(['auth', 'role:desa'])->group(function () {

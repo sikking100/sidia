@@ -84,7 +84,7 @@ export default function BPJSIndex(props: Props) {
     };
     return (
         <div id="wrapper">
-            <BPJSNav />
+            <BPJSNav {...user} />
             {/* Modal Hapus */}
             <CustomModal
                 show={modalHapus.isOpen}
@@ -369,7 +369,7 @@ export default function BPJSIndex(props: Props) {
 }
 
 
-export function BPJSNav() {
+export function BPJSNav(user: User) {
     return (
         <div>
             <nav className="navbar navbar-fixed-top">
@@ -402,14 +402,24 @@ export function BPJSNav() {
                         <span>SI-DiA</span>
 
                     </div>
-                    <div id="navbar-menu">
-                        <ul className="nav navbar-nav">
-                            <li>
-                                <Link href={route('logout')} method="post" className="icon-menu text-link">
-                                    <i className="icon-power"></i>
-                                </Link>
-                            </li>
-                        </ul>
+                    <div className="navbar-right">
+                        <div id="navbar-menu">
+                            <ul className="nav navbar-nav">
+                                <li>
+                                    <a
+                                        href={route('bpjs.user', user.id)}
+                                        className="icon-menu"
+                                    >
+                                        <i className="icon-user"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <Link href={route('logout')} method="post" className="icon-menu text-link">
+                                        <i className="icon-power"></i>
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </nav>

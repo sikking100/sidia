@@ -267,18 +267,6 @@ export default function Welcome() {
                         </Col>
                         <Col xs={12} md={4} lg={4} xl={3} sm={3}>
                             <div className='card'>
-                                <Image src='../../assets/11.png' rounded className='img-fluid' />
-                                <div>
-                                    <div className="header">
-                                        <a href={route('guest.create', 'Surat-Keterangan-Pelepasan-Kewarganegaraan')}>
-                                            <h2>Surat Keterangan Pelepasan Kewarganegaraan Indonesia</h2>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </Col>
-                        <Col xs={12} md={4} lg={4} xl={3} sm={3}>
-                            <div className='card'>
                                 <Image src='../../assets/13.png' rounded className='img-fluid' />
                                 <div>
                                     <div className="header">

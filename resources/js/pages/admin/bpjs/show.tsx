@@ -9,7 +9,7 @@ import useCustomModal from "@/hooks/use-modal";
 import CustomModal from "@/components/custom-modal";
 import { Button, Col, Form, FormControl, Image, Row, Table } from "react-bootstrap";
 import { GiCancel, GiTick } from "react-icons/gi";
-import { BiFace, BiFile, BiHome, BiIdCard, BiMap, BiMapAlt, BiPhone, BiPrinter, BiRevision, BiSolidDownload, BiText, BiTime, BiUserCircle } from "react-icons/bi";
+import { BiFace, BiFile, BiHome, BiIdCard, BiMap, BiMapAlt, BiPhone, BiRevision, BiSolidDownload, BiText, BiTime, BiUserCircle } from "react-icons/bi";
 import { GoVerified } from "react-icons/go";
 import { checkFile, getFileType, getStatus, getStatusBerkas } from "@/hooks/functions";
 import PageHeader from "@/components/page-header";
@@ -47,9 +47,9 @@ export default function BPJSShow({ application, flash }: Props) {
         status_description: ''
     })
 
-    function onClick() {
-        window.open(route('application.edit', application.id))
-    }
+    // function onClick() {
+    //     window.open(route('application.edit', application.id))
+    // }
 
     function onTolak() {
         setData('status', 'CANCEL')
@@ -60,7 +60,7 @@ export default function BPJSShow({ application, flash }: Props) {
         const check = application.filess.filter(e => e.status != 1)
         if (check.length > 0) {
             setError('Berkas belum diverifikasi, silahkan verifikasi semua berkas terlebih dahulu')
-            errorModal.open()
+            open()
             return
         }
         try {
@@ -71,7 +71,7 @@ export default function BPJSShow({ application, flash }: Props) {
             // window.location.reload()
         } catch (error) {
             setError(`${error}`)
-            errorModal.open()
+            open()
         }
         return
     }
@@ -85,7 +85,7 @@ export default function BPJSShow({ application, flash }: Props) {
             window.location.reload()
         } catch (error) {
             setError(`${error}`)
-            errorModal.open()
+            open()
         }
         return
     }
@@ -99,14 +99,14 @@ export default function BPJSShow({ application, flash }: Props) {
         if (selectedFile !== null && selectedFile !== undefined) {
             put(route('bpjs.file', selectedFile?.id), {
                 onError: (e) => {
-                    errorModal.open()
+                    open()
                     setError(e.message)
                 }
             })
         } else {
             put(route('bpjs.update', application.id), {
                 onError: (e) => {
-                    errorModal.open()
+                    open()
                     setError(e.message)
                 }
             })
@@ -129,15 +129,15 @@ export default function BPJSShow({ application, flash }: Props) {
 
 
     const tolakModal = useCustomModal()
-    const errorModal = useCustomModal()
+    const { open, isOpen, close } = useCustomModal()
     const lihatModal = useCustomModal()
 
     React.useEffect(() => {
         if (flash?.message !== undefined && flash?.message !== null && flash?.message !== '') {
-            errorModal.open()
+            open()
         }
 
-    }, [flash?.message])
+    }, [flash?.message, open])
 
 
 
@@ -166,7 +166,7 @@ export default function BPJSShow({ application, flash }: Props) {
 
     return (
         <div id="wrapper">
-            <BPJSNav />
+            <BPJSNav {...user} />
             <CustomModal
                 show={lihatModal.isOpen}
                 onHide={lihatModal.close}
@@ -229,12 +229,12 @@ export default function BPJSShow({ application, flash }: Props) {
 
             {/* kalau ada error */}
             <CustomModal
-                show={errorModal.isOpen}
-                onHide={errorModal.close}
+                show={isOpen}
+                onHide={close}
                 title="Kesalahan"
                 size="sm"
                 footer={
-                    <Button type="reset" onClick={errorModal.close} className="btn btn-sm btn-outline-primary mr-2">
+                    <Button type="reset" onClick={close} className="btn btn-sm btn-outline-primary mr-2">
                         <GiCancel className="mr-1" />
                         Tutup
                     </Button>
@@ -311,7 +311,7 @@ export default function BPJSShow({ application, flash }: Props) {
                                     </div>
 
                                     <div className='form-row mt-3'>
-                                        {(application.status == 'VERIFIED' || application.status == 'COMPLETED') &&
+                                        {/* {(application.status == 'VERIFIED' || application.status == 'COMPLETED') &&
                                             <div className="col-xs-2">
                                                 <Button
                                                     onClick={onClick}
@@ -321,7 +321,7 @@ export default function BPJSShow({ application, flash }: Props) {
                                                     Print PDF
                                                 </Button>
                                             </div>
-                                        }
+                                        } */}
                                         {(application.status == 'VERIFIED') &&
                                             <div className="col">
                                                 <Button
@@ -333,7 +333,7 @@ export default function BPJSShow({ application, flash }: Props) {
                                                             window.location.reload()
                                                         } catch (error) {
                                                             setError(`${error}`)
-                                                            errorModal.open()
+                                                            open()
                                                         }
                                                     }}
                                                     className="btn btn-sm btn-success"
@@ -671,7 +671,7 @@ export default function BPJSShow({ application, flash }: Props) {
                                                                         window.location.reload()
                                                                     } catch (error) {
                                                                         setError(`${error}`)
-                                                                        errorModal.open()
+                                                                        open()
                                                                     }
                                                                 }}
                                                                 className="btn btn-sm btn-success"
