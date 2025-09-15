@@ -191,6 +191,7 @@ class ApplicationController extends Controller
 
     public function store(Request $request)
     {
+        Log::info('testing masuk');
         // untuk api
         try {
             $jwtToken = $request->header('Authorization');
@@ -411,10 +412,10 @@ class ApplicationController extends Controller
 
     public function update_status(Request $request, $id)
     {
-        $application = Application::where('id', $id)->first();
-
+        $application = Application::find($id);
         try {
-            if (($application->ticket != null && $application->ticket != '' && $application->ticket != '-') && ($request->status == "VERIFIED" || $request->status == "DEFFICIENT" || $request->status == "COMPLETED")) {
+            if (($application->ticket != null && $application->ticket != '' && $application->ticket != '-' && $application->ticket[0] != 'S' && $application->ticket[0] != 'J') && ($request->status == "CANCEL" || $request->status == "VERIFIED" || $request->status == "DEFFICIENT" || $request->status == "COMPLETED")) {
+                Log::info('api dimulai');
                 $key = config('services.external_api.symmetric');
                 $status = 0;
                 switch ($request->status) {
@@ -437,8 +438,10 @@ class ApplicationController extends Controller
                     "status" => $status,
                 ];
                 $ext_url = config('services.external_api.url');
+                Log::info('api dipanggil');
 
                 $result = Http::put($ext_url . "integration/client/ticket/change-status", $data);
+                Log::info('selesai memanggil API');
                 if ($result->failed()) {
                     $tes = [
                         'status' => $result->status(),
@@ -491,5 +494,24 @@ class ApplicationController extends Controller
         return response()->json([
             'count' => count($c)
         ]);
+    }
+
+    public function photo(Request $request)
+    {
+        $url = config('services.external_api.url');
+        $sym = config('services.external_api.symmetric');
+        $response = Http::withHeaders([
+            'symetric' => $sym,
+            'Accept' => 'image/jpeg',
+        ])->get($url . "files-sym/" . $request->name);
+        if ($response->successful()) {
+            $contentType = $response->header('Content-Type', 'application/octet-stream');
+            $filename = 'photo.jpg'; // atau ambil dari Content-Disposition kalau tersedia
+
+            return response($response->body(), 200)
+                ->header('Content-Type', $contentType)
+                ->header('Content-Disposition', 'inline; filename="' . $filename . '"');
+        }
+        return abort(404, 'Image not found');
     }
 }

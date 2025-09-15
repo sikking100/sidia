@@ -103,8 +103,10 @@
 }
 
 .navbar-nav {
+	align-items: center;
     @extend .margin-0;
     @extend .m-r-15;
+	flex-flow: nowrap;
 
 	.icon-menu {
 		padding: 15px;
@@ -147,6 +149,8 @@
 	ul.notifications {
         background:  $col-dark;
 		width: 500px;
+		overflow-y: scroll;
+		max-height: 50vh;
 
 		@include max-screen($break-small) {
 			width: calc(100% - 20px);

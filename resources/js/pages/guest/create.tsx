@@ -20,7 +20,7 @@ interface Props {
 }
 
 export default function GuestCreate({ category, menu, application, districts }: Props) {
-    const { data, setData, post, errors } = useForm<Applicant>(
+    const { data, setData, post, errors, processing } = useForm<Applicant>(
         {
             id: application?.id ?? 0,
             family_card_number: application?.family_card_number ?? '',
@@ -499,13 +499,17 @@ export default function GuestCreate({ category, menu, application, districts }: 
                             <Row className="justify-content-md-center">
                                 <Col md={"auto"}>
                                     <Button
+                                        disabled={processing}
                                         className='mt-5'
                                         type='submit'
                                         size='sm'
                                         variant="primary"
                                     >
                                         <HiSave className={'mr-2'} />
-                                        {application !== null ? 'Revisi' : 'Ajukan'} Permohoan
+
+                                        {processing ? <><i className="fa fa-spinner fa-spin"></i>{" "}
+                                            <span>Loading...</span>
+                                        </> : application !== null ? 'Revisi' : 'Ajukan'} Permohoan
                                     </Button>
                                 </Col>
                             </Row>

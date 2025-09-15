@@ -6,7 +6,7 @@ export default function Welcome() {
 
     return (
         <>
-            <Head title="Welcome">
+            <Head title="Selamat Datang">
             </Head>
             <Guest title='Selamat Datang'>
                 <Container fluid className='pt-2'>
