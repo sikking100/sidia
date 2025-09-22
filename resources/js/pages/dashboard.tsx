@@ -250,7 +250,7 @@ export default function Dashboard(props: Props) {
                             <div className="body">
                                 <div className='form-row'>
                                     {user.role !== 'desa' && <div className="col mb-3">
-                                        <select className="custom-select" id="kecamatan"
+                                        <select className="custom-select" id="inputGroupSelect01"
                                             value={kecamatan?.id}
                                             onChange={(e) => {
                                                 e.preventDefault();
@@ -267,7 +267,7 @@ export default function Dashboard(props: Props) {
 
                                     </div>}
                                     {user.role !== 'desa' && <div className="col mb-3">
-                                        <select className="custom-select" id="desa"
+                                        <select className="custom-select" id="inputGroupSelect01"
                                             value={desa?.id}
                                             onChange={(e) => {
                                                 e.preventDefault();
@@ -284,7 +284,7 @@ export default function Dashboard(props: Props) {
                                     </div>}
                                     <div className="col mb-3">
 
-                                        <select className="custom-select" id="dusun"
+                                        <select className="custom-select" id="inputGroupSelect01"
                                             value={dusun?.id}
                                             onChange={(e) => {
                                                 e.preventDefault();
@@ -308,7 +308,7 @@ export default function Dashboard(props: Props) {
                                     </div>
                                     <div className="col mb-3">
 
-                                        <select className="custom-select" id="tahun"
+                                        <select className="custom-select" id="inputGroupSelect01"
                                             onChange={e => setTahun(Number.parseInt(e.target.value))}
                                         >
                                             <option value={-1}>Tahun</option>

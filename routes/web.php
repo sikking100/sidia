@@ -12,7 +12,6 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WardController;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -119,16 +118,6 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/requirement/{requirement}/edit', [RequirementController::class, 'edit'])->name('requirement.edit');
     Route::put('/requirement/{requirement}', [RequirementController::class, 'update'])->name('requirement.update');
     Route::delete('/requirement/{requirement}', [RequirementController::class, 'destroy'])->name('requirement.destroy');
-    Route::get('/notifications/unread', function () {
-        return Auth::user()->unreadNotifications;
-    });
-
-    Route::post('/notifications/{id}/read', function ($id) {
-        Auth::user()->notifications()
-            ->where('id', $id)
-            ->update(['read_at' => now()]);
-        return response()->json(['status' => 'ok']);
-    });
 });
 
 require __DIR__ . '/settings.php';

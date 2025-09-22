@@ -4,57 +4,18 @@ import { Dropdown, Nav } from "react-bootstrap";
 import { Link, usePage } from "@inertiajs/react";
 import { User } from "@/types";
 import LOGO from "../../../assets/images/logoduk.png"
-import { useEchoNotification } from "@laravel/echo-react";
-import axios from "axios";
-import TimeAgo from "react-timeago";
-import { makeIntlFormatter } from "react-timeago/defaultFormatter";
-
-interface NotificationData {
-    id: number
-    message: string
-    created_at: string
-}
-
-interface Notification {
-    id: string
-    created_at: string
-    data: NotificationData
-    read_at?: string | null
-}
 
 
 export default function AdminNav() {
     const [menu, setMenu] = useState(true)
     const [themeColor, setThemeColor] = useState('theme-cyan')
     const [black, setBlack] = useState(false)
-    const [toggleNotification, setToggleNotification] = useState(false)
     const { url } = usePage()
     const { user } = usePage().props.auth as { user: User }
-    const [notifications, setNotification] = useState<Array<Notification>>([])
-
-    const getRead = async () => {
-        const response = await axios.get('/notifications/unread')
-        const result = response.data as Array<Notification>
-
-        setNotification((prev) => [...result, ...prev])
-    }
 
     useEffect(() => {
         setBlack(document.body.classList.contains("full-dark"))
     }, [black])
-
-    useEffect(() => {
-        // connectWebSocket()
-        getRead()
-    }, [])
-
-    useEchoNotification(
-        `notif.${user.id}`,
-        () => {
-            getRead()
-
-        },
-    )
 
     return (
         <div>
@@ -90,130 +51,11 @@ export default function AdminNav() {
                     </div>
                     <div id="navbar-menu">
                         <ul className="nav navbar-nav">
-                            <li
-                                className={
-                                    toggleNotification ? "show dropdown" : "dropdown"
-                                }
-                            >
-                                <a
-                                    href="#!"
-                                    className="dropdown-toggle icon-menu"
-                                    data-toggle="dropdown"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        setToggleNotification(!toggleNotification);
-                                    }}
-                                >
-                                    <i className="icon-bell"></i>
-                                    {notifications.filter((e) => e.read_at === null).length > 0 && <span className="notification-dot"></span>}
-                                </a>
-                                <ul
-                                    className={
-                                        toggleNotification
-                                            ? "dropdown-menu notifications show"
-                                            : "dropdown-menu notifications"
-                                    }
-                                >
-                                    <li className="header">
-                                        <strong>Anda memilik {notifications.filter((e) => e.read_at === null).length} pemberitahuan baru</strong>
-                                    </li>
-                                    {notifications.map((n, i) => {
-                                        const date = new Date(n.created_at ?? 1692230400000)
-                                        const formattedDate = new Intl.DateTimeFormat('id-ID', {
-                                            day: 'numeric',
-                                            month: 'short',
-                                            year: 'numeric',
-                                        }).format(date)
-                                        const intlFormatter = makeIntlFormatter({
-                                            locale: "id-ID", // string
-                                        });
-                                        return (
-                                            <li key={i}>
-                                                <Link
-                                                    onClick={async () => {
-                                                        await axios.post(`/notifications/${n.id}/read`)
-                                                    }}
-                                                    href={route('application.show', n.data.id)}>
-                                                    <div className="media">
-                                                        <div className="media-left">
-                                                            {n.read_at === null ? <i className="icon-info text-warning"></i> :
-                                                                <i className="icon-like text-success"></i>}
-                                                        </div>
-                                                        <div className="media-body">
-                                                            <p className="text">
-                                                                {n.data.message}
-                                                            </p>
-                                                            <span className="timestamp">
-                                                                {formattedDate} - <TimeAgo date={n.created_at ?? '1997-02-07'} formatter={intlFormatter} />
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            </li>
-                                        );
-                                    })}
-                                    {/* <li>
-                                        <Link href="#">
-                                            <div className="media">
-                                                <div className="media-left">
-                                                    <i className="icon-like text-success"></i>
-                                                </div>
-                                                <div className="media-body">
-                                                    <p className="text">
-                                                        Your New Campaign <strong>Holiday Sale</strong>{" "}
-                                                        is approved.
-                                                    </p>
-                                                    <span className="timestamp">11:30 AM Today</span>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link href="#">
-                                            <div className="media">
-                                                <div className="media-left">
-                                                    <i className="icon-pie-chart text-info"></i>
-                                                </div>
-                                                <div className="media-body">
-                                                    <p className="text">
-                                                        Website visits from Twitter is 27% higher than
-                                                        last week.
-                                                    </p>
-                                                    <span className="timestamp">04:00 PM Today</span>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link href="#">
-                                            <div className="media">
-                                                <div className="media-left">
-                                                    <i className="icon-info text-danger"></i>
-                                                </div>
-                                                <div className="media-body">
-                                                    <p className="text">
-                                                        Error on website analytics configurations
-                                                    </p>
-                                                    <span className="timestamp">Yesterday</span>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </li>
-                                    <li className="footer">
-                                        <Link href="#" className="more">See all notifications</Link>
-                                    </li> */}
-                                </ul>
-                            </li>
                             <li>
                                 <Link href={route('logout')} method="post" className="icon-menu text-link">
                                     <i className="icon-power"></i>
                                 </Link>
                             </li>
-                            {/* <li>
-                                <a href="login" className="icon-menu">
-                                    <i className="icon-login"></i>
-                                </a>
-                            </li> */}
                         </ul>
                     </div>
                 </div>
@@ -228,7 +70,7 @@ export default function AdminNav() {
                             alt="User Profile"
                         />
                         <Dropdown>
-                            <span>Selamat Datang,</span>
+                            <span>Welcome,</span>
                             <Dropdown.Toggle
                                 variant="none"
                                 as="a"

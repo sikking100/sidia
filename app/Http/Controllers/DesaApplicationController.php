@@ -8,10 +8,8 @@ use App\Models\Hamlet;
 use App\Models\Menu;
 use App\Models\SupportFile;
 use App\Support\MyUploadFile;
-use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
@@ -113,41 +111,6 @@ class DesaApplicationController extends Controller
             }
         }
 
-        // input data ke website DIA SAJA
-        $currentTimestamp = strtotime("now");
-        $key = config('services.external_api.symmetric');
-        $payload = [
-            "iss" => "lumen-jwt",
-            "iat" => $currentTimestamp
-        ];
-
-        $token = JWT::encode($payload, $key, 'HS256');
-        // nomor tiket dari aplikasi sidia
-        // JB untuk awalan sidia
-        // id dari primary key / id category dari citigov - tanggal sekarang / bulan / tahun / 
-        $nomor_tiket = "JB" . $applicant->id . "/" . $applicant->cat->id_citigov . "-" .  $applicant->created_at->format('d') . "/" . $applicant->created_at->format('m') . "/" . $applicant->created_at->format('Y') . "/" . $applicant->cat->id . "-JEBOL-" . $applicant->id;
-        $data = [
-            "nama_aplikasi" => "sidia",
-            "nama_layanan" => $applicant->cat->name_citigov,
-            "id_layanan" => $applicant->cat->id_citigov,
-            "nomor_tiket" => $nomor_tiket,
-            "status" => 1,
-            "nama_pemohon" => $applicant->name,
-            "nik_pemohon" => $applicant->id_card_number,
-            "email_pemohon" => $applicant->email,
-            "telepon_pemohon" => $applicant->phone,
-            "nip_petugas" => "198709032020122002",
-            "nama_petugas" => "FATMAWATI",
-            "bidang_petugas" => "PENDAFTARAN PENDUDUK",
-            "jabatan_petugas" => "PENGAWAS KEPENDUDUKAN",
-        ];
-        $ext_url = config('services.external_api.url');
-
-        $result = Http::withHeaders([
-            'token' => $token,
-            'symmetric' => $key,
-        ])->post($ext_url . "application/ticket/insert", $data);
-
         // email ke pemohon
         kirimEmail(
             $request->email,
@@ -163,7 +126,6 @@ class DesaApplicationController extends Controller
             'Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.'
         );
 
-
         // $desaApplication = DesaApplication::make($request->all());
         // $this->upload->uploadImages($request, 'images', $desaApplication);
         // $desaApplication->save();
@@ -177,10 +139,6 @@ class DesaApplicationController extends Controller
         // }
         // $menu = Menu::firstWhere('name', $request->category);
         // $syarat = $menu->requirements;
-
-        $applicant->update([
-            'ticket' => $nomor_tiket
-        ]);
 
         session()->flash('message', 'Data berhasil dibuat');
         return redirect()->route('desa.index');

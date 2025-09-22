@@ -8,15 +8,10 @@ use App\Models\District;
 use App\Models\File as ModelsFile;
 use App\Models\Menu;
 use App\Models\SupportFile;
-use App\Models\User;
-use App\Notifications\RequestCreatedNotification;
 use App\Support\MyUploadFile;
-use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -38,7 +33,7 @@ class GuestController extends Controller
 
     public function pencarian(Request $request)
     {
-        $applications = Application::query()->where('id_card_number', $request->q)->orWhere('name', 'LIKE', '%' . $request->q . '%')->orderBy('created_at', 'DESC')->get();
+        $applications = Application::query()->where('id_card_number', $request->q)->orWhere('name', 'LIKE', '%' . $request->q . '%')->get();
         return response()->json([
             'applications' => $applications
         ]);
@@ -67,6 +62,7 @@ class GuestController extends Controller
 
     public function formAction(StoreApplicationRequest $request)
     {
+        // dd(config('custom.email_dukcapil'));
         // dd($request->email);
         $applicant = Application::make($request->all());
         $this->upload->uploadImages($request, 'images', $applicant);
@@ -121,62 +117,37 @@ class GuestController extends Controller
             }
         }
 
-        // kirim notifikasi
-        $admins = User::where('role', 'superadmin')->get();
-        // Notification::send($admins, new RequestCreatedNotification([
-        //     'id' => $applicant->id,
-        //     'user' => $applicant->name,
-        // ]));
-        foreach ($admins as $key => $admin) {
-            $admin->notify(new RequestCreatedNotification(
-                [
-                    'id' => $applicant->id,
-                    'user_id' => $admin->id,
-                    'message' => 'Permohonan baru diajukan.',
-                    'created_at' => $applicant->created_at,
-                ]
-            ));
-        }
 
+        // $currentTimestamp = strtotime("now");
+        // $key = config('services.external_api.symmetric');
+        // $payload = [
+        //     "iss" => "lumen-jwt",
+        //     "iat" => $currentTimestamp
+        // ];
 
-        // input data ke website DIA SAJA
-        $currentTimestamp = strtotime("now");
-        $key = config('services.external_api.symmetric');
-        $payload = [
-            "iss" => "lumen-jwt",
-            "iat" => $currentTimestamp
-        ];
+        // $token = JWT::encode($payload, $key, 'HS256');
+        // $data = [
+        //     "nama_aplikasi" => "sidia",
+        //     "nama_layanan" => $applicant->cat->name_citigov,
+        //     "id_layanan" => $applicant->cat->id_citigov,
+        //     "nomor_tiket" => $applicant->id . "/" . $applicant->id_card_number . "/" . $applicant->created_at->format('d') . "/" . $applicant->created_at->format('m') . "/" . $applicant->created_at->format('Y'),
+        //     "status" => 1,
+        //     "nama_pemohon" => $applicant->name,
+        //     "nik_pemohon" => $applicant->id_card_number,
+        //     "email_pemohon" => $applicant->email,
+        //     "telepon_pemohon" => $applicant->phone,
+        //     "nip_petugas" => "198709032020122002",
+        //     "nama_petugas" => "FATMAWATI",
+        //     "bidang_petugas" => "PENDAFTARAN PENDUDUK",
+        //     "jabatan_petugas" => "PENGAWAS KEPENDUDUKAN",
+        // ];
+        // $ext_url = config('services.external_api.url');
 
-        $token = JWT::encode($payload, $key, 'HS256');
-        // nomor tiket dari aplikasi sidia
-        // SD untuk awalan sidia
-        // id dari primary key / id category dari citigov - tanggal sekarang / bulan / tahun / 
-        $nomor_tiket = "SD" . $applicant->id . "/" . $applicant->cat->id_citigov . "-" .  $applicant->created_at->format('d') . "/" . $applicant->created_at->format('m') . "/" . $applicant->created_at->format('Y') . "/" . $applicant->cat->id . "-SIDIA-" . $applicant->id;
-        $data = [
-            "nama_aplikasi" => "sidia",
-            "nama_layanan" => $applicant->cat->name_citigov,
-            "id_layanan" => $applicant->cat->id_citigov,
-            "nomor_tiket" => $nomor_tiket,
-            "status" => 1,
-            "nama_pemohon" => $applicant->name,
-            "nik_pemohon" => $applicant->id_card_number,
-            "email_pemohon" => $applicant->email,
-            "telepon_pemohon" => $applicant->phone,
-            "nip_petugas" => "198709032020122002",
-            "nama_petugas" => "FATMAWATI",
-            "bidang_petugas" => "PENDAFTARAN PENDUDUK",
-            "jabatan_petugas" => "PENGAWAS KEPENDUDUKAN",
-        ];
-        $ext_url = config('services.external_api.url');
-
-        $result = Http::withHeaders([
-            'token' => $token,
-            'symmetric' => $key,
-        ])->post($ext_url . "application/ticket/insert", $data);
-
-        $applicant->update([
-            'ticket' => $nomor_tiket
-        ]);
+        // $result = Http::withHeaders([
+        //     'token' => $token,
+        //     'symmetric' => $key,
+        // ])->post($ext_url . "application/ticket/insert", $data);
+        $category = $request->category;
 
         // dd(gettype($syarat));
         session()->flash('message', 'Berhasil mengajukan permohonan untuk NIK : ' . $applicant->id_card_number . '\nCek data pengajuan secara berkala');
