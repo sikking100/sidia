@@ -23,7 +23,7 @@ class CommentController extends Controller
         $comment = Comment::make($request->all());
         if ($request->has('file')) {
             // cek apakah desa atau bukan
-            if ($request->has('ward')) {
+            if ($request->has('hamlet')) {
                 $applicant = Application::find($request->application_id);
                 $nameExt = time() . '.' . $request->file->extension();
                 $request->file->storeAs($request->category, $nameExt, 'public');
@@ -41,7 +41,7 @@ class CommentController extends Controller
                 $comment->content = 'Berkas terkirim ke email ' . $request->guest_mail;
                 $applicant = Application::find($request->application_id);
                 $applicant->status = 'COMPLETED';
-                $applicant->status = 'Berkas sudah terkirim ke email';
+                $applicant->status_description = 'Berkas sudah terkirim ke email';
                 $applicant->save();
             }
         }

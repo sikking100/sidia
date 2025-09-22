@@ -562,7 +562,7 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                         <BiFile size={25} />
                                         <span>Lampiran Permohonan : </span>
                                     </div>
-                                    <div className="table">
+                                    <div className="table container">
                                         <Table striped bordered hover size="sm">
                                             <thead>
                                                 <tr>
