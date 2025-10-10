@@ -29,6 +29,27 @@ class Application extends Model
         'files'
     ];
 
+    protected static function booted()
+    {
+        static::created(function ($application) {
+            if (!is_null($application->ticket) && trim((string) $application->ticket) !== '') {
+                return;
+            }
+            $prefix = '';
+            if ($application->hamlet == null) {
+                $prefix = "SD";
+            } else {
+                $prefix = "JB";
+            }
+            // nomor tiket dari aplikasi sidia dan desa
+            // SD untuk awalan sidia
+            // JB untuk awalan sidia
+            // id dari primary key / id category dari citigov - tanggal sekarang / bulan / tahun / 
+            $application->ticket = $prefix . $application->id . "/" . $application->cat->id_citigov . "-" .  $application->created_at->format('d') . "/" . $application->created_at->format('m') . "/" . $application->created_at->format('Y') . "/" . $application->cat->id . "-SIDIA-" . $application->id;
+            $application->save();
+        });
+    }
+
     public function filess()
     {
         return $this->hasMany(File::class);

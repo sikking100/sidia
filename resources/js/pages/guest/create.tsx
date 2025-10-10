@@ -1,6 +1,6 @@
-import { checkFile, defImage, permasalahan, Subtitle } from "@/hooks/functions";
+import { checkFile, defImage, permasalahan } from "@/hooks/functions";
 import Guest from "@/layouts/guest";
-import { Applicant, District, FilesForm, Menu } from "@/types";
+import { Applicant, District, Menu } from "@/types";
 import { router, useForm } from "@inertiajs/react";
 import React from "react";
 import { Button, Card, Col, Form, InputGroup, Row } from "react-bootstrap";
@@ -20,7 +20,8 @@ interface Props {
 }
 
 export default function GuestCreate({ category, menu, application, districts }: Props) {
-    const { data, setData, post, errors } = useForm<Applicant>(
+
+    const { data, setData, post, errors, processing } = useForm<Applicant>(
         {
             id: application?.id ?? 0,
             family_card_number: application?.family_card_number ?? '',
@@ -49,11 +50,7 @@ export default function GuestCreate({ category, menu, application, districts }: 
     const [selectedFile, setSelectedFile] = React.useState<Blob | MediaSource>()
     const [preview, setPreview] = React.useState<string>()
     const fileInputRef = React.useRef<HTMLInputElement>(null);
-    const filessRef = React.useRef<FilesForm[]>([])
-
-
-
-
+    const fileInputRefs = React.useRef<(HTMLInputElement | null)[]>([]);
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
@@ -93,10 +90,15 @@ export default function GuestCreate({ category, menu, application, districts }: 
         formData.append('sex', data.sex);
         formData.append('problem', data.problem ?? '');
         if (application !== null) {
-            formData.append('_method', 'put');
+            formData.append('_method', 'put')
             formData.append('id', String(application.id));
-            router.post(route('form.update', application.id), {
-                forceFormData: true,
+            router.post(route('form.update', application.id), formData, {
+                onSuccess: () => {
+                    console.log('Berhasil update!');
+                },
+                onError: (errors) => {
+                    console.error(errors);
+                },
             })
         } else {
             post(route('form.action'), {
@@ -140,11 +142,13 @@ export default function GuestCreate({ category, menu, application, districts }: 
             <div
                 className={'container-fluid'}
             >
-                <Form onSubmit={handleSubmit} validated={errors == null}>
+                {menu == null ? <div>
+                    <h1>Hubungi administrator untuk melengkapi data</h1>
+                </div> : <Form onSubmit={handleSubmit} validated={errors == null}>
                     <Card>
                         <Card.Body>
                             <Card.Title>Formulir Persyaratan</Card.Title>
-                            <Card.Subtitle className="mb-2 text-muted">{`Pelayanan ${Subtitle.get(category)}`}</Card.Subtitle>
+                            <Card.Subtitle className="mb-2 text-muted">{`Pelayanan ${menu.name_citigov}`}</Card.Subtitle>
                             <Card.Title><BiHome /> Data Kepala Keluarga : </Card.Title>
                             <Row>
                                 <Col xs={12} md={6} className="mb-3">
@@ -154,6 +158,7 @@ export default function GuestCreate({ category, menu, application, districts }: 
                                         </InputGroup.Prepend>
                                         <Form.Control
                                             required
+                                            value={data.family_card_number}
                                             placeholder="Masukkan No. Kartu Keluarga"
                                             isInvalid={errors.family_card_number != null}
                                             onChange={e => setData('family_card_number', e.target.value)}
@@ -171,6 +176,8 @@ export default function GuestCreate({ category, menu, application, districts }: 
                                         <Form.Control
                                             required
                                             placeholder="Masukkan Nama Kepala Keluarga"
+                                            value={data.family_head_name}
+
                                             isInvalid={errors.family_head_name != null}
                                             onChange={e => setData('family_head_name', e.target.value)}
 
@@ -190,6 +197,7 @@ export default function GuestCreate({ category, menu, application, districts }: 
                                         </InputGroup.Prepend>
                                         <Form.Control
                                             required
+                                            value={data.id_card_number}
                                             placeholder="Masukkan NIK"
                                             isInvalid={errors.id_card_number != null}
                                             onChange={e => setData('id_card_number', e.target.value)}
@@ -207,6 +215,7 @@ export default function GuestCreate({ category, menu, application, districts }: 
                                         </InputGroup.Prepend>
                                         <Form.Control
                                             required
+                                            value={data.name}
                                             placeholder="Masukkan Nama Pemohon"
                                             isInvalid={errors.name != null}
                                             onChange={e => setData('name', e.target.value)}
@@ -224,6 +233,7 @@ export default function GuestCreate({ category, menu, application, districts }: 
                                         </InputGroup.Prepend>
                                         <Form.Control
                                             required
+                                            value={data.phone}
                                             placeholder="Masukkan No. Telepon"
                                             isInvalid={errors.phone != null}
                                             onChange={e => setData('phone', e.target.value)}
@@ -241,6 +251,7 @@ export default function GuestCreate({ category, menu, application, districts }: 
                                         </InputGroup.Prepend>
                                         <Form.Control
                                             required
+                                            value={data.email}
                                             placeholder="Masukkan Email"
                                             isInvalid={errors.email != null}
                                             onChange={e => setData('email', e.target.value)}
@@ -266,6 +277,7 @@ export default function GuestCreate({ category, menu, application, districts }: 
 
                                             required
                                             as={"select"}
+                                            value={data.sex}
                                             isInvalid={errors.sex != null} >
                                             <option value={''}>-- Pilih Jenis Kelamin --</option>
                                             <option value={'L'}>Laki - Laki</option>
@@ -281,7 +293,7 @@ export default function GuestCreate({ category, menu, application, districts }: 
                                     <Form.Control as={"select"}
                                         required
                                         onChange={e => setData('religion', e.target.value)}
-
+                                        value={data.religion}
                                         isInvalid={errors.religion != null} >
                                         <option value={''}>-- Pilih Agama --</option>
                                         <option value={'Islam'}>Islam</option>
@@ -302,6 +314,7 @@ export default function GuestCreate({ category, menu, application, districts }: 
                                         </InputGroup.Prepend>
                                         <Form.Control
                                             required
+                                            value={data.district}
                                             as={"select"} onChange={e => {
                                                 setStateDistrict(districts.find(d => d.name === e.target.value))
                                                 setData('district', e.target.value)
@@ -325,6 +338,7 @@ export default function GuestCreate({ category, menu, application, districts }: 
                                         </InputGroup.Prepend>
                                         <Form.Control
                                             required
+                                            value={data.ward}
                                             as={"select"} onChange={e => setData('ward', e.target.value)}
                                             isInvalid={errors.ward != null} >
                                             <option value={''}>-- Pilih Desa --</option>
@@ -348,6 +362,7 @@ export default function GuestCreate({ category, menu, application, districts }: 
                                         </InputGroup.Prepend>
                                         <Form.Control
                                             required
+                                            value={data.problem}
                                             as={"select"} onChange={e => setData('problem', e.target.value)}>
                                             <option value={''}>-- Pilih Jenis Pengaduan --</option>
                                             {permasalahan.map((e, i) =>
@@ -359,7 +374,9 @@ export default function GuestCreate({ category, menu, application, districts }: 
                             </Row>}
                             <Row>
                                 <Col sm={8} className="mb-3">
-                                    <Form.Control required as="textarea" rows={12} placeholder="Jelaskan alasan permohonan" isInvalid={errors.description != null}
+                                    <Form.Control
+                                        value={data.description}
+                                        required as="textarea" rows={12} placeholder="Jelaskan alasan permohonan" isInvalid={errors.description != null}
                                         onChange={e => setData('description', e.target.value)}
                                     />
                                     <Form.Control.Feedback type="invalid">
@@ -371,11 +388,12 @@ export default function GuestCreate({ category, menu, application, districts }: 
                                     <Row>
                                         <Col xs={9}>
                                             <Form.File
-                                                required
+                                                required={data.images === null ? true : false}
                                                 ref={fileInputRef}
                                                 custom
                                                 id="custom-file"
-                                                label="Custom file input"
+                                                label={fileInputRef.current?.value ?? 'Data Foto'}
+                                                accept="image/*"
                                                 onChange={onSelectFile}
                                                 isInvalid={errors.images != null}
                                             />
@@ -413,31 +431,57 @@ export default function GuestCreate({ category, menu, application, districts }: 
                                         const checkFiles = checkFile(v.name, v.id, application?.filess ?? [])
                                         if (checkFiles !== undefined && checkFiles.status == 1) return null
                                         return <Form.Row key={k} className="mb-3">
-                                            <Form.Label column lg={2}>{checkFiles !== undefined && checkFiles.status == 2 ? <span className="text-danger">PERLU REVISI</span> : ''} {v.name} {v.require ? '(WAJIB)' : ''}</Form.Label>
+                                            <Form.Label column lg={2}>{checkFiles !== undefined && checkFiles.status == 2 ? <span className="text-danger">PERLU REVISI</span> : ''} {v.name} {v.require == 1 ? '(WAJIB)' : ''}</Form.Label>
                                             <Col>
-                                                <Form.File
-                                                    custom
+                                                <Form.Control
+                                                    ref={(el) => {
+                                                        fileInputRefs.current[k] = el
+                                                    }}
+                                                    type="file"
                                                     id="custom-file"
-                                                    required={data.filessss.find(f => f.name === v.name)?.place === '' ? v.require === 1 ? true : false : false}
-                                                    label={data.filessss[k]?.filenya.name ?? ''}
+                                                    className="form-control"
+                                                    required={
+                                                        checkFiles !== undefined && checkFiles.status == 2 ? true :
+                                                            data.filessss.find(f => f.name === v.name)?.place === '' ? false : v.require == 1 ? true : false
+                                                    }
+                                                    // label={data.filessss[k]?.filenya.name ?? ''}
+                                                    accept="image/*"
+                                                    isInvalid={errors[`filessss.${k}.filenya`] != null}
                                                     onChange={e => {
-                                                        const listFiles = e.target.files
+                                                        const listFiles = (e.target as HTMLInputElement).files
                                                         if (listFiles != null) {
+                                                            const existing = application?.filess?.find(f => f.name === v.name);
+                                                            const file = listFiles[0]
                                                             if (application !== null && application !== undefined && application.filess?.filter((e) => e.name === v.name)[0] !== undefined) {
                                                                 console.log(v.name);
                                                                 console.log(application.filess?.filter((e) => e.name === v.name));
-                                                                filessRef.current.push({ name: v.name, filenya: listFiles[0], place: application.filess?.filter((e) => e.name === v.name)[0].place ?? '' })
+                                                                // filessRef.current.push({ name: v.name, filenya: listFiles[0], place: application.filess?.filter((e) => e.name === v.name)[0].place ?? '' })
+                                                                const newFiles = [
+                                                                    ...data.filessss.filter(f => f.name !== v.name), // hapus lama
+                                                                    { id: v.id, name: v.name, filenya: file, place: existing?.place ?? application.filess?.filter((e) => e.name === v.name)[0].place ?? '' }
+                                                                ];
+                                                                setData('filessss', newFiles)
                                                             } else {
-                                                                filessRef.current.push({ name: v.name, filenya: listFiles[0], place: '' })
+                                                                // filessRef.current.push({ name: v.name, filenya: listFiles[0], place: '' })
+                                                                const newFiles = [
+                                                                    ...data.filessss.filter(f => f.name !== v.name), // hapus lama
+                                                                    { name: v.name, filenya: file, place: existing?.place ?? '' }
+
+                                                                ];
+                                                                setData('filessss', newFiles)
                                                             }
-                                                            console.log(filessRef.current.length);
-                                                            setData('filessss', filessRef.current)
+                                                            // console.log(filessRef.current.length);
+                                                            // setData('filessss', filessRef.current)
 
                                                         }
                                                     }}
                                                     name={v.name}
                                                 />
+                                                <Form.Control.Feedback type="invalid">
+                                                    {errors[`filessss.${k}.filenya`] ?? ''}
+                                                </Form.Control.Feedback>
                                             </Col>
+
                                         </Form.Row>
                                     })}
                                 </Col>
@@ -499,6 +543,7 @@ export default function GuestCreate({ category, menu, application, districts }: 
                             <Row className="justify-content-md-center">
                                 <Col md={"auto"}>
                                     <Button
+                                        disabled={processing}
                                         className='mt-5'
                                         type='submit'
                                         size='sm'
@@ -511,7 +556,8 @@ export default function GuestCreate({ category, menu, application, districts }: 
                             </Row>
                         </Card.Body>
                     </Card>
-                </Form>
+                </Form>}
+
             </div>
         </Guest >
     )

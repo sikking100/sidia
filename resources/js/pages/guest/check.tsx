@@ -16,18 +16,24 @@ export default function Check() {
     const isMobile = useIsMobile()
     const { message } = usePage().props.flash as { message: string }
     const { open, isOpen, close } = useCustomModal()
-
-
+    const [error, setError] = useState('')
 
 
     const handleButton = async () => {
-        const response = await axios.get(route('search', {
-            param: {
+        console.log(query);
+
+        const response = await axios.get(route('search'), {
+            params: {
                 q: query
             }
-        }))
+        })
         if (response.status == 200) {
-            setApplications(response.data.applications)
+            if (response.data.errors != null) {
+                setError(response.data.errors)
+                open()
+                return
+            }
+            setApplications([response.data.applications])
         }
     }
 
@@ -53,7 +59,7 @@ export default function Check() {
                     </div>
                 }
             >
-                <h5>{message}</h5>
+                <h5>{error !== '' ? error : message}</h5>
             </CustomModal>
             <Container fluid className="mt-2">
                 <Row className="justify-content-center">
@@ -70,7 +76,7 @@ export default function Check() {
                                 value={query}
                                 onChange={e => setQuery(e.target.value)}
                                 className="form-control"
-                                placeholder="Masukkan Nama atau NIK Anda"
+                                placeholder="Masukkan Nomot Tiket Anda"
                                 type="text"
                             />
                         </div>
@@ -95,12 +101,14 @@ export default function Check() {
                                             isMobile ? <tr>
                                                 <th>#</th>
                                                 <th>Tanggal Pengajuan</th>
+                                                <th>Tiket</th>
                                                 <th>Status</th>
                                                 <th>NIK</th>
                                                 <th>Pemohon</th>
                                             </tr> : <tr>
                                                 <th>#</th>
                                                 <th>Tanggal Pengajuan</th>
+                                                <th>Tiket</th>
                                                 <th>Status</th>
                                                 <th>Kategori</th>
                                                 <th>NIK</th>
@@ -123,6 +131,7 @@ export default function Check() {
                                                         <tr key={i}>
                                                             <th scope="row">{i + 1}</th>
                                                             <th>{formattedDate}</th>
+                                                            <th>{v.ticket}</th>
                                                             <td>{getStatus(v.status ?? '')}</td>
                                                             <td>{v.id_card_number}</td>
                                                             <td>{v.name}</td>
@@ -130,6 +139,8 @@ export default function Check() {
                                                         : <tr key={i}>
                                                             <td>{i + 1}</td>
                                                             <td>{formattedDate}</td>
+                                                            <th>{v.ticket}</th>
+
                                                             <td>{getStatus(v.status ?? '')}</td>
                                                             <td>{v.category}</td>
                                                             <td>{v.id_card_number}</td>

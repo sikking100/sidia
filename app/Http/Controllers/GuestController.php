@@ -3,19 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreApplicationRequest;
+use App\Mail\RegisterMail;
 use App\Models\Application;
 use App\Models\District;
 use App\Models\File as ModelsFile;
 use App\Models\Menu;
 use App\Models\SupportFile;
 use App\Support\MyUploadFile;
+use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use App\Models\File as FileModel;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-
-use function App\Support\kirimEmail;
 
 class GuestController extends Controller
 {
@@ -33,10 +36,22 @@ class GuestController extends Controller
 
     public function pencarian(Request $request)
     {
-        $applications = Application::query()->where('id_card_number', $request->q)->orWhere('name', 'LIKE', '%' . $request->q . '%')->get();
-        return response()->json([
-            'applications' => $applications
-        ]);
+        try {
+            $applications = Application::where('ticket', $request->q)->first();
+            if ($applications != null) {
+                return response()->json([
+                    'applications' => $applications
+                ]);
+            } else {
+                return response()->json([
+                    'errors' => 'data tidak ditemukan'
+                ]);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'errors' => 'data tidak ditemukan'
+            ]);
+        }
     }
 
     public function detail($id)
@@ -64,23 +79,32 @@ class GuestController extends Controller
     {
         // dd(config('custom.email_dukcapil'));
         // dd($request->email);
+        $request->validate([
+            'images' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+            'filessss.*.filenya' => ['image', 'mimes:jpeg,png,jpg,gif,svg'],
+        ]);
+
         $applicant = Application::make($request->all());
         $this->upload->uploadImages($request, 'images', $applicant);
         $applicant->status_description = "Mohon cek secara berkala, sementara permohonan Anda sedang diverifikasi";
         $applicant->save();
         // email ke pemohon
-        kirimEmail(
-            $request->email,
-            'Permohonan telah diregister',
-            'Permohonan ' . $applicant->category . ' telah diregister. Mohon cek email dan website secara berkala untuk mengetahui status permohonan.'
-        );
+        // kirimEmail(
+        //     $request->email,
+        //     'Permohonan telah diregister',
+        //     'Permohonan ' . $applicant->category . ' dengan nomor Tiket : ' . $applicant->ticket  . '  telah diregister. Mohon cek email dan website secara berkala untuk mengetahui status permohonan.'
+        // );
+        Mail::to($request->email)->send(new RegisterMail($applicant, false));
+
 
         // email ke dukcapil
-        kirimEmail(
-            config('custom.email_dukcapil'),
-            'Permohonan Baru',
-            'Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.'
-        );
+        // kirimEmail(
+        //     config('custom.email_dukcapil'),
+        //     'Permohonan Baru',
+        //     'Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.'
+        // );
+        Mail::to(config('custom.email_dukcapil'))->send(new RegisterMail($applicant, true));
+
 
         if ($request->filessss != null) {
             foreach ($request->filessss as $key => $file) {
@@ -106,51 +130,56 @@ class GuestController extends Controller
             }
         }
 
-        if ($request->pendukung != null) {
-            foreach ($request->pendukung as $key => $file) {
-                $nameExt =  $key . '-' . time() . '.' . $file['filenya']->extension();
-                $file['filenya']->storeAs('pendukung', $nameExt, 'public');
-                $desaFile = new SupportFile();
-                $desaFile->name = $file['name'];
-                $desaFile->place = 'pendukung' . '/' . $nameExt;
-                $applicant->supports()->save($desaFile);
-            }
-        }
+        session()->flash('message', 'Berhasil mengajukan permohonan dengan Ticket : ' . $applicant->ticket . '.  Cek data pengajuan secara berkala');
+        // if ($request->pendukung != null) {
+        //     foreach ($request->pendukung as $key => $file) {
+        //         $nameExt =  $key . '-' . time() . '.' . $file['filenya']->extension();
+        //         $file['filenya']->storeAs('pendukung', $nameExt, 'public');
+        //         $desaFile = new SupportFile();
+        //         $desaFile->name = $file['name'];
+        //         $desaFile->place = 'pendukung' . '/' . $nameExt;
+        //         $applicant->supports()->save($desaFile);
+        //     }
+        // }
 
 
-        // $currentTimestamp = strtotime("now");
-        // $key = config('services.external_api.symmetric');
-        // $payload = [
-        //     "iss" => "lumen-jwt",
-        //     "iat" => $currentTimestamp
-        // ];
 
-        // $token = JWT::encode($payload, $key, 'HS256');
-        // $data = [
-        //     "nama_aplikasi" => "sidia",
-        //     "nama_layanan" => $applicant->cat->name_citigov,
-        //     "id_layanan" => $applicant->cat->id_citigov,
-        //     "nomor_tiket" => $applicant->id . "/" . $applicant->id_card_number . "/" . $applicant->created_at->format('d') . "/" . $applicant->created_at->format('m') . "/" . $applicant->created_at->format('Y'),
-        //     "status" => 1,
-        //     "nama_pemohon" => $applicant->name,
-        //     "nik_pemohon" => $applicant->id_card_number,
-        //     "email_pemohon" => $applicant->email,
-        //     "telepon_pemohon" => $applicant->phone,
-        //     "nip_petugas" => "198709032020122002",
-        //     "nama_petugas" => "FATMAWATI",
-        //     "bidang_petugas" => "PENDAFTARAN PENDUDUK",
-        //     "jabatan_petugas" => "PENGAWAS KEPENDUDUKAN",
-        // ];
-        // $ext_url = config('services.external_api.url');
+        // // input data ke website DIA SAJA
+        $currentTimestamp = strtotime("now");
+        $key = config('services.external_api.symmetric');
+        $payload = [
+            "iss" => "lumen-jwt",
+            "iat" => $currentTimestamp
+        ];
 
-        // $result = Http::withHeaders([
-        //     'token' => $token,
-        //     'symmetric' => $key,
-        // ])->post($ext_url . "application/ticket/insert", $data);
-        $category = $request->category;
+        $token = JWT::encode($payload, $key, 'HS256');
+        $data = [
+            "nama_aplikasi" => "sidia",
+            "nama_layanan" => $applicant->cat->name_citigov,
+            "id_layanan" => $applicant->cat->id_citigov,
+            "nomor_tiket" => $applicant->ticket,
+            "status" => 1,
+            "nama_pemohon" => $applicant->name,
+            "nik_pemohon" => $applicant->id_card_number,
+            "email_pemohon" => $applicant->email,
+            "telepon_pemohon" => $applicant->phone,
+            "nip_petugas" => "198709032020122002",
+            "nama_petugas" => "FATMAWATI",
+            "bidang_petugas" => "PENDAFTARAN PENDUDUK",
+            "jabatan_petugas" => "PENGAWAS KEPENDUDUKAN",
+        ];
+        $ext_url = config('services.external_api.url');
+        Log::info($data);
+
+
+        $result = Http::withHeaders([
+            'token' => $token,
+            'symmetric' => $key,
+        ])->post($ext_url . "application/ticket/insert", $data);
+        Log::info($result);
 
         // dd(gettype($syarat));
-        session()->flash('message', 'Berhasil mengajukan permohonan untuk NIK : ' . $applicant->id_card_number . '\nCek data pengajuan secara berkala');
+        session()->flash('message', 'Berhasil mengajukan permohonan dengan Ticket : ' . $applicant->ticket . 'Cek data pengajuan secara berkala');
         // return redirect()->route($name.'.upload', [$applicant]);
         // return Inertia::render('Guest/UploadFile', ['applicant' => $applicant, 'requirements' => $syarat]);
         // return redirect()->route('upload', [$applicant->id, $category]);
@@ -176,7 +205,7 @@ class GuestController extends Controller
 
                 if ($file['place'] != null && $file['place'] !== "") {
                     $this->upload->deleteBerkas($file['place']);
-                    File::where('place', $file['place'])->delete();
+                    FileModel::where('place', $file['place'])->delete();
                 }
                 LOG::info('file place = ' . $file['place']);
                 LOG::info('file filenya = ' . $file['filenya']);
@@ -209,14 +238,14 @@ class GuestController extends Controller
         $applicant->fill($request->all());
         if ($request->filessss == null && $request->hasFile('images') == false && $applicant->isClean()) {
             session()->flash('message', 'Anda belum merevisi berkas : ' . $applicant->id_card_number);
-            return redirect()->route('check.detail', $applicant->id);
+            return redirect()->route('detail', $applicant->id);
         }
 
         $applicant->status = 'REVISED';
         $applicant->status_description = 'Berkas sudah direvisi';
         $applicant->save();
         session()->flash('message', 'Berhasil merevisi berkas : ' . $applicant->id_card_number . '\nCek data pengajuan secara berkala');
-        return redirect()->route('check.detail', $applicant->id);
+        return redirect()->route('detail', $applicant->id);
     }
 
     public function downloadFile(Request $request)

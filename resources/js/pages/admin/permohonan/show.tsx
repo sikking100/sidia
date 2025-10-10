@@ -80,7 +80,21 @@ export default function PermohonanDetail({ application, flash }: Props) {
                 status: "VERIFIED",
                 status_description: "Berkas sudah diverifikasi"
             })
-            // window.location.reload()
+            window.location.reload()
+        } catch (error) {
+            setError(`${error}`)
+            errorModal.open()
+        }
+        return
+    }
+
+    const onSelesai = async () => {
+        try {
+            await axios.put(route('status', application.id), {
+                status: "COMPLETED",
+                status_description: "Permohonan selesai"
+            })
+            window.location.reload()
         } catch (error) {
             setError(`${error}`)
             errorModal.open()
@@ -95,6 +109,8 @@ export default function PermohonanDetail({ application, flash }: Props) {
                 status_description: 'Berkas terverifikasi'
             })
             window.location.reload()
+            setError(`Berkas Diverifikasi`)
+            errorModal.open()
         } catch (error) {
             setError(`${error}`)
             errorModal.open()
@@ -102,7 +118,20 @@ export default function PermohonanDetail({ application, flash }: Props) {
         return
     }
 
-
+    const onRevisingBerkas = async () => {
+        try {
+            await axios.put(route('files.update', selectedFile?.id), {
+                status: '2',
+                status_description: 'Berkas ditolak'
+            })
+            window.location.reload()
+            setError(`Berkas Ditolak`)
+            errorModal.open()
+        } catch (error) {
+            setError(`${error}`)
+            errorModal.open()
+        }
+    }
 
 
     function handleSubmit(e: React.FormEvent) {
@@ -169,9 +198,6 @@ export default function PermohonanDetail({ application, flash }: Props) {
         }
     };
 
-
-
-
     return (
         <Admin>
             {/* modal lihat file */}
@@ -192,16 +218,8 @@ export default function PermohonanDetail({ application, flash }: Props) {
                             Download
                         </Button>
                         {
-                            (selectedFile?.status == 0 || selectedFile?.status == 2) &&
-                            <Button className={"btn btn-sm btn-outline-warning mr-2"} onClick={async e => {
-                                e.preventDefault()
-                                await axios.put(route('files.update', application.id), {
-                                    'status': '2',
-                                    'status_description': 'Berkas ditolak'
-
-                                })
-                                window.location.reload()
-                            }}>
+                            (selectedFile?.status != 1) &&
+                            <Button className={"btn btn-sm btn-outline-warning mr-2"} onClick={onRevisingBerkas}>
                                 <BiRevision className='mr-1 h-4 w-4' />
                                 Revisi
                             </Button>
@@ -333,17 +351,7 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                         {(application.status == 'VERIFIED') &&
                                             <div className="col">
                                                 <Button
-                                                    onClick={async () => {
-                                                        try {
-                                                            await axios.put(route('status', application.id), {
-                                                                status: 'COMPLETED'
-                                                            })
-                                                            window.location.reload()
-                                                        } catch (error) {
-                                                            setError(`${error}`)
-                                                            errorModal.open()
-                                                        }
-                                                    }}
+                                                    onClick={onSelesai}
                                                     className="btn btn-sm btn-success"
                                                 >
                                                     <GiTick className="mr-2 h-4 w-4" />
@@ -556,6 +564,18 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                                 {application.district}
                                             </Col>
                                         </Row>
+                                        {application.hamlet && <Row>
+                                            <Col className="title" xs={12} sm={3}>
+                                                <BiMap />
+                                                <span>Dusun</span>
+                                            </Col>
+                                            <Col xs={12} sm={1} className="d-none d-sm-block d-md-block">
+                                                :
+                                            </Col>
+                                            <Col className="subtitle" xs={12} sm={8}>
+                                                {application.hamlet}
+                                            </Col>
+                                        </Row>}
                                     </div>
 
                                     <div className="sub-header">
@@ -573,28 +593,26 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                             </thead>
                                             <tbody>
                                                 {
-                                                    application.ticket !== null && application.ticket !== '' && application.ticket !== '-' ?
-                                                        application.files !== null && application.files !== '' ? (JSON.parse(application.files!) as Array<FileTicket>).map((v, k) => {
-                                                            return (
-                                                                <tr key={k}>
-                                                                    <td>{k + 1}</td>
-                                                                    <td>{v.TypeName}</td>
-                                                                    <td>{ }</td>
-                                                                    <td>
-                                                                        <Button
-                                                                            className='btn btn-info'
-                                                                            onClick={() => handleClick(v.FileName)}
-                                                                        >
-                                                                            <HiEye className='mr-2' />
-                                                                            Lihat
-                                                                        </Button>
-                                                                    </td>
-                                                                </tr>
-                                                            )
-                                                        }) : <tr>
-                                                            <td colSpan={3} className='text-center'>Berkas tidak lengkap</td>
-                                                        </tr> :
-                                                        application.filess && application.filess.map((e, i) => (
+
+                                                    application.files !== null && application.files !== '' ? (JSON.parse(application.files!) as Array<FileTicket>).map((v, k) => {
+                                                        return (
+                                                            <tr key={k}>
+                                                                <td>{k + 1}</td>
+                                                                <td>{v.TypeName}</td>
+                                                                <td>{ }</td>
+                                                                <td>
+                                                                    <Button
+                                                                        className='btn btn-info'
+                                                                        onClick={() => handleClick(v.FileName)}
+                                                                    >
+                                                                        <HiEye className='mr-2' />
+                                                                        Lihat
+                                                                    </Button>
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    }) :
+                                                        application.filess && application.filess.filter(e => e.name.includes('Hasil') == false).map((e, i) => (
                                                             <tr key={i}>
                                                                 <td>{i + 1}</td>
                                                                 <td>{e.name}</td>
@@ -616,6 +634,49 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                                                 </td>
                                                             </tr>
                                                         ))
+                                                }
+                                            </tbody>
+                                        </Table>
+                                    </div>
+
+                                    <div className="sub-header">
+                                        <BiFile size={25} />
+                                        <span>Berkas Hasil : </span>
+                                    </div>
+                                    <div className="table">
+                                        <Table striped bordered hover size="sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Nama</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {
+
+                                                    application.filess && application.filess.filter(e => e.name.includes('Hasil') == true).map((e, i) => (
+                                                        <tr key={i}>
+                                                            <td>{i + 1}</td>
+                                                            <td>{e.name}</td>
+                                                            <td>
+                                                                {
+                                                                    checkFile(e.name, e.id, application.filess) !== undefined ?
+                                                                        <Button
+                                                                            className='btn btn-sm btn-info'
+                                                                            onClick={(ee) => {
+                                                                                ee.preventDefault()
+                                                                                return handleView(checkFile(e.name, e.id, application.filess)!)
+                                                                            }}
+                                                                        >
+                                                                            <HiEye className='mr-2' />
+                                                                            Lihat
+                                                                        </Button>
+                                                                        : <p className='text-red-400'>Tidak diupload</p>
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    ))
                                                 }
                                             </tbody>
                                         </Table>
@@ -786,8 +847,8 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                                         if (file !== null) {
                                                             formData.append('file', file)
                                                         }
-                                                        if (application.ward !== null && application.ward !== undefined && application.ward !== '') {
-                                                            formData.append('ward', application.ward)
+                                                        if (application.hamlet !== null && application.hamlet !== undefined && application.hamlet !== '') {
+                                                            formData.append('hamlet', application.hamlet)
                                                         }
                                                         formData.append('content', content)
                                                         formData.append('user_id', String(user.id))

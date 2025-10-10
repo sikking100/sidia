@@ -13,7 +13,7 @@ class HamletController extends Controller
     {
         $user = Auth::user();
         $perPage = $request->get('per_page', 10);
-        $hamlets = Hamlet::when($request->has('search'), function ($q) use ($request) {
+        $hamlets = Hamlet::where('ward_id', $user->ddesa->id)->when($request->has('search'), function ($q) use ($request) {
             $q->where('name', 'LIKE', '%' . $request->search . '%');
         })->paginate($perPage);
         return Inertia::render('admin/dusun/index', [

@@ -64,7 +64,7 @@ class WardController extends Controller
     public function edit(Ward $ward)
     {
         $district = $ward->district()->first();
-        return Inertia::render('Admin/Ward/Edit', ['district' => $district, 'wards' => $ward]);
+        return Inertia::render('admin/desa/edit', ['district' => $district, 'ward' => $ward]);
     }
 
     public function update(Request $request, Ward $ward)

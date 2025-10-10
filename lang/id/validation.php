@@ -71,7 +71,7 @@ return [
         'string' => 'Kolom :attribute harus lebih besar atau sama dengan :value karakter.',
     ],
     'hex_color' => 'Kolom :attribute harus berupa warna heksadesimal yang valid.',
-    'image' => 'Kolom :attribute harus berupa gambar.',
+    'image' => 'harus berupa gambar.',
     'in' => 'Pilihan :attribute tidak valid.',
     'in_array' => 'Kolom :attribute harus ada di :other.',
     'in_array_keys' => 'Kolom :attribute harus mengandung salah satu dari kunci berikut: :values.',
@@ -102,7 +102,7 @@ return [
         'string' => 'Kolom :attribute tidak boleh lebih dari :max karakter.',
     ],
     'max_digits' => 'Kolom :attribute tidak boleh lebih dari :max digit.',
-    'mimes' => 'Kolom :attribute harus berupa file dengan tipe: :values.',
+    'mimes' => 'harus berupa file dengan tipe: :values.',
     'mimetypes' => 'Kolom :attribute harus berupa file dengan tipe: :values.',
     'min' => [
         'array' => 'Kolom :attribute harus memiliki setidaknya :min item.',

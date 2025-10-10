@@ -198,7 +198,7 @@ export default function Welcome() {
                                                         <Link href={route('guest.create', 'Akta-Kelahiran-Perubahan')}>Akta Lahir Perubahan Data</Link>
                                                     </li>
                                                     <li>
-                                                        <Link href={route('guest.create', 'Akta-Kelahiran-Tidak-Tahu')}>Akta Kelahiran Bagi Anak Yang Tidak Diketahui Asal-usulnya/Keberadaan Orang Tuanya</Link>
+                                                        <Link href={route('guest.create', 'Akta-Kelahiran-Tidak-Diketahui')}>Akta Kelahiran Bagi Anak Yang Tidak Diketahui Asal-usulnya/Keberadaan Orang Tuanya</Link>
                                                     </li>
                                                 </Dropdown.Menu>
                                             </Dropdown.Toggle>

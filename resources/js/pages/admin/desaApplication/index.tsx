@@ -292,9 +292,9 @@ export default function DusunIndex({ hamlets, flash, desaApps, ward }: Props) {
                                                             </td>
                                                             <td>
 
-                                                                <div className="d-flex">
+                                                                <div className="grid">
                                                                     {
-                                                                        v.status == 'COMPLETED' && (v.filess !== null && v.filess !== undefined && v.filess!.length !== 0 && v.filess!.filter((e) => e.name.includes('Hasil')).length !== 0) ?
+                                                                        (v.filess !== null && v.filess !== undefined && v.filess!.length !== 0 && v.filess!.filter((e) => e.name.includes('Hasil')).length !== 0) ?
                                                                             // <Link
                                                                             //   className={'inline-block bg-green-600 px-4 py-2 text-white rounded-md font-semibold'}
                                                                             //   type={'a'}
@@ -305,7 +305,7 @@ export default function DusunIndex({ hamlets, flash, desaApps, ward }: Props) {
                                                                             //   Download Hasil
 
                                                                             // </Link>
-                                                                            <a className={'btn btn-sm btn-outline-success'} href={`/download-file?place=${v.filess!.filter((a) => a.name.includes('Hasil'))[0].place}`} target="_blank" rel="noopener noreferrer">Download Hasil</a>
+                                                                            <a className={'btn btn-sm btn-outline-success mb-1'} href={`/guest-download-file?place=${v.filess!.filter((a) => a.name.includes('Hasil'))[0].place}`} target="_blank" rel="noopener noreferrer">Download Hasil</a>
                                                                             : <div></div>
                                                                     }
                                                                     <Button

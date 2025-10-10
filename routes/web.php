@@ -34,13 +34,14 @@ Route::controller(GuestController::class)->group(function () {
     Route::get('buat/{category}', 'buat')->name('guest.create');
     Route::post('/form', 'formAction')->name('form.action');
     Route::put('/form', 'form_update')->name('form.update');
-    Route::get('/download-file', 'downloadFile')->name('file.download');
+    Route::get('/guest-download-file', 'downloadFile')->name('guestfile.download');
 });
 
 
 Route::post('pass-reset', [UserController::class, 'kirim_pass'])->name('pass.reset');
 Route::get('/comment/{id}', [CommentController::class, 'get']);
 Route::post('/comment', [CommentController::class, 'store']);
+Route::get('/download-file', [ApplicationController::class, 'downloadFile'])->name('file.download');
 
 Route::middleware(['auth', 'role:bpjs'])->group(function () {
     Route::get('/bpjs', [BpjsController::class, 'index'])->name('bpjs.index');
@@ -106,7 +107,6 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::put('/ward/{ward}', [WardController::class, 'update'])->name('ward.update');
     Route::delete('/ward/{ward}', [WardController::class, 'destroy'])->name('ward.destroy');
     Route::get('/photo/{name}', [ApplicationController::class, 'photo'])->name('photo');
-    Route::get('/download-file', [ApplicationController::class, 'downloadFile'])->name('file.download');
     Route::post('/uploadFile/{id}/berkas', [ApplicationController::class, 'uploadBerkas'])->name('upload.berkas');
     Route::get('/open-file', [ApplicationController::class, 'openFile'])->name('file.open');
 

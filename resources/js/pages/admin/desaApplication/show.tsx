@@ -152,7 +152,7 @@ export default function DesaApplicationShow({ application, flash }: Props) {
             <div className="container-fluid">
                 <PageHeader
                     HeaderText={`Permohonan NIK ${application.id_card_number}`}
-                    Breadcrumb={[{ name: "Permohonan", navigate: 'application.index' }, { name: "Detail" }]}
+                    Breadcrumb={[{ name: "Permohonan", navigate: 'desa.index' }, { name: "Detail" }]}
                 />
 
                 <div className="row clearfix">
@@ -331,6 +331,18 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                         </Row>
                                         <Row>
                                             <Col className="title" xs={12} sm={3}>
+                                                <BiMap />
+                                                <span>Dusun</span>
+                                            </Col>
+                                            <Col xs={12} sm={1} className="d-none d-sm-block d-md-block">
+                                                :
+                                            </Col>
+                                            <Col className="subtitle" xs={12} sm={8}>
+                                                {application.hamlet}
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col className="title" xs={12} sm={3}>
                                                 <BiMapAlt />
                                                 <span>Desa</span>
                                             </Col>
@@ -370,27 +382,24 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                             </thead>
                                             <tbody>
                                                 {
-                                                    application.ticket !== null && application.ticket !== '' && application.ticket !== '-' ?
-                                                        application.files !== null && application.files !== '' ? (JSON.parse(application.files!) as Array<FileTicket>).map((v, k) => {
-                                                            return (
-                                                                <tr key={k}>
-                                                                    <td>{k + 1}</td>
-                                                                    <td>{v.TypeName}</td>
-                                                                    <td>{ }</td>
-                                                                    <td>
-                                                                        <Button
-                                                                            className='btn btn-info'
-                                                                            onClick={() => handleClick(v.FileName)}
-                                                                        >
-                                                                            <HiEye className='mr-2' />
-                                                                            Lihat
-                                                                        </Button>
-                                                                    </td>
-                                                                </tr>
-                                                            )
-                                                        }) : <tr>
-                                                            <td colSpan={3} className='text-center'>Berkas tidak lengkap</td>
-                                                        </tr> :
+                                                    application.files !== null && application.files !== '' ? (JSON.parse(application.files!) as Array<FileTicket>).map((v, k) => {
+                                                        return (
+                                                            <tr key={k}>
+                                                                <td>{k + 1}</td>
+                                                                <td>{v.TypeName}</td>
+                                                                <td>{ }</td>
+                                                                <td>
+                                                                    <Button
+                                                                        className='btn btn-info'
+                                                                        onClick={() => handleClick(v.FileName)}
+                                                                    >
+                                                                        <HiEye className='mr-2' />
+                                                                        Lihat
+                                                                    </Button>
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    }) :
                                                         application.filess && application.filess.filter(e => e.name.includes('Hasil') == false).map((e, i) => (
                                                             <tr key={i}>
                                                                 <td>{i + 1}</td>

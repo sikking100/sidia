@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\RegisterMail;
 use App\Models\Application;
 use App\Models\File;
 use App\Models\Hamlet;
 use App\Models\Menu;
-use App\Models\SupportFile;
 use App\Support\MyUploadFile;
+use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 use function App\Support\kirimEmail;
@@ -80,65 +83,107 @@ class DesaApplicationController extends Controller
     public function store(Request $request)
     {
 
+        $request->validate([
+            'images' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+            'filessss.*.filenya' => ['image', 'mimes:jpeg,png,jpg,gif,svg'],
+        ]);
+
         // try {
         $user = Auth::user();
         $applicant = Application::make($request->all());
-        $applicant->ticket = '-';
         $applicant->hamlet = $request->hamlet;
         $applicant->ward = $user->ddesa->name;
         $applicant->district = $user->ddesa->district->name;
         $this->upload->uploadImages($request, 'images', $applicant);
         $applicant->save();
 
-        foreach ($request->filessss as $key => $file) {
-            $nameExt = $key . '-' . time() . '.' . $file['filenya']->extension();
-            $file['filenya']->storeAs($request->category, $nameExt, 'public');
-            $desaFile = new File();
-            $desaFile->name = $file['name'];
-            $desaFile->place = $request->category . '/' . $nameExt;
-            $desaFile->status = '0';
-            $applicant->filess()->save($desaFile);
-        }
+        if ($request->filessss != null) {
+            foreach ($request->filessss as $key => $file) {
+                // hapus terlebih dahulu gambarnya
+                Log::info('perulangan ke = ' . $key);
 
-        if ($request->pendukung != null) {
-            foreach ($request->pendukung as $key => $file) {
-                $nameExt =  $key . '-' . time() . '.' . $file['filenya']->extension();
-                $file['filenya']->storeAs('pendukung', $nameExt, 'public');
-                $desaFile = new SupportFile();
+                if ($file['place'] != null && $file['place'] !== "") {
+                    $this->upload->deleteBerkas($file['place']);
+                    File::where('place', $file['place'])->delete();
+                }
+                LOG::info('file place = ' . $file['place']);
+                LOG::info('file filenya = ' . $file['filenya']);
+                $nameExt = $key . '-' . time() . '.' . $file['filenya']->extension();
+                $file['filenya']->storeAs($request->category, $nameExt, 'public');
+                $desaFile = new File();
                 $desaFile->name = $file['name'];
-                $desaFile->place = 'pendukung' . '/' . $nameExt;
-                $applicant->supports()->save($desaFile);
+                $desaFile->place = $request->category . '/' . $nameExt;
+                $desaFile->status = '0';
+                $desaFile->comment = '-';
+                $applicant->filess()->save($desaFile);
             }
         }
 
+        // if ($request->pendukung != null) {
+        //     foreach ($request->pendukung as $key => $file) {
+        //         $nameExt =  $key . '-' . time() . '.' . $file['filenya']->extension();
+        //         $file['filenya']->storeAs('pendukung', $nameExt, 'public');
+        //         $desaFile = new SupportFile();
+        //         $desaFile->name = $file['name'];
+        //         $desaFile->place = 'pendukung' . '/' . $nameExt;
+        //         $applicant->supports()->save($desaFile);
+        //     }
+        // }
+
+
         // email ke pemohon
-        kirimEmail(
-            $request->email,
-            'Permohonan telah diproses dan dikirim ke Dukcapil',
-            'Permohonan ' . $request->cateogry . ' telah diproses dan dikirim ke Dukcapil. Mohon cek email dan website secara berkala untuk mengetahui status permohonan'
-        );
+        // kirimEmail(
+        //     $request->email,
+        //     'Permohonan telah diproses dan dikirim ke Dukcapil',
+        //     'Permohonan ' . $request->cateogry . ' telah diproses dan dikirim ke Dukcapil. Mohon cek email dan website secara berkala untuk mengetahui status permohonan'
+        // );
+        Mail::to($request->email)->send(new RegisterMail($applicant, false));
+
 
 
         // email ke dukcapil
-        kirimEmail(
-            'disdukcapilkabmorut@gmail.com',
-            'Permohonan baru',
-            'Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.'
-        );
+        // kirimEmail(
+        //     'disdukcapilkabmorut@gmail.com',
+        //     'Permohonan baru',
+        //     'Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.'
+        // );
+        Mail::to(config('custom.email_dukcapil'))->send(new RegisterMail($applicant, true));
 
-        // $desaApplication = DesaApplication::make($request->all());
-        // $this->upload->uploadImages($request, 'images', $desaApplication);
-        // $desaApplication->save();
-        // foreach ($request->filessss as $key => $file) {
-        //     $nameExt = time() . '.' . $file['filenya']->extension();
-        //     $file['filenya']->storeAs($request->category, $nameExt, 'public');
-        //     $desaFile = new DesaFile();
-        //     $desaFile->name = $file['name'];
-        //     $desaFile->place = $request->category . '/' . $nameExt;
-        //     $desaApplication->files()->save($desaFile);
-        // }
-        // $menu = Menu::firstWhere('name', $request->category);
-        // $syarat = $menu->requirements;
+        // input data ke website DIA SAJA
+        $currentTimestamp = strtotime("now");
+        $key = config('services.external_api.symmetric');
+        $payload = [
+            "iss" => "lumen-jwt",
+            "iat" => $currentTimestamp
+        ];
+
+        $token = JWT::encode($payload, $key, 'HS256');
+        $data = [
+            "nama_aplikasi" => "sidia",
+            "nama_layanan" => $applicant->cat->name_citigov,
+            "id_layanan" => $applicant->cat->id_citigov,
+            "nomor_tiket" => $applicant->ticket,
+            "status" => 1,
+            "nama_pemohon" => $applicant->name,
+            "nik_pemohon" => $applicant->id_card_number,
+            "email_pemohon" => $applicant->email,
+            "telepon_pemohon" => $applicant->phone,
+            "nip_petugas" => "198709032020122002",
+            "nama_petugas" => "FATMAWATI",
+            "bidang_petugas" => "PENDAFTARAN PENDUDUK",
+            "jabatan_petugas" => "PENGAWAS KEPENDUDUKAN",
+        ];
+        $ext_url = config('services.external_api.url');
+
+        Log::info($data);
+
+        $result = Http::withHeaders([
+            'token' => $token,
+            'symmetric' => $key,
+        ])->post($ext_url . "application/ticket/insert", $data);
+
+        Log::info($result);
+
 
         session()->flash('message', 'Data berhasil dibuat');
         return redirect()->route('desa.index');
@@ -214,14 +259,14 @@ class DesaApplicationController extends Controller
 
                 $nameExt = $key . '-' . time() . '.' . $file['filenya']->extension();
                 $file['filenya']->storeAs($request->category, $nameExt, 'public');
-                $desaFile = File::find($file['id']);
+                $desaFile = new File();
                 $desaFile->name = $file['name'];
                 $desaFile->place = $request->category . '/' . $nameExt;
                 $desaFile->status = '0';
                 $desaFile->comment = 'sudah direvisi';
                 LOG::info('desafile name = ' . $desaFile->name);
                 LOG::info('desafile place = ' . $desaFile->place);
-                $application->filess()->update($desaFile);
+                $application->filess()->save($desaFile);
             }
         }
         $application->status = 'REVISED';

@@ -78,7 +78,7 @@ export interface Applicant {
   ticket?: string | null
   upload?: string | null
   filess: Array<Filess>
-  hamlet_id?: number | null
+  hamlet?: string | null
   filessss: FilesForm[]
   pendukung: Pendukung[]
   supports: Array<Filess>

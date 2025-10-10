@@ -1,16 +1,15 @@
 import PageHeader from "@/components/page-header"
 import { checkFile, defImage, permasalahan } from "@/hooks/functions"
-import { DesaApplication, DesaApplicationPost, FilesForm, Hamlet, Menu } from "@/types"
+import { DesaApplication, DesaApplicationPost, Hamlet, Menu } from "@/types"
 import { router, useForm } from "@inertiajs/react"
 import React from "react"
 import { Button, Card, Col, Form, InputGroup, Row } from "react-bootstrap"
-import { BiFace, BiFile, BiHome, BiIdCard, BiUpload, BiUser } from "react-icons/bi"
+import { BiFace, BiHome, BiIdCard, BiUpload, BiUser } from "react-icons/bi"
 import { FaRestroom } from "react-icons/fa"
 import { GiVillage } from "react-icons/gi"
 import { GoNumber, GoPerson } from "react-icons/go"
 import { HiSave } from "react-icons/hi"
 import { MdWarning } from "react-icons/md"
-import { CgAdd, CgRemove } from "react-icons/cg"
 
 interface Props {
     hamlets: Hamlet[]
@@ -36,7 +35,7 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
             email: application?.email ?? '',
             sex: application?.sex ?? '',
             religion: application?.religion ?? '',
-            images: application?.images ?? '',
+            images: application?.images ?? undefined,
             description: application?.description ?? '',
             problem: application?.problem ?? '',
             filessss: [],
@@ -47,9 +46,9 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
     const [preview, setPreview] = React.useState<string>()
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     // const filessRef = React.useRef<FilesForm[]>([])
-    const [pendukung, setPendukung] = React.useState<(FilesForm | null)[]>([])
+    // const [pendukung, setPendukung] = React.useState<(FilesForm | null)[]>([])
     const fileInputs = React.useRef<Record<number, HTMLInputElement | null>>({})
-    const fileInputSupport = React.useRef<Record<number, HTMLInputElement | null>>({})
+    // const fileInputSupport = React.useRef<Record<number, HTMLInputElement | null>>({})
 
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -355,11 +354,12 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
                                                 <Row>
                                                     <Col xs={9}>
                                                         <Form.File
-                                                            required={application === null}
+                                                            required={data.images === null ? true : false}
                                                             ref={fileInputRef}
                                                             custom
                                                             id="custom-file"
-                                                            label={'pilih foto'}
+                                                            accept="image/*"
+                                                            label={fileInputRef.current?.value ?? 'pilih foto'}
                                                             onChange={onSelectFile}
                                                             isInvalid={errors.images != null}
                                                         />
@@ -393,22 +393,27 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
                                         <Card.Title><BiUpload /> Dokumen Persyaratan : </Card.Title>
                                         <Row>
                                             <Col>
-                                                {menu.requirements.map(v => {
+                                                {menu.requirements.map((v, k) => {
                                                     const checkFiles = checkFile(v.name, v.id, application?.filess ?? [])
                                                     if (checkFiles !== undefined && checkFiles.status == 1) return null
                                                     const currentFile = data.filessss.find(f => f.name === v.name);
                                                     return <Form.Row key={v.id} className="mb-3">
-                                                        <Form.Label key={v.id} column lg={2}>{checkFiles !== undefined && checkFiles.status == 2 ? <span className="text-danger">PERLU REVISI</span> : ''} {v.name} {v.require ? '(WAJIB)' : ''} {v.link &&
+                                                        <Form.Label key={v.id} column lg={2}>{checkFiles !== undefined && checkFiles.status == 2 ? <span className="text-danger">PERLU REVISI</span> : ''} {v.name} {v.require == 1 ? '(WAJIB)' : ''} {v.link &&
                                                             <a className={'text-link'} style={{ color: 'blue' }} href={v.link.includes('http') ? v.link : `/download-file-wajib?place=${v.link}`} target="_blank" rel="noopener noreferrer">Download Contoh</a>
                                                         }</Form.Label>
                                                         <Col>
                                                             <Form.File
                                                                 key={v.id}
                                                                 ref={(ee) => { fileInputs.current[v.id] = ee }}
-                                                                required={data.filessss.find(f => f.name === v.name)?.place === '' ? v.require === 1 ? true : false : false}
+                                                                required={
+                                                                    checkFiles !== undefined && checkFiles.status == 2 ? true :
+                                                                        data.filessss.find(f => f.name === v.name)?.place === '' ? false : v.require == 1 ? true : false
+                                                                }
                                                                 custom
                                                                 id={`custom-file-${v.id}`}
                                                                 label={currentFile?.filenya.name || 'Pilih file....'}
+                                                                isInvalid={errors[`filessss.${k}.filenya`] != null}
+                                                                accept="image/*"
                                                                 onChange={e => {
                                                                     const listFiles = e.target.files
                                                                     if (listFiles != null) {
@@ -444,7 +449,7 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
                                                 })}
                                             </Col>
                                         </Row>
-                                        <Card.Title className="mt-3"><BiFile /> Berkas lainnya : <CgAdd
+                                        {/* <Card.Title className="mt-3"><BiFile /> Berkas lainnya : <CgAdd
                                             onClick={e => {
                                                 e.preventDefault()
                                                 setPendukung([...pendukung, null])
@@ -471,6 +476,7 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
                                                                 id="custom-file"
                                                                 ref={e => { fileInputSupport.current[k] = e }}
                                                                 label={data.pendukung[k]?.filenya?.name ?? ''}
+                                                                accept="image/*"
                                                                 onChange={e => {
                                                                     const listFiles = e.target.files
                                                                     if (listFiles != null) {
@@ -502,7 +508,7 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
                                                     </Form.Row>
                                                 })}
                                             </Col>
-                                        </Row>
+                                        </Row> */}
 
                                         <Row className="justify-content-md-center">
                                             <Col md={"auto"}>

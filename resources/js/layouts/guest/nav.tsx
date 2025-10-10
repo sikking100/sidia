@@ -42,7 +42,7 @@ export function GuestNavbar() {
                             <ul className="nav navbar-nav metismenu">
                                 <li>
                                     <a
-                                        href="filedocuments"
+                                        href="https://dukcapil.morowaliutarakab.go.id"
                                         className="icon-menu d-none d-lg-flex d-sm-flex d-md-none"
                                     >
                                         <i className="icon-home"></i> <div>DUKCAPIL</div>

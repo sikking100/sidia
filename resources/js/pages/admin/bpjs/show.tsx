@@ -68,7 +68,7 @@ export default function BPJSShow({ application, flash }: Props) {
                 status: "VERIFIED",
                 status_description: "Berkas sudah diverifikasi"
             })
-            // window.location.reload()
+            window.location.reload()
         } catch (error) {
             setError(`${error}`)
             open()

@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\SimpleMail;
+use App\Mail\RegisterMail;
+use App\Mail\RejectMail;
 use App\Models\Application;
 use App\Models\District;
 use App\Models\Hamlet;
@@ -19,8 +20,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use mervick\aesEverywhere\AES256;
-
-use function App\Support\kirimEmail;
 
 class ApplicationController extends Controller
 {
@@ -193,6 +192,7 @@ class ApplicationController extends Controller
     {
         // untuk api
         try {
+            Log::info('dipanngill api');
             $jwtToken = $request->header('Authorization');
             if (!$jwtToken) {
                 return response()->json(['error' => 'Token tidak valid'], 401);
@@ -215,48 +215,42 @@ class ApplicationController extends Controller
                 $applicant->category = $menu->name;
                 $applicant->images = '';
                 $applicant->ticket = $forms["TicketNumber"];
+                LOG::info($forms["TicketNumber"]);
+
                 $applicant->files = json_encode($forms["FileAttachment"]);
 
                 foreach ($forms["FormResultData"] as $key => $value) {
                     switch ($value['Label']) {
                         case 'No. KK':
                             $applicant->family_card_number = $value["Value"];
-                            LOG::info('kk');
 
                             break;
                         case 'Nama Kepala Keluarga':
                             $applicant->family_head_name = $value["Value"];
-                            LOG::info('kepala');
 
                             break;
                         case 'Nama Pemohon':
                             $applicant->name = $value["Value"];
-                            LOG::info('pemohon');
 
                             break;
                         case 'NIK Pemohon':
                             $applicant->id_card_number = $value["Value"];
-                            LOG::info('nik');
 
                             break;
                         case 'Jenis Kelamin':
                             $applicant->sex = $value["Value"] == "Perempuan" ? "P" : "L";
-                            LOG::info('jenkel');
 
                             break;
                         case 'Agama':
                             $applicant->religion = $value["Value"];
-                            LOG::info('agama');
 
                             break;
                         case 'No. HP Pemohon':
                             $applicant->phone = $value["Value"];
-                            LOG::info('hp');
 
                             break;
                         case 'Email Pemohon':
                             $applicant->email = $value["Value"];
-                            LOG::info('email');
 
                             break;
                         case 'Kelurahan / Desa':
@@ -268,12 +262,10 @@ class ApplicationController extends Controller
                                     $applicant->ward = $v["elementResult"]["value"];
                                 }
                             }
-                            LOG::info('kel des');
 
                             break;
                         case 'Keterangan / penjelasan keperluan':
                             $applicant->description = $value["Value"];
-                            LOG::info('ket');
 
                             break;
                         default:
@@ -284,29 +276,28 @@ class ApplicationController extends Controller
                 $res = $applicant->save();
 
                 // email ke pemohon
-                kirimEmail(
-                    $applicant->email,
-                    'Permohonan telah diregister',
-                    'Permohonan ' . $applicant->category . ' telah diregister. Mohon cek email dan website secara berkala untuk mengetahui status permohonan.'
-                );
+                // kirimEmail(
+                //     $applicant->email,
+                //     'Permohonan telah diregister',
+                //     'Permohonan ' . $applicant->category . ' telah diregister. Mohon cek email dan website secara berkala untuk mengetahui status permohonan.'
+                // );
+                Mail::to($applicant->email)->send(new RegisterMail($applicant, false));
+
                 // Mail::to($applicant->email)->queue(
                 //     new SimpleMail('Permohonan ' . $applicant->category  . ' telah diregister. Mohon cek email dan website secara berkala untuk mengetahui status permohonan.', 'Permohonan telah diregister', false)
                 // );
 
                 // email ke dukcapil
-                kirimEmail(
-                    config('custom.email_dukcapil'),
-                    'Permohonan baru',
-                    'Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.'
-                );
+                // kirimEmail(
+                //     config('custom.email_dukcapil'),
+                //     'Permohonan baru',
+                //     'Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.'
+                // );
+                Mail::to(config('custom.email_dukcapil'))->send(new RegisterMail($applicant, true));
+
                 // Mail::to(config('custom.email_dukcapil'))->queue(
                 //     new SimpleMail('Ada permohonan ' . $request->cateogry . ' dengan NIK : ' . $request->id_card_number . '. Mohon untuk segera ditindaklanjuti.', 'Permohonan baru', false)
                 // );
-
-                LOG::info('simpan data', [
-                    'result' => $res,
-                    'data' => $applicant
-                ]);
             } catch (\Exception $e) {
                 LOG::error('error menyimpan data', [
                     'errornya' => $e
@@ -411,10 +402,11 @@ class ApplicationController extends Controller
 
     public function update_status(Request $request, $id)
     {
-        $application = Application::where('id', $id)->first();
 
+        $application = Application::where('id', $id)->first();
+        // update ke api
         try {
-            if (($application->ticket != null && $application->ticket != '' && $application->ticket != '-') && ($request->status == "VERIFIED" || $request->status == "DEFFICIENT" || $request->status == "COMPLETED")) {
+            if ($request->status == 'COMPLETED' || $request->status == 'COMPLETED_FILE' || $request->status == 'CANCEL') {
                 $key = config('services.external_api.symmetric');
                 $status = 0;
                 switch ($request->status) {
@@ -431,21 +423,52 @@ class ApplicationController extends Controller
                         $status = 1;
                         break;
                 }
-                $data = [
-                    "symetric_key" => $key,
-                    "ticket_number" => $application->ticket,
-                    "status" => $status,
-                ];
                 $ext_url = config('services.external_api.url');
-
-                $result = Http::put($ext_url . "integration/client/ticket/change-status", $data);
-                if ($result->failed()) {
-                    $tes = [
-                        'status' => $result->status(),
-                        'body' => $result->body()
+                if ($application->ticket[0] == 'S' || $application->ticket == 'J') {
+                    $currentTimestamp = strtotime("now");
+                    $key = config('services.external_api.symmetric');
+                    $payload = [
+                        "iss" => "lumen-jwt",
+                        "iat" => $currentTimestamp
                     ];
-                    error_log(json_encode($tes));
-                    throw new \Exception("error ketika menyimpan ke citigov");
+
+                    $token = JWT::encode($payload, $key, 'HS256');
+                    $data = [
+                        "id_layanan" => $application->cat->id_citigov,
+                        "nomor_tiket" => $application->ticket,
+                        "status" => $status,
+                    ];
+                    $result = Http::withHeaders([
+                        'token' => $token,
+                        'symmetric' => $key,
+                    ])->post($ext_url . "application/ticket/update", $data);
+                    if ($result->failed()) {
+                        $tes = [
+                            'status' => $result->status(),
+                            'body' => $result->body()
+                        ];
+                        error_log(json_encode($tes));
+                        throw new \Exception("error ketika menyimpan ke citigov");
+                    }
+                } else {
+                    Log::info('disini pakai put');
+                    $data = [
+                        "symetric_key" => $key,
+                        "ticket_number" => $application->ticket,
+                        "status" => $status,
+                    ];
+                    $result = Http::put($ext_url . "integration/client/ticket/change-status", $data);
+                    Log::info($result);
+                    Log::info($result->status());
+
+                    // if ($result->failed()) {
+                    //     $tes = [
+                    //         'status' => $result->status(),
+                    //         'body' => $result->body()
+                    //     ];
+                    //     error_log(json_encode($tes));
+                    //     throw new \Exception("error ketika menyimpan ke citigov");
+                    // }
                 }
             }
         } catch (\Throwable $th) {
@@ -462,27 +485,39 @@ class ApplicationController extends Controller
                 $hamlet = Hamlet::where('name', $application->hamlet)->first();
                 return response()->json($hamlet);
                 // kirim ke desa
-                kirimEmail(
-                    $hamlet->ward->user->email,
-                    'Permohonan ditolak',
-                    'Permohonan ' . $application->category . 'dengan NIK : ' . $application->id_card_number . ' telah ditolak. Alasan penolakan : ' . $application->status_description,
-                );
+                // kirimEmail(
+                //     $hamlet->ward->user->email,
+                //     'Permohonan ditolak',
+                //     'Permohonan ' . $application->category . 'dengan NIK : ' . $application->id_card_number . ' telah ditolak. Alasan penolakan : ' . $application->status_description,
+                // );
+                Mail::to($hamlet->ward->user->email)->send(new RejectMail($application, true));
+
+
                 // Mail::to($hamlet->ward->user->email)->queue(
                 //     new SimpleMail('Permohonan ' . $application->category  . 'dengan NIK : ' . $application->id_card_number . ' telah ditolak. Alasan penolakan : ' . $application->status_description, 'Permohonan ditolak', false)
                 // );
             }
-            kirimEmail(
-                $application->email,
-                'Permohonan ditolak',
-                'Permohonan ' . $application->category . ' telah ditolak. Alasan penolakan : ' . $application->status_description,
-            );
+            // kirimEmail(
+            //     $application->email,
+            //     'Permohonan ditolak',
+            //     'Permohonan ' . $application->category . ' telah ditolak. Alasan penolakan : ' . $application->status_description,
+            // );
+            Mail::to($application->email)->send(new RejectMail($application, false));
+
             // Mail::to($application->email)->queue(
             //     new SimpleMail('Permohonan ' . $application->category . ' telah ditolak. Alasan penolakan : ' . $application->status_description, 'Permohonan ditolak', false)
             // );
         }
 
         session()->flash('message', 'Sukses mengubah status');
-        return redirect()->route('application.index');
+        // return response()->json([
+        //     'status' => 200
+        // ]);
+        if ($request->status == 'CANCEL') {
+            return redirect()->route('application.index');
+        } else {
+            return response()->json(200);
+        }
     }
 
     public function count()
