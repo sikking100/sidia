@@ -28,7 +28,7 @@ export default function ForgotPassword({ status, role }: { status?: string, role
                     <div className="vertical-align-middle auth-main" style={
                         role == 'desa' ? {
                             backgroundColor: "#0f65ad",
-                            backgroundImage: "url('/assets/bgbola.png')",
+                            backgroundImage: "url('/assets/bgbola.webp')",
                             backgroundSize: "93%",
                             backgroundRepeat: "no-repeat",
                             // top: -10,
@@ -36,7 +36,7 @@ export default function ForgotPassword({ status, role }: { status?: string, role
                             backgroundPosition: "right"
                         } : {
                             backgroundColor: "#052f73",
-                            backgroundImage: "url('/assets/bglogin.png')",
+                            backgroundImage: "url('/assets/bglogin.webp')",
                             backgroundSize: "93%",
                             backgroundRepeat: "no-repeat",
                             // top: -10,

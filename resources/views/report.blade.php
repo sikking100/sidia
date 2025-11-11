@@ -70,7 +70,7 @@
 
       <tr>
         <td style="width: 0px">
-          <img src="{{ public_path('assets/logo.png') }}" style="height: 6.2rem; display: block; margin-left: auto; margin-right: auto;" />
+          <img src="{{ public_path('assets/logo.webp') }}" style="height: 6.2rem; display: block; margin-left: auto; margin-right: auto;" />
         </td>
         <td colspan="5" style="width: 100%">
           <span class="h1">PEMERINTAH KABUPATEN MOROWALI UTARA</span>

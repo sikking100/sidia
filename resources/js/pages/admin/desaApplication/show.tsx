@@ -1,6 +1,6 @@
 import CustomModal from "@/components/custom-modal";
 import PageHeader from "@/components/page-header";
-import { checkFile, getFileType, getStatus } from "@/hooks/functions";
+import { checkFile, getFileType, getStatus, getStatusBerkas } from "@/hooks/functions";
 import useCustomModal from "@/hooks/use-modal";
 import Admin from "@/layouts/admin";
 import { Applicant, CustomComment, Filess, FlashProps, User } from "@/types";
@@ -377,6 +377,7 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Nama Lampiran</th>
+                                                    <th>Status</th>
                                                     <th>Aksi</th>
                                                 </tr>
                                             </thead>
@@ -404,6 +405,7 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                                             <tr key={i}>
                                                                 <td>{i + 1}</td>
                                                                 <td>{e.name}</td>
+                                                                <td>{getStatusBerkas(e.status ?? 0)}</td>
                                                                 <td>
                                                                     {
                                                                         checkFile(e.name, e.id, application.filess) !== undefined ?
@@ -510,8 +512,8 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                                 return (
                                                     <li className="clearfix" key={i}>
                                                         <div className={`message-data ${e.guest_email !== null ? "" : "text-right"}`}>
-                                                            <span className="message-data-time">{e.guest_email === null ? 'OPERATOR' : 'PEMOHON'} {dateCreate} <TimeAgo date={e.created_at} formatter={intlFormatter} /></span>
-                                                            {e.guest_email === null && <img alt="avatar" src={`../../storage/images/${application.images}`} />}
+                                                            <span className="message-data-time">{e.guest_email === null ? 'OPERATOR' : 'PEMOHON'}</span>
+                                                            <div>{dateCreate} <TimeAgo date={e.created_at} formatter={intlFormatter} /> {e.guest_email !== null && <img alt="avatar" src={`../../storage/images/${application.images}`} />}</div>
                                                         </div>
                                                         <div className={`message ${e.guest_email !== null ? "my-message" : "other-message float-right"}`}>
                                                             {e.content}
@@ -562,6 +564,7 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                                         formData.append('content', content)
                                                         formData.append('application_id', String(application?.id))
                                                         formData.append('guest_email', String(user.email))
+                                                        formData.append('user_id', String(user.id))
                                                         formData.append('guest_name', String(user.name))
                                                         formData.append('category', String(application?.category))
 
@@ -576,7 +579,7 @@ export default function DesaApplicationShow({ application, flash }: Props) {
                                                                 {
                                                                     content: response.data.content,
                                                                     created_at: response.data.created_at,
-                                                                    user_id: null,
+                                                                    user_id: user.id,
                                                                     guest_name: user.name,
                                                                     guest_email: user.email
                                                                 }

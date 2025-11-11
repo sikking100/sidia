@@ -82,7 +82,6 @@ export default function PermohonanIndex(props: Props) {
         e.preventDefault();
         get(route('application.index'), {
             preserveState: true, replace: true,
-
         });
     };
 
@@ -319,6 +318,7 @@ export default function PermohonanIndex(props: Props) {
                                                     <td className="whitespace-nowrap font-bold text-gray-900 dark:text-white">
                                                         <p>{getStatus(d.status ?? '')} </p>
                                                         <p className={'text-green-500'}>{(d.filess !== null && d.filess!.length !== 0 && d.filess!.filter((e) => e.name.includes('Hasil')).length !== 0) ? '(Berkas terupload)' : ''}</p>
+                                                        <p>{d.status === 'COMPLETED_FILE' && 'Berkas telah terkirim ke email'}</p>
                                                     </td>
                                                     <td>
                                                         {d.category}

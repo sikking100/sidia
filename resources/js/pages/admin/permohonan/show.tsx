@@ -1,5 +1,5 @@
 import PageHeader from "@/components/page-header";
-import { checkFile, getFileType, getStatus, } from "@/hooks/functions";
+import { checkFile, getFileType, getStatus, getStatusBerkas, } from "@/hooks/functions";
 import Admin from "@/layouts/admin";
 import { Applicant, CustomComment, Filess, FlashProps, Hamlet, User } from "@/types";
 import { PageProps } from "node_modules/@inertiajs/core/types/types";
@@ -197,6 +197,8 @@ export default function PermohonanDetail({ application, flash }: Props) {
             setContent(file.name)
         }
     };
+    const cekTiket = application.ticket?.at(0) === 'S' || application.ticket?.at(0) === 'J'
+    console.log(cekTiket);
 
     return (
         <Admin>
@@ -319,9 +321,9 @@ export default function PermohonanDetail({ application, flash }: Props) {
                             <div className="body">
                                 <div className="application">
                                     <h3>{application.category}</h3>
-                                    <div>
+                                    {cekTiket && <div>
                                         <Image src={`../../storage/images/${application.images}`} roundedCircle style={{ width: '20vh' }} />
-                                    </div>
+                                    </div>}
                                     <div className="status">
                                         {(application.status === 'COMPLETED' || application.status === 'COMPLETED_FILE') && <MdVerified className='text-success mr-1' size={'30'} />}
                                         {application.status === 'DEFFICIENT' || application.status === 'REVISED' && <MdCreate className='mr-1' color="orange" size={'30'} />}
@@ -582,12 +584,13 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                         <BiFile size={25} />
                                         <span>Lampiran Permohonan : </span>
                                     </div>
-                                    <div className="table container">
+                                    <div className="table container m-2">
                                         <Table striped bordered hover size="sm">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Nama Lampiran</th>
+                                                    <th>Status</th>
                                                     <th>Aksi</th>
                                                 </tr>
                                             </thead>
@@ -616,6 +619,7 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                                             <tr key={i}>
                                                                 <td>{i + 1}</td>
                                                                 <td>{e.name}</td>
+                                                                <td>{getStatusBerkas(e.status ?? 0)}</td>
                                                                 <td>
                                                                     {
                                                                         checkFile(e.name, e.id, application.filess) !== undefined ?
@@ -643,7 +647,7 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                         <BiFile size={25} />
                                         <span>Berkas Hasil : </span>
                                     </div>
-                                    <div className="table">
+                                    <div className="table m-2">
                                         <Table striped bordered hover size="sm">
                                             <thead>
                                                 <tr>
@@ -701,7 +705,7 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                                     <img alt="avatar" src={`../../storage/images/${application.images}`} />
                                                 </Link>
                                                 <div className="chat-about">
-                                                    <h6 className="m-b-0">Pemohon : {application.name}</h6>
+                                                    <h6 className="m-b-0">Pemohon : {application.ticket?.at(0) === 'J' ? 'Jemput Bola' : application.name}</h6>
                                                     <small>{getStatus(application.status ?? '')}</small>
                                                 </div>
                                             </div>
@@ -776,23 +780,6 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                     </div>
                                     <div className="chat-history">
                                         <ul className="m-b-0">
-                                            {/* <li className="clearfix">
-                                                <div className="message-data text-right">
-                                                    <span className="message-data-time">PEMOHON 10:10 AM, Today</span>
-                                                </div>
-                                                <div className="message other-message float-right">
-                                                    {" "}
-                                                    Hi Aiden, how are you? How is the project coming along?{" "}
-                                                </div>
-                                            </li>
-                                            <li className="clearfix">
-                                                <div className="message-data">
-                                                    <span className="message-data-time">OPERATOR 10:12 AM, Today</span>
-                                                </div>
-                                                <div className="message my-message">
-                                                    Are we meeting today?
-                                                </div>
-                                            </li> */}
                                             {comments.map((e, i) => {
                                                 const dateCreated = Date.parse(e.created_at ?? '')
                                                 const dateCreate = Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(dateCreated)
@@ -803,7 +790,7 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                                     <li className="clearfix" key={i}>
                                                         <div className={`message-data ${e.user_id !== null ? "" : "text-right"}`}>
                                                             <span className="message-data-time">{e.user_id !== null ? 'OPERATOR' : 'PEMOHON'} {dateCreate} <TimeAgo date={e.created_at} formatter={intlFormatter} /></span>
-                                                            {e.user_id !== null && <img alt="avatar" src={`../../storage/images/${application.images}`} />}
+                                                            {e.user_id === null && <img alt="avatar" src={`../../storage/images/${application.images}`} />}
                                                         </div>
                                                         <div className={`message ${e.user_id !== null ? "my-message" : "other-message float-right"}`}>
                                                             {e.content}

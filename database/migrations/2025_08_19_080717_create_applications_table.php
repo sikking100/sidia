@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('religion', 255);
             $table->string('district', 255);
             $table->string('ward', 255);
-            $table->string('hamlet', 255);
+            $table->string('hamlet', 255)->nullable();
             $table->text('images');
             $table->text('description')->nullable();
             $table->text('problems')->nullable();

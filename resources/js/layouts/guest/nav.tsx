@@ -28,7 +28,7 @@ export function GuestNavbar() {
                     <div className="navbar-brand">
                         <a href={sidia} className="d-flex">
                             <img
-                                src="../../assets/logo.png"
+                                src="../../assets/logo.webp"
                                 alt="Logo Dukcapil"
                                 style={{ height: 25, width: 25 }}
                                 className="img-responsive logo pr-2"

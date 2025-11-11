@@ -527,4 +527,23 @@ class ApplicationController extends Controller
             'count' => count($c)
         ]);
     }
+
+    public function photo(Request $request)
+    {
+        $url = config('services.external_api.url');
+        $sym = config('services.external_api.symmetric');
+        $response = Http::withHeaders([
+            'symetric' => $sym,
+            'Accept' => 'image/jpeg',
+        ])->get($url . "files-sym/" . $request->name);
+        if ($response->successful()) {
+            $contentType = $response->header('Content-Type', 'application/octet-stream');
+            $filename = 'photo.jpg'; // atau ambil dari Content-Disposition kalau tersedia
+
+            return response($response->body(), 200)
+                ->header('Content-Type', $contentType)
+                ->header('Content-Disposition', 'inline; filename="' . $filename . '"');
+        }
+        return abort(404, 'Image not found');
+    }
 }

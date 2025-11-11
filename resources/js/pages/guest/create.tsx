@@ -109,6 +109,8 @@ export default function GuestCreate({ category, menu, application, districts }: 
 
                 }
             })
+            // console.log(route('form.action'));
+
         }
         return
     }

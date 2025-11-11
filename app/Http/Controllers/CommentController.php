@@ -6,7 +6,9 @@ use App\Mail\SendAttachmentMail;
 use App\Models\Application;
 use App\Models\Comment;
 use App\Models\File;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class CommentController extends Controller
@@ -24,6 +26,7 @@ class CommentController extends Controller
         if ($request->has('file')) {
             // cek apakah desa atau bukan
             if ($request->has('hamlet')) {
+                Log::info('ada hamletnya');
                 $applicant = Application::find($request->application_id);
                 $nameExt = time() . '.' . $request->file->extension();
                 $request->file->storeAs($request->category, $nameExt, 'public');
@@ -45,7 +48,9 @@ class CommentController extends Controller
                 $applicant->save();
             }
         }
-        if ($request->has('user_id')) {
+
+        $user = User::find($request->user_id);
+        if ($user->role == 'superadmin') {
             $comment->guest_email = null;
         }
         $comment->save();

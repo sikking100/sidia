@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('menu_id')->constrained()->onDelete('cascade');
             $table->text('name');
             $table->text('link')->nullable();
+            $table->tinyInteger('require')->default(0);
         });
     }
 

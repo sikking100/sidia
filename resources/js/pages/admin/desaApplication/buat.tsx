@@ -166,7 +166,7 @@ export default function DesaApplicationBuat() {
                                     </Col>
                                     <Col xs={12} md={4} lg={4} xl={3} sm={3}>
                                         <div className='card'>
-                                            <Image src='../../assets/10.png' rounded className='img-fluid' />
+                                            <Image src='../../assets/10.webp' rounded className='img-fluid' />
                                             <div>
                                                 <div className="header">
                                                     <a href={route('desa.create', 'Surat-Keterangan-Pindah-Luar-Negeri')}>
@@ -242,7 +242,7 @@ export default function DesaApplicationBuat() {
                                     </Col>
                                     <Col xs={12} md={4} lg={4} xl={3} sm={3}>
                                         <div className='card'>
-                                            <Image src='../../assets/12.png' rounded className='img-fluid' />
+                                            <Image src='../../assets/12.webp' rounded className='img-fluid' />
                                             <div>
                                                 <div className="header">
                                                     <Dropdown as="ul" className="header-dropdown">
@@ -275,7 +275,7 @@ export default function DesaApplicationBuat() {
                                     </Col>
                                     <Col xs={12} md={4} lg={4} xl={3} sm={3}>
                                         <div className='card'>
-                                            <Image src='../../assets/13.png' rounded className='img-fluid' />
+                                            <Image src='../../assets/13.webp' rounded className='img-fluid' />
                                             <div>
                                                 <div className="header">
                                                     <Dropdown as="ul" className="header-dropdown">
@@ -364,7 +364,7 @@ export default function DesaApplicationBuat() {
                                     </Col>
                                     <Col xs={12} md={4} lg={4} xl={3} sm={3}>
                                         <div className='card'>
-                                            <Image src='../../assets/14.png' rounded className='img-fluid' />
+                                            <Image src='../../assets/14.webp' rounded className='img-fluid' />
                                             <div>
                                                 <div className="header">
                                                     <a href={route('desa.create', 'Klaim-JKM')}>

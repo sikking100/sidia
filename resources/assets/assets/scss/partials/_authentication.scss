@@ -2,13 +2,13 @@
 
 body,
 div#wrapper {
-    &:after, &:before {
+    &:after,
+    &:before {
         background-color: #49c5b6;
     }
 }
-.auth-main{
-    // background: url(../../../images/bglogin.png) no-repeat top left fixed;
-    
+.auth-main {
+    // background: url(../../../images/bglogin.webp) no-repeat top left fixed;
 
     // &::before{
     //     content: '';
@@ -33,8 +33,8 @@ div#wrapper {
     //     height: 100%;
     //     z-index: -2;
     // }
-    .card{
-        padding:10px;
+    .card {
+        padding: 10px;
     }
 
     #home {
@@ -52,41 +52,39 @@ div#wrapper {
             font-size: 30px;
             margin-left: 20px;
             color: white;
-	    }
+        }
     }
 }
 
-
 .auth-box {
-	width: 300px;
-	height: auto;
+    width: 300px;
+    height: auto;
     margin-left: 95px;
 
-
-    .top{
+    .top {
         @extend .m-b-30;
-        img{
+        img {
             width: 130px;
         }
     }
 
-	.form-auth-small {
-		.btn{
+    .form-auth-small {
+        .btn {
             @extend .m-t-20;
-		}
+        }
 
-		.element-left {
-			float: left;
-		}
+        .element-left {
+            float: left;
+        }
 
-		.element-right {
-			float: right;
-		}
+        .element-right {
+            float: right;
+        }
 
-		.bottom {
+        .bottom {
             @extend .m-t-20;
-			@extend .align-center;
-		}
+            @extend .align-center;
+        }
     }
 
     .lead {
@@ -95,40 +93,39 @@ div#wrapper {
         font-size: 18px;
     }
 
-	.helper-text {
+    .helper-text {
         color: $color-muted;
         @extend .displayblock;
-	}
+    }
 
-	.btn-signin-social {
+    .btn-signin-social {
         @extend .displayblock;
         @extend .m-b-5;
-		padding: 10px 22px;
-		width: 100%;
-		background-color: $col-white;
-		border-color: $grey-200;
+        padding: 10px 22px;
+        width: 100%;
+        background-color: $col-white;
+        border-color: $grey-200;
 
-		&:hover,
-		&:focus {
-			background-color: $grey-200;
-		}
+        &:hover,
+        &:focus {
+            background-color: $grey-200;
+        }
 
-		i {
-			font-size: 16px;
-			margin: 5px;
-		}
-	}
+        i {
+            font-size: 16px;
+            margin: 5px;
+        }
+    }
 
-	@include max-screen($break-1280 - 1px) {
+    @include max-screen($break-1280 - 1px) {
+    }
 
-	}
-
-	@include max-screen($break-medium) {
+    @include max-screen($break-medium) {
         width: 80%;
         margin: 0 auto;
-	}
+    }
 
-	@include max-screen($break-xsmall) {
+    @include max-screen($break-xsmall) {
         width: 90%;
-	}
+    }
 }

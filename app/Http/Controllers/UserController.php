@@ -24,7 +24,13 @@ class UserController extends Controller
             if (is_numeric($query)) {
                 $q->where('phone', $query);
             } else {
-                $q->where('name', 'LIKE', '%' . $query . '%');
+                $q->where(function ($sub) use ($query) {
+                    $sub->where('name', 'LIKE', "%{$query}%")
+                        ->orWhereHas('ddesa', function ($q2) use ($query) {
+                            // sesuaikan nama kolom di tabel wards
+                            $q2->where('name', 'LIKE', "%{$query}%");
+                        });
+                });
             }
         }
         $q->whereIn('role', ['desa', 'bpjs']);

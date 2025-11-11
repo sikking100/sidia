@@ -77,6 +77,7 @@ class GuestController extends Controller
 
     public function formAction(StoreApplicationRequest $request)
     {
+        dd($request->all());
         // dd(config('custom.email_dukcapil'));
         // dd($request->email);
         $request->validate([
