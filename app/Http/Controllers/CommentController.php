@@ -28,10 +28,11 @@ class CommentController extends Controller
             if ($request->has('hamlet')) {
                 Log::info('ada hamletnya');
                 $applicant = Application::find($request->application_id);
-                $nameExt = time() . '.' . $request->file->extension();
+
+                $nameExt = $request->filename;
                 $request->file->storeAs($request->category, $nameExt, 'public');
                 $files = new File;
-                $files->name = 'Hasil-' . $request->application_id;
+                $files->name = 'Hasil-' . $nameExt;
                 $files->place = $request->category . '/' . $nameExt;
                 $applicant->status = 'COMPLETED_FILE';
                 $applicant->status_description = 'Berkas sudah diupload';

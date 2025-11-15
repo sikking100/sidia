@@ -833,6 +833,7 @@ export default function PermohonanDetail({ application, flash }: Props) {
                                                         const formData = new FormData()
                                                         if (file !== null) {
                                                             formData.append('file', file)
+                                                            // formData.append('filename', content)
                                                         }
                                                         if (application.hamlet !== null && application.hamlet !== undefined && application.hamlet !== '') {
                                                             formData.append('hamlet', application.hamlet)

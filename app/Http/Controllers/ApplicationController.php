@@ -370,12 +370,8 @@ class ApplicationController extends Controller
 
     public function show(Application $application)
     {
-
-        $files = $application->filess;
         $hamlet = $application->hamlet;
-        $menu = Menu::firstWhere('name', $application->category);
-        $requirements = $menu->requirements;
-        return Inertia::render('admin/permohonan/show', compact('application', 'files', 'menu', 'requirements', 'hamlet'));
+        return Inertia::render('admin/permohonan/show', compact('application', 'hamlet'));
     }
 
     public function edit(Application $application)
