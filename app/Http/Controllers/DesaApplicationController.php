@@ -60,6 +60,24 @@ class DesaApplicationController extends Controller
         return response()->json($years);
     }
 
+    private function isKelurahan($user = null): bool
+    {
+        $user = $user ?? Auth::user();
+        if (!$user) {
+            return false;
+        }
+
+        $wardName = strtoupper(trim($user->ddesa->name ?? ''));
+        $userName = strtoupper(trim($user->name ?? ''));
+
+        return str_starts_with($wardName, 'KEL.')
+            || str_starts_with($wardName, 'KEL ')
+            || str_starts_with($wardName, 'KELURAHAN')
+            || str_starts_with($userName, 'KEL.')
+            || str_starts_with($userName, 'KEL ')
+            || str_starts_with($userName, 'KELURAHAN');
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -68,10 +86,11 @@ class DesaApplicationController extends Controller
     public function create($category)
     {
         $user = Auth::user();
-        $hamlets = $user->ddesa->hamlets;
+        $isKelurahan = $this->isKelurahan($user);
+        $hamlets = $isKelurahan ? [] : $user->ddesa->hamlets;
         $menu = Menu::firstWhere('name', $category);
         $requirements = $menu->requirements;
-        return Inertia::render('admin/desaApplication/create', compact('menu', 'hamlets', 'category', 'requirements'));
+        return Inertia::render('admin/desaApplication/create', compact('menu', 'hamlets', 'category', 'requirements', 'isKelurahan'));
     }
 
     /**
@@ -86,14 +105,17 @@ class DesaApplicationController extends Controller
         $request->validate([
             'images' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
             'filessss.*.filenya' => ['image', 'mimes:jpeg,png,jpg,gif,svg'],
+            'hamlet' => ['nullable', 'string'],
+            'ward' => ['nullable', 'string'],
         ]);
 
         // try {
         $user = Auth::user();
+        $isKelurahan = $this->isKelurahan($user);
         $applicant = Application::make($request->all());
-        $applicant->hamlet = $request->hamlet;
-        $applicant->ward = $user->ddesa->name;
-        $applicant->district = $user->ddesa->district->name;
+        $applicant->hamlet = $isKelurahan ? null : ($request->hamlet ?: null);
+        $applicant->ward = $user->ddesa->name ?? $request->ward ?? '';
+        $applicant->district = $user->ddesa->district->name ?? $request->district ?? '';
         $this->upload->uploadImages($request, 'images', $applicant);
         $applicant->save();
 
@@ -218,11 +240,12 @@ class DesaApplicationController extends Controller
         $application = Application::find($id);
         $filess = $application->filess;
         $user = Auth::user();
-        $hamlets = $user->ddesa->hamlets;
+        $isKelurahan = $this->isKelurahan($user);
+        $hamlets = $isKelurahan ? [] : $user->ddesa->hamlets;
         $category = $application->category;
         $menu = Menu::firstWhere('name', $category);
         $requirements = $menu->requirements;
-        return Inertia::render('admin/desaApplication/edit', compact('filess', 'hamlets', 'menu', 'requirements', 'application', 'category'));
+        return Inertia::render('admin/desaApplication/edit', compact('filess', 'hamlets', 'menu', 'requirements', 'application', 'category', 'isKelurahan'));
     }
 
     /**
@@ -271,6 +294,15 @@ class DesaApplicationController extends Controller
         }
         $application->status = 'REVISED';
         $application->status_description = 'Permohonan sudah direvisi';
+
+        $user = Auth::user();
+        $isKelurahan = $this->isKelurahan($user);
+        if ($isKelurahan) {
+            $application->hamlet = null;
+        } elseif ($request->has('hamlet')) {
+            $application->hamlet = $request->hamlet ?: null;
+        }
+
         $application->save();
 
         $hamlet = Hamlet::find($application->hamlet_id);
@@ -284,15 +316,14 @@ class DesaApplicationController extends Controller
      * @param  \App\Models\DesaApplication  $desaApplication
      * @return \Illuminate\Http\Response
      */
-    // public function destroy(DesaApplication $desaApplication)
-    // {
-    //     $this->upload->deleteKK($desaApplication->category, $desaApplication);
-    //     $this->upload->deleteKTP($desaApplication->category, $desaApplication);
-    //     $this->upload->deleteSurat($desaApplication->category, $desaApplication);
-    //     $this->upload->deleteImages('applicant', $desaApplication);
-    //     $desaApplication->delete();
-    //     return redirect()->route('desa.index');
-    // }
+    public function destroy($id)
+    {
+        $application = Application::findOrFail($id);
+        $application->delete();
+        session()->flash('message', 'Berhasil menghapus data');
+
+        return response()->json(200);
+    }
 
     // public function ready(Request $request)
     // {

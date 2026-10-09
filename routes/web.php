@@ -64,6 +64,7 @@ Route::middleware(['auth', 'role:desa'])->group(function () {
     Route::get('/desa/{id}', [DesaApplicationController::class, 'show'])->name('desa.show');
     Route::get('/desa/{id}/edit', [DesaApplicationController::class, 'edit'])->name('desa.edit');
     Route::put('/desa/{id}', [DesaApplicationController::class, 'update'])->name('desa.update');
+    Route::delete('/desa/{id}', [DesaApplicationController::class, 'destroy'])->name('desa.destroy');
     Route::put('/desa/{id}/status', [DesaApplicationController::class, 'update_status'])->name('desa.status');
     Route::resource('hamlet', HamletController::class);
     Route::get('/hamlet-paging', [HamletController::class, 'pagination']);

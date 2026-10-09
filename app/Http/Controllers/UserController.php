@@ -25,12 +25,12 @@ class UserController extends Controller
                 $q->where('phone', $query);
             } else {
                 $q->where(function ($sub) use ($query) {
-                    $sub->where('name', 'LIKE', "%{$query}%")
-                        ->orWhereHas('ddesa', function ($q2) use ($query) {
-                            // sesuaikan nama kolom di tabel wards
-                            $q2->where('name', 'LIKE', "%{$query}%");
-                        });
+            $sub->where('name', 'LIKE', "%{$query}%")
+                ->orWhereHas('ddesa', function ($q2) use ($query) {
+                    // sesuaikan nama kolom di tabel wards
+                    $q2->where('name', 'LIKE', "%{$query}%");
                 });
+        });
             }
         }
         $q->whereIn('role', ['desa', 'bpjs']);
@@ -90,7 +90,15 @@ class UserController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
+        $pass = generateStrongPassword(6);
+        $user->password = bcrypt($pass);
         $user->save();
+        
+        Mail::html('Ini adalah password terbaru Anda <strong>' . $pass . '</strong>.  Silakan untuk mengubah password tersebut setelah Anda login.', function ($message) use ($request) {
+            $message->to($request->email)
+                ->subject('Password baru');
+        });
+        
 
         return redirect()->route('user.index')->with('message', 'Data berhasil diubah');
     }
@@ -150,7 +158,7 @@ class UserController extends Controller
 
         return back()->with('status', __('Silakan cek email Anda'));
     }
-
+    
     public function bpjs($id)
     {
         $user = User::find($id);

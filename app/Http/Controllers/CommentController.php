@@ -8,7 +8,6 @@ use App\Models\Comment;
 use App\Models\File;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class CommentController extends Controller
@@ -26,7 +25,6 @@ class CommentController extends Controller
         if ($request->has('file')) {
             // cek apakah desa atau bukan
             if ($request->has('hamlet')) {
-                Log::info('ada hamletnya');
                 $applicant = Application::find($request->application_id);
 
                 $nameExt = $request->filename;

@@ -199,6 +199,8 @@ export default function PermohonanDetail({ application, flash }: Props) {
     };
     const cekTiket = application.ticket?.at(0) === 'S' || application.ticket?.at(0) === 'J'
     console.log(cekTiket);
+    console.log(application);
+    
 
     return (
         <Admin>

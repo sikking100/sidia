@@ -16,9 +16,11 @@ interface Props {
     menu: Menu
     category: string
     application?: DesaApplication
+    isKelurahan?: boolean
 }
 
-export default function DesaApplicationForm({ hamlets, menu, category, application }: Props) {
+export default function DesaApplicationForm({ hamlets, menu, category, application, isKelurahan }: Props) {
+    const hideHamlet = isKelurahan ?? (hamlets == null || hamlets.length === 0);
 
     const title = application !== null && application !== undefined ? 'Ubah' : 'Simpan'
     const breadcumb = application !== null && application !== undefined ? 'Revisi' : 'Buat'
@@ -81,7 +83,7 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
                 formData.append(`pendukung[${i}][filenya]`, v?.filenya ?? '')
             })
 
-            formData.append('hamlet', data.hamlet);
+            formData.append('hamlet', hideHamlet ? '' : (data.hamlet ?? ''));
             formData.append('phone', data.phone);
             formData.append('religion', data.religion);
             formData.append('sex', data.sex);
@@ -251,7 +253,7 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
                                             </Col>
                                         </Row>
                                         <Row>
-                                            <Col className="mb-3" xs={12} sm={4}>
+                                            <Col className="mb-3" xs={12} sm={hideHamlet ? 6 : 4}>
                                                 <InputGroup>
                                                     <InputGroup.Prepend>
                                                         <InputGroup.Text style={{ height: '36px' }}><FaRestroom /></InputGroup.Text>
@@ -274,7 +276,7 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
                                                     </Form.Control.Feedback>
                                                 </InputGroup>
                                             </Col>
-                                            <Col className="mb-3" xs={12} sm={4}>
+                                            <Col className="mb-3" xs={12} sm={hideHamlet ? 6 : 4}>
                                                 <Form.Control as={"select"}
                                                     required
                                                     onChange={e => setData('religion', e.target.value)}
@@ -295,28 +297,30 @@ export default function DesaApplicationForm({ hamlets, menu, category, applicati
                                                 </Form.Control.Feedback>
                                             </Col>
 
-                                            <Col className="mb-3" xs={12} sm={4}>
-                                                <InputGroup>
-                                                    <InputGroup.Prepend className="sm">
-                                                        <InputGroup.Text style={{ height: '36px' }}><GiVillage /></InputGroup.Text>
-                                                    </InputGroup.Prepend>
-                                                    <Form.Control
-                                                        required
-                                                        value={data.hamlet}
+                                            {!hideHamlet && (
+                                                <Col className="mb-3" xs={12} sm={4}>
+                                                    <InputGroup>
+                                                        <InputGroup.Prepend className="sm">
+                                                            <InputGroup.Text style={{ height: '36px' }}><GiVillage /></InputGroup.Text>
+                                                        </InputGroup.Prepend>
+                                                        <Form.Control
+                                                            required
+                                                            value={data.hamlet}
 
-                                                        as={"select"} onChange={e => setData('hamlet', e.target.value)}
-                                                        isInvalid={errors.hamlet != null} >
-                                                        <option value={''}>-- Pilih Dusun --</option>
-                                                        {hamlets?.map((e, i) =>
-                                                            <option key={i} value={e.name}>{e.name}</option>
-                                                        )}
+                                                            as={"select"} onChange={e => setData('hamlet', e.target.value)}
+                                                            isInvalid={errors.hamlet != null} >
+                                                            <option value={''}>-- Pilih Dusun --</option>
+                                                            {hamlets?.map((e, i) =>
+                                                                <option key={i} value={e.name}>{e.name}</option>
+                                                            )}
 
-                                                    </Form.Control>
-                                                    <Form.Control.Feedback type="invalid">
-                                                        {errors.hamlet}
-                                                    </Form.Control.Feedback>
-                                                </InputGroup>
-                                            </Col>
+                                                        </Form.Control>
+                                                        <Form.Control.Feedback type="invalid">
+                                                            {errors.hamlet}
+                                                        </Form.Control.Feedback>
+                                                    </InputGroup>
+                                                </Col>
+                                            )}
                                         </Row>
                                         {data.category === 'PENGADUAN' && <Row>
                                             <Col className="mb-3">

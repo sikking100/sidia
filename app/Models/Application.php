@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File as FileFacade;
 
 class Application extends Model
 {
@@ -47,6 +49,48 @@ class Application extends Model
             // id dari primary key / id category dari citigov - tanggal sekarang / bulan / tahun / 
             $application->ticket = $prefix . $application->id . "/" . $application->cat->id_citigov . "-" .  $application->created_at->format('d') . "/" . $application->created_at->format('m') . "/" . $application->created_at->format('Y') . "/" . $application->cat->id . "-SIDIA-" . $application->id;
             $application->save();
+        });
+
+        static::deleting(function ($application) {
+            // Hapus foto pemohon (images)
+            if (!empty($application->images)) {
+                if (Storage::disk('public')->exists('images/' . $application->images)) {
+                    Storage::disk('public')->delete('images/' . $application->images);
+                }
+                if (FileFacade::exists(public_path('storage/images/' . $application->images))) {
+                    FileFacade::delete(public_path('storage/images/' . $application->images));
+                }
+            }
+
+            // Hapus berkas persyaratan (filess)
+            if ($application->filess) {
+                foreach ($application->filess as $file) {
+                    if (!empty($file->place)) {
+                        if (Storage::disk('public')->exists($file->place)) {
+                            Storage::disk('public')->delete($file->place);
+                        }
+                        if (FileFacade::exists(public_path('storage/' . $file->place))) {
+                            FileFacade::delete(public_path('storage/' . $file->place));
+                        }
+                    }
+                    $file->delete();
+                }
+            }
+
+            // Hapus berkas pendukung (supports)
+            if ($application->supports) {
+                foreach ($application->supports as $support) {
+                    if (!empty($support->place)) {
+                        if (Storage::disk('public')->exists($support->place)) {
+                            Storage::disk('public')->delete($support->place);
+                        }
+                        if (FileFacade::exists(public_path('storage/' . $support->place))) {
+                            FileFacade::delete(public_path('storage/' . $support->place));
+                        }
+                    }
+                    $support->delete();
+                }
+            }
         });
     }
 

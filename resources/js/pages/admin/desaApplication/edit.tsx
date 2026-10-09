@@ -7,12 +7,13 @@ interface Props {
     menu: Menu
     category: string
     application?: DesaApplication
+    isKelurahan?: boolean
 }
 
-export default function DesaApplicationEdit({ hamlets, menu, category, application }: Props) {
+export default function DesaApplicationEdit({ hamlets, menu, category, application, isKelurahan }: Props) {
     return (
         <Admin>
-            <DesaApplicationForm hamlets={hamlets} menu={menu} category={category} application={application} />
+            <DesaApplicationForm hamlets={hamlets} menu={menu} category={category} application={application} isKelurahan={isKelurahan} />
         </Admin>
     )
 }

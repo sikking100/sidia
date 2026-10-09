@@ -373,7 +373,7 @@ export default function PermohonanIndex(props: Props) {
                                                                 onClick={(e) => {
                                                                     e.preventDefault()
                                                                     id.current = d.id ?? 0;
-                                                                    // setShowModalDelete(true);
+                                                                    modalHapus.open();
                                                                 }}
                                                             >
                                                                 <HiTrash className='mr-2' />

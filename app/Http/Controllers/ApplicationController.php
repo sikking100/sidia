@@ -370,8 +370,11 @@ class ApplicationController extends Controller
 
     public function show(Application $application)
     {
+
+          $files = $application->filess;
         $hamlet = $application->hamlet;
-        return Inertia::render('admin/permohonan/show', compact('application', 'hamlet'));
+
+        return Inertia::render('admin/permohonan/show', compact('application', 'files', 'hamlet'));
     }
 
     public function edit(Application $application)
@@ -385,14 +388,9 @@ class ApplicationController extends Controller
 
     public function destroy(Application $application)
     {
-        $this->up->deleteKK($application->category, $application);
-        $this->up->deleteKTP($application->category, $application);
-        $this->up->deleteSurat($application->category, $application);
-        $this->up->deleteImages('applicant', $application);
         $application->delete();
         session()->flash('message', 'Berhasil menghapus data');
 
-        // return redirect()->route('application.index');
         return response()->json(200);
     }
 
@@ -523,7 +521,7 @@ class ApplicationController extends Controller
             'count' => count($c)
         ]);
     }
-
+    
     public function photo(Request $request)
     {
         $url = config('services.external_api.url');
